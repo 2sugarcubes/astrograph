@@ -2,5 +2,11 @@
 name = "astrolabe"
 version = "0.1.0"
 edition = "2021"
+license = "LGPL-3.0-or-later"
+description = "A library dedicated to provinding astronomical predictions of non-chaotic and deterministic bodies."
+readme = "README.md"
+repository = "https://github.com/2sugarcubes/astrolabe"
+keywords = ["astronomy", "physics", "mathmatics"]
+categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
 
 [dependencies]
