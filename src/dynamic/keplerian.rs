@@ -124,15 +124,42 @@ mod tests {
         // from https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
         Keplerian::new_with_period(
             0.01671022,
-            1.00000011 * 499.0,
+            1.00000011 * 499.004839,
             (0.00005 as Float).to_radians(),
             (-11.26064 as Float).to_radians(),
             (102.94719 as Float).to_radians(),
             (100.46435 as Float).to_radians(),
-            365.256 * 24.0,
+            365.25636 * 24.0,
         )
     }
 
+    #[test]
+    fn orbital_period_from_parent_mass() {
+        const PARENT_MASS: Float = 1048.0; // Mass of the sun
+        const CHILD_MASS: Float = 0.003146; // Mass of the earth
+        const SEMI_MAJOR_AXIS: Float = 499.004839; // Semi-major axis of the earth
+        let orbit = Keplerian::new(
+            0.0,
+            SEMI_MAJOR_AXIS,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            PARENT_MASS + CHILD_MASS,
+        );
+        const EXPECTED: Float = 8766.1525;
+
+        println!(
+            "{} - {} = {}",
+            orbit.orbital_period,
+            EXPECTED,
+            (orbit.orbital_period - EXPECTED).abs() / EXPECTED
+        );
+
+        // Get within 0.00005% of the "true" value (note: we aren't taking into account general
+        // relativity, so it should always underestimate the time required)
+        assert!((orbit.orbital_period - EXPECTED).abs() / EXPECTED < 5e-6);
+    }
     #[test]
     fn anomaly_at_epoch() {
         let earth = get_earth();
