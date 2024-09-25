@@ -1,16 +1,16 @@
 use coordinates::three_dimensional::Vector3;
 
-use crate::FLOAT;
+use crate::Float;
 
 use super::Dynamic;
 
 #[derive(Clone, Copy, Debug)]
-struct Fixed {
-    location: Vector3<FLOAT>,
+pub struct Fixed {
+    location: Vector3<Float>,
 }
 
 impl Dynamic for Fixed {
-    fn get_offset(&self, _: crate::FLOAT) -> Vector3<crate::FLOAT> {
+    fn get_offset(&self, _: crate::Float) -> Vector3<crate::Float> {
         self.location
     }
 }
@@ -33,9 +33,9 @@ mod tests {
         };
 
         for t in 0_u8..10 {
-            assert_eq!(fixed_up.get_offset(FLOAT::from(t)), Vector3::UP);
-            assert_eq!(fixed_right.get_offset(FLOAT::from(t)), Vector3::RIGHT);
-            assert_eq!(fixed_back.get_offset(FLOAT::from(t)), Vector3::BACK);
+            assert_eq!(fixed_up.get_offset(Float::from(t)), Vector3::UP);
+            assert_eq!(fixed_right.get_offset(Float::from(t)), Vector3::RIGHT);
+            assert_eq!(fixed_back.get_offset(Float::from(t)), Vector3::BACK);
         }
     }
 }
