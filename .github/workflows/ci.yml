@@ -43,7 +43,7 @@ jobs:
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
 
-  build:
+  code-coverage:
     runs-on: ubuntu-latest
 
     steps:
