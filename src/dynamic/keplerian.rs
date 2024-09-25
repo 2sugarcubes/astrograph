@@ -116,6 +116,7 @@ impl Dynamic for Keplerian {
 }
 
 #[cfg(test)]
+#[allow(clippy::excessive_precision)] // Tests should pass for f64 builds as well
 mod tests {
 
     use super::*;
@@ -123,12 +124,12 @@ mod tests {
     fn get_earth() -> Keplerian {
         // from https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
         Keplerian::new_with_period(
-            0.01671022,
-            1.00000011 * 499.0,
-            (0.00005 as Float).to_radians(),
-            (-11.26064 as Float).to_radians(),
-            (102.94719 as Float).to_radians(),
-            (100.46435 as Float).to_radians(),
+            0.016_710_22,
+            1.000_000_11 * 499.0,
+            (0.000_05 as Float).to_radians(),
+            (-11.260_64 as Float).to_radians(),
+            (102.947_19 as Float).to_radians(),
+            (100.464_35 as Float).to_radians(),
             365.256 * 24.0,
         )
     }
@@ -139,7 +140,7 @@ mod tests {
 
         let anomaly = earth.get_mean_anomality(0.0);
 
-        assert!((anomaly - (100.46435 as Float).to_radians()).abs() < 0.0001);
+        assert!((anomaly - (100.46435 as Float).to_radians()).abs() < 0.000_1);
     }
 
     #[test]
@@ -147,7 +148,7 @@ mod tests {
         let earth = get_earth();
         let anomaly = earth.get_mean_anomality(earth.orbital_period / 4.0);
 
-        assert!((anomaly - (190.46435 as Float).to_radians()).abs() < 0.0001);
+        assert!((anomaly - (190.46435 as Float).to_radians()).abs() < 0.000_1);
     }
 
     #[test]
@@ -155,7 +156,7 @@ mod tests {
         let earth = get_earth();
         let anomaly = earth.get_mean_anomality(earth.orbital_period / 2.0);
 
-        assert!((anomaly - (280.46435 as Float).to_radians()).abs() < 0.0001);
+        assert!((anomaly - (280.46435 as Float).to_radians()).abs() < 0.000_1);
     }
 
     fn get_tau_period() -> Keplerian {
@@ -196,7 +197,7 @@ mod tests {
                 theta.sin()
             );
             assert!((location.x - theta.sin()).abs() < 0.0001);
-            println!("\tSuccess ✅")
+            println!("\tSuccess ✅");
         }
     }
 
