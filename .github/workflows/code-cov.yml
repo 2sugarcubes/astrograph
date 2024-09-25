@@ -1,49 +1,16 @@
-name: CI
+name: Rust
 
 on:
   push:
+    branches: ["master", "dev"]
   pull_request:
-
-permissions:
-  contents: read
+    branches: ["master", "dev"]
 
 env:
-  RUSTFLAGS: -Dwarnings
+  CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: Test suite
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test
-
-  test_windows:
-    name: Test suite (windows)
-    runs-on: windows-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test -- --skip ui --exact
-
-  clippy_pedantic_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Clippy (Pedantic)
-        run: cargo clippy --all-targets --all-features -- -D clippy::pedantic
-
-  clippy_regular_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
-
-  build:
+  code-coverage:
     runs-on: ubuntu-latest
 
     steps:
