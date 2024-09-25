@@ -10,3 +10,6 @@ keywords = ["astronomy", "physics", "mathmatics"]
 categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
 
 [dependencies]
+assert_float_eq = "1.1.3"
+coordinates = "0.3.1"
+quaternion = "1.0.0"
