@@ -9,6 +9,13 @@ pub struct Fixed {
     location: Vector3<Float>,
 }
 
+impl Fixed {
+    #[must_use]
+    pub fn new(location: Vector3<Float>) -> Self {
+        Fixed { location }
+    }
+}
+
 impl Dynamic for Fixed {
     fn get_offset(&self, _: crate::Float) -> Vector3<crate::Float> {
         self.location

@@ -4,6 +4,7 @@ use quaternion::Quaternion;
 
 use super::Dynamic;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Keplerian {
     // Size and shape
     eccentricity: Float,
@@ -116,6 +117,7 @@ impl Dynamic for Keplerian {
 }
 
 #[cfg(test)]
+#[allow(clippy::excessive_precision)] // Tests should pass for f64 builds as well
 mod tests {
 
     use super::*;
@@ -166,7 +168,7 @@ mod tests {
 
         let anomaly = earth.get_mean_anomality(0.0);
 
-        assert!((anomaly - (100.46435 as Float).to_radians()).abs() < 0.0001);
+        assert!((anomaly - (100.46435 as Float).to_radians()).abs() < 0.000_1);
     }
 
     #[test]
@@ -174,7 +176,7 @@ mod tests {
         let earth = get_earth();
         let anomaly = earth.get_mean_anomality(earth.orbital_period / 4.0);
 
-        assert!((anomaly - (190.46435 as Float).to_radians()).abs() < 0.0001);
+        assert!((anomaly - (190.46435 as Float).to_radians()).abs() < 0.000_1);
     }
 
     #[test]
@@ -182,7 +184,7 @@ mod tests {
         let earth = get_earth();
         let anomaly = earth.get_mean_anomality(earth.orbital_period / 2.0);
 
-        assert!((anomaly - (280.46435 as Float).to_radians()).abs() < 0.0001);
+        assert!((anomaly - (280.46435 as Float).to_radians()).abs() < 0.000_1);
     }
 
     fn get_tau_period() -> Keplerian {
@@ -223,7 +225,7 @@ mod tests {
                 theta.sin()
             );
             assert!((location.x - theta.sin()).abs() < 0.0001);
-            println!("\tSuccess ✅")
+            println!("\tSuccess ✅");
         }
     }
 
