@@ -13,3 +13,7 @@ categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
 assert_float_eq = "1.1.3"
 coordinates = "0.3.1"
 quaternion = "1.0.0"
+dyn-clone = "1.0.17"
+
+[dev-dependencies]
+assert_float_eq = "1.1.3"

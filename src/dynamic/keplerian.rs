@@ -4,6 +4,7 @@ use quaternion::Quaternion;
 
 use super::Dynamic;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Keplerian {
     // Size and shape
     eccentricity: Float,
