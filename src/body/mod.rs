@@ -49,11 +49,7 @@ impl Body {
     #[must_use]
     pub fn get_observations_from_here(&self, time: Float) -> Vec<(ArcBody, Vector3<Float>)> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
-        if let Some(p) = &self.parent.clone().and_then(|w| w.upgrade()) {
-            // TODO resolve poisoned locks
-            let parent = p.read().unwrap();
-            results.extend(parent.traverse_up(time, -self.dynamic.get_offset(time)));
-        }
+        results.extend(self.traverse_up(time, Vector3::ORIGIN));
 
         results
     }
@@ -146,6 +142,7 @@ mod tests {
 
     #[test]
     fn make_observations() {
+        const EXPECTED_COUNT: usize = 9;
         let (_root_body, observing_body) = get_toy_example();
 
         let observations = observing_body
@@ -158,18 +155,18 @@ mod tests {
         println!("{sanitised_observations:?}");
         let count = sanitised_observations.len();
         assert!(
-            count <= 8,
-            "Body should not count itself (left: {count}, right: 8)",
+            count <= EXPECTED_COUNT,
+            "Body should not count itself (left: {count}, right: {EXPECTED_COUNT})",
         );
         assert!(
-            sanitised_observations.len() >= 8,
-            "Not observing enough bodies (left: {count}, right: 8)",
+            sanitised_observations.len() >= EXPECTED_COUNT,
+            "Not observing enough bodies (left: {count}, right: {EXPECTED_COUNT})",
         );
 
         let mut expected_x = 0.0;
 
         // Check children
-        for observation in &sanitised_observations[0..3] {
+        for observation in &sanitised_observations[0..4] {
             expected_x += DOWNWARDS_STEP;
             assert!(
                 (observation.x - expected_x).abs() < Float::EPSILON,
@@ -182,7 +179,7 @@ mod tests {
         let mut expected_y = 0.0;
 
         // Check parents
-        for observation in &sanitised_observations[3..] {
+        for observation in &sanitised_observations[4..] {
             expected_y -= UPWARDS_STEP;
             assert!(
                 (observation.y - expected_y).abs() < Float::EPSILON,
