@@ -52,4 +52,55 @@ impl Observatory {
 #[cfg(test)]
 mod tests {
     //FIXME write some tests later, my head hurts
+
+    use coordinates::{
+        prelude::{Spherical, ThreeDimensionalConsts, Vector3},
+        traits::{Cross3D, Magnitude},
+    };
+
+    use crate::{
+        body::{observitory::Observatory, rotating_body::RotatingBody, ArcBody, Body},
+        consts::float,
+        dynamic::fixed::Fixed,
+        Float,
+    };
+
+    fn get_toy_example_body() -> ArcBody {
+        let body = Body::new(None, Fixed::new(Vector3::ORIGIN));
+        body.write().unwrap().rotation = Some(RotatingBody::new(4.0, Spherical::UP));
+        let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::RIGHT));
+        //                        \-> ONCE TOLD ME. Now you can't get it out of your head either
+        //let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::BACK));
+        //let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::LEFT));
+        //let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::FORWARD));
+
+        body
+    }
+
+    #[test]
+    fn simple_rotation_test() {
+        let root = get_toy_example_body();
+        let observitory = Observatory::new(Spherical::RIGHT, root);
+
+        for (time, polar_angle) in [
+            (0_u8, 0.0),
+            (1, float::FRAC_PI_2),
+            (2, float::PI),
+            (3, float::FRAC_PI_2),
+        ] {
+            let observations: Vec<Spherical<Float>> = observitory
+                .observe(Float::from(time))
+                .iter()
+                .map(|(_, loc)| loc.clone())
+                .collect();
+
+            println!("{observations:.2?}");
+
+            if observations.len() == 0 {
+                assert!(time == 2);
+            } else {
+                assert_float_absolute_eq!(observations[0].polar_angle, polar_angle);
+            }
+        }
+    }
 }
