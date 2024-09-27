@@ -1,6 +1,9 @@
+pub mod rotating_body;
+
 use std::sync::{Arc, RwLock, Weak};
 
 use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
+use rotating_body::RotatingBody;
 
 use crate::{dynamic::Dynamic, Float};
 
@@ -15,6 +18,7 @@ pub struct Body {
     children: Vec<ArcBody>,
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic + Send + Sync>,
+    pub rotation: Option<RotatingBody>,
     // Geting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
@@ -33,6 +37,7 @@ impl Body {
             parent: parent.clone().map(|p| Arc::<RwLock<Body>>::downgrade(&p)),
             children: Vec::new(),
             dynamic: Box::new(dynamic),
+            rotation: None,
         }));
         if let Some(p) = parent {
             //TODO resolve poisoned lock
