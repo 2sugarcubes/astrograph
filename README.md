@@ -26,7 +26,7 @@ Predict bodies in a n-body problem, a situation where each body influences the m
 - [x] Keplerian bodies
 - [x] Bodies, defines how dynamics relate to one another in parent/children relationships
 - [x] Rotating bodies, will be useful for observatories on bodies, possibly for drawing scenes later as well
-- [ ] Observatories, define the latitude, longitude, and altitude of the observer for observation times
+- [x] Observatories, define the latitude, longitude, and altitude of the observer for observation times
 - [ ] Different projections, default will be an orthographic projection, but other projections will likely be added on a low priority
 - [ ] Writing to file, probably an SVG, but possibly PNG/BMP/etc if I see a need for it.
 - [ ] Configurable precision, i.e. [F32](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format), [F64](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), and possibly [F128](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format)
@@ -34,6 +34,6 @@ Predict bodies in a n-body problem, a situation where each body influences the m
 - [ ] Procedurally generated universes
 - [ ] Color coded Bodies
 - [ ] Body classes (e.g. `planet-rocky`, `planet-gas`, `star-M-class`, `moon-icy`, `black-hole`), useful for filtering bodies in results
-- [ ] Constelations
+- [ ] Constellations
 - [ ] WASM target
 - [ ] web page
