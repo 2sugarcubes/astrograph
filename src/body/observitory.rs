@@ -21,7 +21,7 @@ impl Observatory {
 
     /// Takes bodies from a universal coordinate space and converts them to local coordinates
     /// relative to the observatory
-    pub fn observe(&self, time: Float) -> Vec<(ArcBody, Vector3<Float>)> {
+    pub fn observe(&self, time: Float) -> Vec<(ArcBody, Spherical<Float>)> {
         let body = self.body.read().unwrap();
         let raw_observations = body.get_observations_from_here(time);
 
@@ -37,7 +37,7 @@ impl Observatory {
             .map(|(body, pos)| {
                 (
                     body.clone(),
-                    quaternion::rotate_vector(rotation, (*pos).into()).into(),
+                    Vector3::from(quaternion::rotate_vector(rotation, (*pos).into())).into(),
                 )
             })
             .collect()
