@@ -1,3 +1,4 @@
+pub mod observitory;
 pub mod rotating_body;
 
 use std::sync::{Arc, RwLock, Weak};
