@@ -59,7 +59,7 @@ mod tests {
     };
 
     use crate::{
-        body::{observitory::Observatory, rotating_body::RotatingBody, ArcBody, Body},
+        body::{observatory::Observatory, rotating_body::RotatingBody, ArcBody, Body},
         consts::float,
         dynamic::fixed::Fixed,
         Float,
