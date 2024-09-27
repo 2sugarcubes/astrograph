@@ -34,11 +34,16 @@ impl Observatory {
         // Rotate observations to put them in the local coordinate space
         raw_observations
             .iter()
-            .map(|(body, pos)| {
-                (
-                    body.clone(),
-                    Vector3::from(quaternion::rotate_vector(rotation, (*pos).into())).into(),
-                )
+            .filter_map(|(body, pos)| {
+                let local_coordinates =
+                    Vector3::from(quaternion::rotate_vector(rotation, (*pos).into()));
+
+                // Filter out bodies below the horizon
+                if local_coordinates.z >= 0.0 {
+                    Some((body.clone(), local_coordinates.into()))
+                } else {
+                    None
+                }
             })
             .collect()
     }
