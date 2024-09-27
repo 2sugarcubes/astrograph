@@ -3,4 +3,8 @@ pub mod body;
 pub mod consts;
 pub mod dynamic;
 
+#[allow(unused_imports)] // Macro_use is required here
+#[macro_use]
+extern crate assert_float_eq;
+
 type Float = f32;
