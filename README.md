@@ -24,8 +24,8 @@ Predict bodies in a n-body problem, a situation where each body influences the m
 
 - [x] Fixed bodies, useful for roots or bodies with very long orbital periods e.g. distant galaxies
 - [x] Keplerian bodies
-- [ ] Bodies, defines how dynamics relate to one another in parent/children relationships
-- [ ] Rotating bodies, will be useful for observatories on bodies, possibly for drawing scenes later as well
+- [x] Bodies, defines how dynamics relate to one another in parent/children relationships
+- [x] Rotating bodies, will be useful for observatories on bodies, possibly for drawing scenes later as well
 - [ ] Observatories, define the latitude, longitude, and altitude of the observer for observation times
 - [ ] Different projections, default will be an orthographic projection, but other projections will likely be added on a low priority
 - [ ] Writing to file, probably an SVG, but possibly PNG/BMP/etc if I see a need for it.
