@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/LICENSE.txt)
 
-[![codecov](https://codecov.io/github/2sugarcubes/astrolabe/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
+[![codecov](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests)](https://github.com/2sugarcubes/astrolabe/actions)
 [![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]()
 
@@ -27,7 +27,7 @@ Predict bodies in a n-body problem, a situation where each body influences the m
 - [x] Bodies, defines how dynamics relate to one another in parent/children relationships
 - [x] Rotating bodies, will be useful for observatories on bodies, possibly for drawing scenes later as well
 - [x] Observatories, define the latitude, longitude, and altitude of the observer for observation times
-- [ ] Different projections, default will be an orthographic projection, but other projections will likely be added on a low priority
+- [x] Different projections, default will be an orthographic projection, but other projections will likely be added on a low priority
 - [ ] Writing to file, probably an SVG, but possibly PNG/BMP/etc if I see a need for it.
 - [ ] Configurable precision, i.e. [F32](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format), [F64](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), and possibly [F128](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format)
 - [ ] Serialisation, most likely json, but other [supported serialisation data formats](https://serde.rs/#data-formats) will be added on an as needed basis
