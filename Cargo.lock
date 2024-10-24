@@ -16,6 +16,7 @@ dependencies = [
  "coordinates",
  "dyn-clone",
  "quaternion",
+ "svg",
 ]
 
 [[package]]
@@ -69,6 +70,12 @@ name = "roots"
 version = "0.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c36d2bbc763f480668d6d6790ae2fdd2e52ac0c21a3a26d156f3534a3d9eea9"
+
+[[package]]
+name = "svg"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94afda9cd163c04f6bee8b4bf2501c91548deae308373c436f36aeff3cf3c4a3"
 
 [[package]]
 name = "vecmath"
