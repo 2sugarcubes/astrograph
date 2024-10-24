@@ -8,7 +8,7 @@ use rotating_body::RotatingBody;
 
 use crate::{dynamic::Dynamic, Float};
 
-type ArcBody = Arc<RwLock<Body>>;
+pub type ArcBody = Arc<RwLock<Body>>;
 type WeakBody = Weak<RwLock<Body>>;
 
 #[derive(Debug, Clone)]
