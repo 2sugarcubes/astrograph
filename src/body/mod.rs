@@ -8,7 +8,7 @@ use rotating_body::RotatingBody;
 
 use crate::{dynamic::Dynamic, Float};
 
-type ArcBody = Arc<RwLock<Body>>;
+pub type ArcBody = Arc<RwLock<Body>>;
 type WeakBody = Weak<RwLock<Body>>;
 
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ pub struct Body {
     /// The body that this body is orbiting around
     parent: Option<WeakBody>,
     /// Bodies that orbit around this body
-    children: Vec<ArcBody>,
+    pub(crate) children: Vec<ArcBody>,
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic + Send + Sync>,
     pub rotation: Option<RotatingBody>,
