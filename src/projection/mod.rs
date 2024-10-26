@@ -3,7 +3,7 @@ use coordinates::prelude::{Spherical, Vector2};
 use crate::{consts::float, Float};
 
 pub trait Projection {
-    #[inline(always)]
+    //#[inline(always)]
     fn project_with_state(&self, location: &Spherical<Float>) -> Option<Vector2<Float>> {
         // default behaviour when there is no state
         Self::project(location)
@@ -54,7 +54,7 @@ impl Projection for Orthographic {
         }
     }
 
-    #[inline(always)]
+    //#[inline(always)]
     fn project(location: &Spherical<Float>) -> Option<Vector2<Float>> {
         StatelessOrthographic::project(location)
     }
