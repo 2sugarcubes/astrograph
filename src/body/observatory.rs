@@ -23,6 +23,11 @@ impl Observatory {
 
     /// Takes bodies from a universal coordinate space and converts them to local coordinates
     /// relative to the observatory
+    ///
+    /// # Panics
+    ///
+    /// If it cannot get a clean read lock on the body this observatory is on. i.e. the RwLock is
+    /// posioned.
     #[must_use]
     pub fn observe(&self, time: Float) -> Vec<(Arc, Spherical<Float>)> {
         let body = self.body.read().unwrap();
