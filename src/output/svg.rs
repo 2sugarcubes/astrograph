@@ -11,9 +11,9 @@ use svg::{
 };
 
 #[derive(Debug, Clone)]
-pub struct SvgOutput<T: Projection>(T);
+pub struct Svg<T: Projection>(T);
 
-impl<T: Projection> SvgOutput<T> {
+impl<T: Projection> Svg<T> {
     pub fn new(projector: T) -> Self {
         Self(projector)
     }
@@ -48,7 +48,7 @@ impl<T: Projection> SvgOutput<T> {
     }
 }
 
-impl<T> Output for SvgOutput<T>
+impl<T> Output for Svg<T>
 where
     T: Projection,
     T: Clone,

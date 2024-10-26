@@ -10,21 +10,17 @@ pub struct Rotating {
 }
 
 impl Rotating {
-    pub fn new(sidereal_period: Float, axis: Spherical<Float>) -> Self {
+    #[must_use]
+    pub fn new(sidereal_period: Float, mut axis: Spherical<Float>) -> Self {
         // Set axis to a unit vector
-        let axis = if axis.radius == 1.0 {
-            axis
-        } else {
-            let mut axis = axis.clone();
-            axis.radius = 1.0;
-            axis
-        };
+        axis.radius = 1.0;
         Self {
             sidereal_period,
             axis: axis.into(),
         }
     }
 
+    #[must_use]
     pub fn get_rotation(&self, time: Float) -> Quaternion<Float> {
         quaternion::axis_angle(self.axis.into(), -self.get_mean_angle(time))
     }

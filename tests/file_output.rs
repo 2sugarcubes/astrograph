@@ -1,6 +1,6 @@
 use astrolabe::{
     body::observatory::Observatory,
-    output::svg::SvgOutput,
+    output::svg::Svg,
     program::{ProgramBuilder, ProgramBuilderError},
     projection,
 };
@@ -14,7 +14,7 @@ fn file_output() -> Result<(), ProgramBuilderError> {
     let mut root_path = std::env::current_exe().unwrap();
     root_path.set_extension("output");
 
-    let output = SvgOutput::new(projection::orthographic::StatelessOrthographic());
+    let output = Svg::new(projection::orthographic::StatelessOrthographic());
     let (root_body, observing_body) =
         astrolabe::testing::make_toy_example(astrolabe::testing::DEFAULT_SEED);
 
