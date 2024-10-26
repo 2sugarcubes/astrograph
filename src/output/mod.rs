@@ -1,4 +1,7 @@
-use std::{fmt::Debug, path::PathBuf};
+use std::{
+    fmt::Debug,
+    path::{Path, PathBuf},
+};
 
 use coordinates::prelude::Spherical;
 use dyn_clone::DynClone;
@@ -11,7 +14,7 @@ pub trait Output: DynClone + Debug {
     fn write_observations_to_file(
         &self,
         observations: &[(ArcBody, Spherical<Float>)],
-        path: &PathBuf,
+        path: &Path,
     ) -> Result<(), std::io::Error>;
 }
 dyn_clone::clone_trait_object!(Output);

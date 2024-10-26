@@ -57,9 +57,9 @@ where
     fn write_observations_to_file(
         &self,
         observations: &[(ArcBody, Spherical<crate::Float>)],
-        path: &std::path::PathBuf,
+        path: &std::path::Path,
     ) -> Result<(), std::io::Error> {
-        let path = super::set_extension(path, "svg");
+        let path = super::set_extension(&path.to_path_buf(), "svg");
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
