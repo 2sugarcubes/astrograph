@@ -10,7 +10,7 @@ pub mod svg;
 pub trait Output: DynClone + Debug {
     fn write_observations_to_file(
         &self,
-        observations: &Vec<(ArcBody, Spherical<Float>)>,
+        observations: &[(ArcBody, Spherical<Float>)],
         path: &PathBuf,
     ) -> Result<(), std::io::Error>;
 }

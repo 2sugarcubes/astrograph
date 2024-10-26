@@ -56,7 +56,7 @@ where
 {
     fn write_observations_to_file(
         &self,
-        observations: &Vec<(ArcBody, Spherical<crate::Float>)>,
+        observations: &[(ArcBody, Spherical<crate::Float>)],
         path: &std::path::PathBuf,
     ) -> Result<(), std::io::Error> {
         let path = super::set_extension(path, "svg");
