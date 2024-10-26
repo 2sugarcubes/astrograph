@@ -59,7 +59,7 @@ where
         observations: &[(Arc, Spherical<crate::Float>)],
         path: &std::path::Path,
     ) -> Result<(), std::io::Error> {
-        let path = super::set_extension(&path, "svg");
+        let path = super::set_extension(path, "svg");
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
