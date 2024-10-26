@@ -5,8 +5,10 @@ pub mod dynamic;
 pub mod output;
 pub mod program;
 pub mod projection;
+
 #[allow(unused_imports)] // Macro_use is required here
 #[macro_use]
+#[cfg(test)]
 extern crate assert_float_eq;
 
 type Float = f32;
