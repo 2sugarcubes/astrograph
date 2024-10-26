@@ -23,8 +23,8 @@ pub trait Output: DynClone + Debug {
 }
 dyn_clone::clone_trait_object!(Output);
 
-fn set_extension(path: &PathBuf, extension: &str) -> PathBuf {
-    let mut path = path.clone();
+fn set_extension(path: &Path, extension: &str) -> PathBuf {
+    let mut path = path.to_path_buf();
     // Make sure Rust isn't trying to be clever and take our file without an extension and convert
     // it to a directory
     if path.is_dir() {
