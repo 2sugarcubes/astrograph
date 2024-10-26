@@ -52,11 +52,12 @@ pub mod testing {
         }
     }
 
+    #[allow(clippy::cast_lossless)]
     fn make_toy_children<T: Rng>(rng: &mut T, parent: &ArcBody, depth: u8, number_of_children: u8) {
         if depth >= 1 {
             for _ in 0..number_of_children {
                 let child = Body::new(
-                    Some(parent.to_owned()),
+                    Some(parent.clone()),
                     make_keplernian_dynamic(rng, -(depth as i32)),
                 );
                 make_toy_children(rng, &child, depth - 1, number_of_children);
@@ -64,6 +65,7 @@ pub mod testing {
         }
     }
 
+    #[allow(clippy::useless_conversion)] // Necesary for testing with different length floats
     fn make_keplernian_dynamic<T: Rng>(rng: &mut T, depth: i32) -> Keplerian {
         let scale = (2.0 as Float).powi(depth.into());
 
