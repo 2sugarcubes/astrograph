@@ -26,8 +26,8 @@ impl Observatory {
     ///
     /// # Panics
     ///
-    /// If it cannot get a clean read lock on the body this observatory is on. i.e. the RwLock is
-    /// posioned.
+    /// If it cannot get a clean read lock on the body this observatory is on. i.e. the `RwLock` is
+    /// [posioned](https://doc.rust-lang.org/std/sync/struct.RwLock.html#poisoning).
     #[must_use]
     pub fn observe(&self, time: Float) -> Vec<(Arc, Spherical<Float>)> {
         let body = self.body.read().unwrap();
