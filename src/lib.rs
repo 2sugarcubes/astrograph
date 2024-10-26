@@ -92,29 +92,24 @@ pub mod testing {
 
         #[test]
         fn right_number_of_bodies() {
-            const DEPTH_OF_CHILDREN: u32 = 3;
-            const NUMBER_OF_CHILDREN: u32 = 4;
-            const NUMBER_OF_PARENTS: u32 = 5;
+            const DEPTH_OF_CHILDREN: u8 = 3;
+            const NUMBER_OF_CHILDREN: u8 = 4;
+            const NUMBER_OF_PARENTS: u8 = 5;
             let mut rng = Xoroshiro128::from_seed(&[DEFAULT_SEED, DEFAULT_SEED]);
-            let (root, observer) = make_toy_parents(&mut rng, NUMBER_OF_PARENTS as u8);
+            let (root, observer) = make_toy_parents(&mut rng, NUMBER_OF_PARENTS);
 
             // We add one so that we are also counting the observer body
-            assert_eq!(count_bodies(root.clone()), NUMBER_OF_PARENTS + 1);
-            make_toy_children(
-                &mut rng,
-                &observer,
-                DEPTH_OF_CHILDREN as u8,
-                NUMBER_OF_CHILDREN as u8,
-            );
+            assert_eq!(count_bodies(root.clone()), NUMBER_OF_PARENTS as u32 + 1);
+            make_toy_children(&mut rng, &observer, DEPTH_OF_CHILDREN, NUMBER_OF_CHILDREN);
 
-            let mut expected_children = 0;
+            let mut expected_children = 0_u32;
             for depth in 1..=DEPTH_OF_CHILDREN {
-                expected_children += NUMBER_OF_CHILDREN.pow(depth)
+                expected_children += (NUMBER_OF_CHILDREN as u32).pow(depth as u32);
             }
 
             assert_eq!(
                 count_bodies(root),
-                NUMBER_OF_PARENTS + 1 + expected_children
+                NUMBER_OF_PARENTS as u32 + 1 + expected_children
             );
         }
 
