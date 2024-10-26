@@ -28,6 +28,7 @@ pub mod testing {
 
     pub const DEFAULT_SEED: u64 = 0x064B_DEAF_BEEF_CAFE;
 
+    #[must_use]
     pub fn make_toy_example(seed: u64) -> (ArcBody, ArcBody) {
         let mut rng = Xorshift128::from_seed(&[seed, seed]);
 
@@ -38,6 +39,7 @@ pub mod testing {
         (root, observer)
     }
 
+    #[must_use]
     fn make_toy_parents<T: Rng>(rng: &mut T, depth: usize) -> (ArcBody, ArcBody) {
         if depth == 0 {
             let body = Body::new(None, make_keplernian_dynamic(rng, -(depth as i32)));
