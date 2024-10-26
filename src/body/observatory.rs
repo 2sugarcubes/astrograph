@@ -12,6 +12,7 @@ pub struct Observatory {
 }
 
 impl Observatory {
+    #[must_use]
     pub fn new(location: Spherical<Float>, body: ArcBody) -> Self {
         let location: Vector3<Float> = location.into();
         Self {
@@ -22,6 +23,7 @@ impl Observatory {
 
     /// Takes bodies from a universal coordinate space and converts them to local coordinates
     /// relative to the observatory
+    #[must_use]
     pub fn observe(&self, time: Float) -> Vec<(ArcBody, Spherical<Float>)> {
         let body = self.body.read().unwrap();
         let raw_observations = body.get_observations_from_here(time);
@@ -54,13 +56,10 @@ impl Observatory {
 mod tests {
     //FIXME write some tests later, my head hurts
 
-    use coordinates::{
-        prelude::{Spherical, ThreeDimensionalConsts, Vector3},
-        traits::{Cross3D, Magnitude},
-    };
+    use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 
     use crate::{
-        body::{observatory::Observatory, rotating_body::RotatingBody, ArcBody, Body},
+        body::{observatory::Observatory, rotating::Rotating, ArcBody, Body},
         consts::float,
         dynamic::fixed::Fixed,
         Float,
@@ -68,7 +67,7 @@ mod tests {
 
     fn get_toy_example_body() -> ArcBody {
         let body = Body::new(None, Fixed::new(Vector3::ORIGIN));
-        body.write().unwrap().rotation = Some(RotatingBody::new(4.0, Spherical::UP));
+        body.write().unwrap().rotation = Some(Rotating::new(4.0, Spherical::UP));
         let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::RIGHT));
         //                        \-> ONCE TOLD ME. Now you can't get it out of your head either
         //let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::BACK));

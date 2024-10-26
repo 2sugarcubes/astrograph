@@ -4,12 +4,12 @@ use quaternion::Quaternion;
 use crate::{consts::float, Float};
 
 #[derive(Debug, Clone)]
-pub struct RotatingBody {
+pub struct Rotating {
     sidereal_period: Float,
     axis: Vector3<Float>,
 }
 
-impl RotatingBody {
+impl Rotating {
     pub fn new(sidereal_period: Float, axis: Spherical<Float>) -> Self {
         // Set axis to a unit vector
         let axis = if axis.radius == 1.0 {
@@ -45,7 +45,7 @@ mod test {
 
     use crate::{consts::float, Float};
 
-    use super::RotatingBody;
+    use super::Rotating;
 
     #[test]
     fn normalise_axis() {
@@ -61,10 +61,10 @@ mod test {
             azimuthal_angle: 0.01,
         };
 
-        let small_rotating_body = RotatingBody::new(1.0, axis_small);
+        let small_rotating_body = Rotating::new(1.0, axis_small);
         assert_eq!(small_rotating_body.axis.magnitude(), EXPECTED_MAGNITUDE);
 
-        let large_rotating_body = RotatingBody::new(1.0, axis_large);
+        let large_rotating_body = Rotating::new(1.0, axis_large);
         assert_eq!(large_rotating_body.axis.magnitude(), EXPECTED_MAGNITUDE);
     }
 
@@ -72,7 +72,7 @@ mod test {
     fn correct_rotations() {
         // Rotate around the y axis with a period of tau so that time should equal the expected
         // angle
-        let rotations = RotatingBody::new(float::TAU, Spherical::UP);
+        let rotations = Rotating::new(float::TAU, Spherical::UP);
 
         for i in 0_u8..u8::MAX {
             let expected_angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
@@ -87,7 +87,7 @@ mod test {
 
     #[test]
     fn correct_quaternion() {
-        let rotations = RotatingBody::new(float::TAU, Spherical::UP);
+        let rotations = Rotating::new(float::TAU, Spherical::UP);
         let fixed_point = Vector3::RIGHT;
 
         for i in 0..u8::MAX {

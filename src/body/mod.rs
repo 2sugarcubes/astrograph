@@ -1,10 +1,10 @@
 pub mod observatory;
-pub mod rotating_body;
+pub mod rotating;
 
 use std::sync::{Arc, RwLock, Weak};
 
 use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
-use rotating_body::RotatingBody;
+use rotating::Rotating;
 
 use crate::{dynamic::Dynamic, Float};
 
@@ -19,7 +19,7 @@ pub struct Body {
     pub(crate) children: Vec<ArcBody>,
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic + Send + Sync>,
-    pub rotation: Option<RotatingBody>,
+    pub rotation: Option<Rotating>,
     // Geting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
