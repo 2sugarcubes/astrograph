@@ -96,12 +96,12 @@ mod tests {
             let observations: Vec<Spherical<Float>> = observatory
                 .observe(Float::from(time))
                 .iter()
-                .map(|(_, loc)| loc.clone())
+                .map(|(_, loc)| *loc)
                 .collect();
 
             println!("{observations:.2?}");
 
-            if observations.len() == 0 {
+            if observations.is_empty() {
                 assert!(time == 2);
             } else {
                 assert_float_absolute_eq!(observations[0].polar_angle, polar_angle);
