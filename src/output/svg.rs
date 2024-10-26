@@ -20,7 +20,7 @@ impl<T: Projection> Svg<T> {
 
     fn consume_observation(
         &self,
-        observations: &Vec<(ArcBody, Spherical<crate::Float>)>,
+        observations: &[(ArcBody, Spherical<crate::Float>)],
     ) -> svg::Document {
         let mut result =
             Document::new().add(Rectangle::new().set("width", "100%").set("height", "100%"));
