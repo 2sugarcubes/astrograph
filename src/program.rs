@@ -1,33 +1,31 @@
 use std::path::PathBuf;
 
+use derive_builder::Builder;
+
 use crate::body::{observatory::Observatory, ArcBody};
 
-// TODO make a builder type for this struct
-pub struct Program<OutputType> {
+#[derive(Builder, Clone, Debug)]
+pub struct Program {
     _root_body: ArcBody,
+    #[builder(setter(each(name = "add_observatory")))]
     observatories: Vec<Observatory>,
-    outputs: Vec<Box<dyn crate::output::Output<OutType = OutputType>>>,
+    #[builder(setter(each(name = "add_output")))]
+    outputs: Vec<Box<dyn crate::output::Output>>,
     output_file_root: PathBuf,
 }
 
-impl<T> Program<T>
-where
-    T: Sized,
-{
+impl Program {
     pub fn make_observations(&self, start_time: i128, end_time: i128, step_size: Option<usize>) {
         for time in (start_time..end_time).step_by(step_size.unwrap_or(1)) {
             for observatory in &self.observatories {
                 let path = self
                     .output_file_root
                     // TODO real names
-                    .join(format!("TODO OBSERVATORY NAME/{time}"));
+                    .join(format!("TODO OBSERVATORY NAME/{time:010}"));
                 let observations = observatory.observe(time as f32);
                 for output in &self.outputs {
-                    // generate file contents
-                    let file_contents = output.consume_observation(&observations);
-
-                    // Write the file, recovering on errors
-                    match output.write_to_file(file_contents, &path) {
+                    // Write the observations to file, recovering on errors
+                    match output.write_observations_to_file(&observations, &path) {
                         Ok(_) => println!(
                             "File {} was written sucessfully",
                             &path.to_str().unwrap_or("[could not display path]")

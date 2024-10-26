@@ -1,33 +1,27 @@
-use crate::projection::Projection;
+use std::fmt::Debug;
+
+use crate::{body::ArcBody, projection::Projection};
 
 use super::Output;
+use coordinates::prelude::Spherical;
 use svg::{
     self,
     node::element::{Circle, Rectangle},
     Document,
 };
 
+#[derive(Debug, Clone)]
 pub struct SvgOutput<T: Projection>(T);
 
 impl<T: Projection> SvgOutput<T> {
     pub fn new(projector: T) -> Self {
         Self(projector)
     }
-}
-
-impl<T> Output for SvgOutput<T>
-where
-    T: Projection,
-{
-    type OutType = svg::Document;
 
     fn consume_observation(
         &self,
-        observations: &Vec<(
-            crate::body::ArcBody,
-            coordinates::prelude::Spherical<crate::Float>,
-        )>,
-    ) -> Self::OutType {
+        observations: &Vec<(ArcBody, Spherical<crate::Float>)>,
+    ) -> svg::Document {
         let mut result =
             Document::new().add(Rectangle::new().set("width", "100%").set("height", "100%"));
 
@@ -52,14 +46,23 @@ where
 
         return result;
     }
+}
 
-    fn write_to_file(
+impl<T> Output for SvgOutput<T>
+where
+    T: Projection,
+    T: Clone,
+    T: Debug,
+{
+    fn write_observations_to_file(
         &self,
-        contents: Self::OutType,
+        observations: &Vec<(ArcBody, Spherical<crate::Float>)>,
         path: &std::path::PathBuf,
     ) -> Result<(), std::io::Error> {
         let path = super::set_extension(path, "svg");
-        std::fs::create_dir_all(&path)?;
-        svg::save(path, &contents)
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        svg::save(path, &self.consume_observation(observations))
     }
 }

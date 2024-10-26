@@ -5,6 +5,7 @@ use crate::Float;
 
 use super::ArcBody;
 
+#[derive(Debug, Clone)]
 pub struct Observatory {
     location: Quaternion<Float>,
     body: ArcBody,

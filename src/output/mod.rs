@@ -1,22 +1,25 @@
-use std::path::PathBuf;
+use std::{fmt::Debug, path::PathBuf};
 
 use coordinates::prelude::Spherical;
+use dyn_clone::DynClone;
 
 use crate::{body::ArcBody, Float};
 
 pub mod svg;
 
-pub trait Output {
-    type OutType;
-    fn consume_observation(&self, observations: &Vec<(ArcBody, Spherical<Float>)>)
-        -> Self::OutType;
-
-    // TODO create a more readable result type
-    fn write_to_file(&self, contents: Self::OutType, path: &PathBuf) -> Result<(), std::io::Error>;
+pub trait Output: DynClone + Debug {
+    fn write_observations_to_file(
+        &self,
+        observations: &Vec<(ArcBody, Spherical<Float>)>,
+        path: &PathBuf,
+    ) -> Result<(), std::io::Error>;
 }
+dyn_clone::clone_trait_object!(Output);
 
 fn set_extension(path: &PathBuf, extension: &str) -> PathBuf {
     let mut path = path.clone();
+    // Make sure Rust isn't trying to be clever and take our file without an extension and convert
+    // it to a directory
     if path.is_dir() {
         path.pop();
     }

@@ -4,6 +4,7 @@ use crate::{consts::float, Float};
 
 use super::Projection;
 
+#[derive(Debug, Clone, Copy)]
 pub struct StatelessOrthographic();
 
 impl Projection for StatelessOrthographic {
@@ -24,6 +25,7 @@ impl Projection for StatelessOrthographic {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Orthographic(Float, Float);
 
 impl Projection for Orthographic {
