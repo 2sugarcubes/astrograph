@@ -32,8 +32,6 @@ impl Rotating {
 
 #[cfg(test)]
 mod test {
-    use std::u8;
-
     use coordinates::{
         prelude::{Spherical, ThreeDimensionalConsts, Vector3},
         traits::Magnitude,
