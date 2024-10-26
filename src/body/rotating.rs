@@ -56,10 +56,10 @@ mod test {
         };
 
         let small_rotating_body = Rotating::new(1.0, axis_small);
-        assert_eq!(small_rotating_body.axis.magnitude(), EXPECTED_MAGNITUDE);
+        assert_float_absolute_eq!(small_rotating_body.axis.magnitude(), EXPECTED_MAGNITUDE);
 
         let large_rotating_body = Rotating::new(1.0, axis_large);
-        assert_eq!(large_rotating_body.axis.magnitude(), EXPECTED_MAGNITUDE);
+        assert_float_absolute_eq!(large_rotating_body.axis.magnitude(), EXPECTED_MAGNITUDE);
     }
 
     #[test]
@@ -70,12 +70,8 @@ mod test {
 
         for i in 0_u8..u8::MAX {
             let expected_angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
-            let observed_angle = rotations.get_mean_angle(expected_angle);
 
-            assert!(
-                (rotations.get_mean_angle(expected_angle) - expected_angle).abs() < Float::EPSILON,
-                "{observed_angle:.2} is too far from the expected angle {expected_angle:.2}"
-            );
+            assert_float_absolute_eq!(rotations.get_mean_angle(expected_angle), expected_angle);
         }
     }
 
