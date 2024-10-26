@@ -40,6 +40,7 @@ pub mod testing {
     }
 
     #[must_use]
+    #[allow(clippy::cast_lossless)] // Necesary to enable testing on multiple float types
     fn make_toy_parents<T: Rng>(rng: &mut T, depth: u8) -> (ArcBody, ArcBody) {
         if depth == 0 {
             let body = Body::new(None, make_keplernian_dynamic(rng, -(depth as i32)));
@@ -99,7 +100,7 @@ pub mod testing {
             assert_eq!(count_bodies(root.clone()), NUMBER_OF_PARENTS + 1);
             make_toy_children(
                 &mut rng,
-                observer.clone(),
+                &observer,
                 DEPTH_OF_CHILDREN as u8,
                 NUMBER_OF_CHILDREN as u8,
             );
@@ -132,7 +133,7 @@ pub mod testing {
             for _ in 0..5_000 {
                 let seed = rng.gen();
                 println!("Seed was: {:x?}", seed);
-                make_toy_example(seed);
+                let _ = make_toy_example(seed);
             }
         }
     }
