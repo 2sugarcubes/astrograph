@@ -17,6 +17,7 @@ pub struct Program {
 impl Program {
     // Precision loss is enevitable since we are going from an intager to a (compile-time) variable length float
     #[allow(clippy::cast_precision_loss)]
+    #[allow(clippy::missing_panics_doc)] // Should only panic in unit tests
     pub fn make_observations(&self, start_time: i128, end_time: i128, step_size: Option<usize>) {
         for time in (start_time..end_time).step_by(step_size.unwrap_or(1)) {
             for observatory in &self.observatories {
@@ -39,11 +40,7 @@ impl Program {
                             );
                             if cfg!(test) {
                                 // Panic can only occur in internal testing mode when panics are expected
-
-                                #[allow(clippy::missing_panics_doc)]
-                                {
-                                    panic!("{message}");
-                                }
+                                panic!("{message}");
                             } else {
                                 //TODO implement log or something similar
                                 eprintln!("{message}");
