@@ -45,12 +45,12 @@ fn file_output() -> Result<(), ProgramBuilderError> {
                 "{}/{time:010}.svg",
                 "TODO OBSERVATORY NAME"
             )));
-            if !path.exists() {
-                panic!(
-                    "Expected path '{}' was not found",
-                    path.to_str().unwrap_or("[COULD NOT DISPLAY PATH]")
-                );
-            }
+
+            assert!(
+                path.exists(),
+                "Expected path '{}' was not found",
+                path.to_str().unwrap_or("[COULD NOT DISPLAY PATH]")
+            )
         }
     }
 
