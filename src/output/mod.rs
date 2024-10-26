@@ -11,6 +11,10 @@ use crate::{body::ArcBody, Float};
 pub mod svg;
 
 pub trait Output: DynClone + Debug {
+    /// # Errors
+    /// implementations may panic if there is an error in the filesystem e.g. writing is not
+    /// allowed for a user in a specific directory, or one or more of the directories are files
+    /// that have already been created
     fn write_observations_to_file(
         &self,
         observations: &[(ArcBody, Spherical<Float>)],
