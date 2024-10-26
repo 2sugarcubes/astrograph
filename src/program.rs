@@ -28,7 +28,7 @@ impl Program {
                 for output in &self.outputs {
                     // Write the observations to file, recovering on errors
                     match output.write_observations_to_file(&observations, &path) {
-                        Ok(_) => println!(
+                        Ok(()) => println!(
                             "File {} was written sucessfully",
                             &path.to_str().unwrap_or("[could not display path]")
                         ),
