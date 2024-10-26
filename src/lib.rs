@@ -1,3 +1,6 @@
+// Style guide suggests using return for any function over 5 lines to improve readability
+#![allow(clippy::needless_return)]
+
 pub mod body;
 #[allow(clippy::excessive_precision)] // Constants should work with up to f128 precision
 pub mod consts;
