@@ -20,7 +20,7 @@ pub struct Body {
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic + Send + Sync>,
     pub rotation: Option<Rotating>,
-    // Geting some parameters ready for a next version
+    // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
     //radius: Float,
@@ -155,24 +155,24 @@ mod tests {
             .read()
             .unwrap()
             .get_observations_from_here(0.0);
-        let sanitised_observations: Vec<&Vector3<f32>> =
+        let sanitized_observations: Vec<&Vector3<f32>> =
             observations.iter().map(|(_, loc)| loc).collect();
 
-        println!("{sanitised_observations:?}");
-        let count = sanitised_observations.len();
+        println!("{sanitized_observations:?}");
+        let count = sanitized_observations.len();
         assert!(
             count <= EXPECTED_COUNT,
             "Body should not count itself (left: {count}, right: {EXPECTED_COUNT})",
         );
         assert!(
-            sanitised_observations.len() >= EXPECTED_COUNT,
+            sanitized_observations.len() >= EXPECTED_COUNT,
             "Not observing enough bodies (left: {count}, right: {EXPECTED_COUNT})",
         );
 
         let mut expected_x = 0.0;
 
         // Check children
-        for observation in &sanitised_observations[0..4] {
+        for observation in &sanitized_observations[0..4] {
             expected_x += DOWNWARDS_STEP;
             assert!(
                 (observation.x - expected_x).abs() < Float::EPSILON,
@@ -185,7 +185,7 @@ mod tests {
         let mut expected_y = 0.0;
 
         // Check parents
-        for observation in &sanitised_observations[4..] {
+        for observation in &sanitized_observations[4..] {
             expected_y -= UPWARDS_STEP;
             assert!(
                 (observation.y - expected_y).abs() < Float::EPSILON,

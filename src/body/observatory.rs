@@ -27,7 +27,7 @@ impl Observatory {
     /// # Panics
     ///
     /// If it cannot get a clean read lock on the body this observatory is on. i.e. the `RwLock` is
-    /// [posioned](https://doc.rust-lang.org/std/sync/struct.RwLock.html#poisoning).
+    /// [poisoned](https://doc.rust-lang.org/std/sync/struct.RwLock.html#poisoning).
     #[must_use]
     pub fn observe(&self, time: Float) -> Vec<(Arc, Spherical<Float>)> {
         let body = self.body.read().unwrap();
@@ -85,7 +85,7 @@ mod tests {
     #[test]
     fn simple_rotation_test() {
         let root = get_toy_example_body();
-        let observitory = Observatory::new(Spherical::RIGHT, root);
+        let observatory = Observatory::new(Spherical::RIGHT, root);
 
         for (time, polar_angle) in [
             (0_u8, 0.0),
@@ -93,7 +93,7 @@ mod tests {
             (2, float::PI),
             (3, float::FRAC_PI_2),
         ] {
-            let observations: Vec<Spherical<Float>> = observitory
+            let observations: Vec<Spherical<Float>> = observatory
                 .observe(Float::from(time))
                 .iter()
                 .map(|(_, loc)| loc.clone())
