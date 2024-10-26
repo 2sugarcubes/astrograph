@@ -3,17 +3,17 @@ use quaternion::Quaternion;
 
 use crate::Float;
 
-use super::ArcBody;
+use super::Arc;
 
 #[derive(Debug, Clone)]
 pub struct Observatory {
     location: Quaternion<Float>,
-    body: ArcBody,
+    body: Arc,
 }
 
 impl Observatory {
     #[must_use]
-    pub fn new(location: Spherical<Float>, body: ArcBody) -> Self {
+    pub fn new(location: Spherical<Float>, body: Arc) -> Self {
         let location: Vector3<Float> = location.into();
         Self {
             location: quaternion::rotation_from_to(location.into(), Vector3::UP.into()),
@@ -24,7 +24,7 @@ impl Observatory {
     /// Takes bodies from a universal coordinate space and converts them to local coordinates
     /// relative to the observatory
     #[must_use]
-    pub fn observe(&self, time: Float) -> Vec<(ArcBody, Spherical<Float>)> {
+    pub fn observe(&self, time: Float) -> Vec<(Arc, Spherical<Float>)> {
         let body = self.body.read().unwrap();
         let raw_observations = body.get_observations_from_here(time);
 
@@ -59,13 +59,13 @@ mod tests {
     use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 
     use crate::{
-        body::{observatory::Observatory, rotating::Rotating, ArcBody, Body},
+        body::{observatory::Observatory, rotating::Rotating, Arc, Body},
         consts::float,
         dynamic::fixed::Fixed,
         Float,
     };
 
-    fn get_toy_example_body() -> ArcBody {
+    fn get_toy_example_body() -> Arc {
         let body = Body::new(None, Fixed::new(Vector3::ORIGIN));
         body.write().unwrap().rotation = Some(Rotating::new(4.0, Spherical::UP));
         let _ = Body::new(Some(body.clone()), Fixed::new(Vector3::RIGHT));

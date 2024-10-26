@@ -6,7 +6,7 @@ use std::{
 use coordinates::prelude::Spherical;
 use dyn_clone::DynClone;
 
-use crate::{body::ArcBody, Float};
+use crate::{body::Arc, Float};
 
 pub mod svg;
 
@@ -17,7 +17,7 @@ pub trait Output: DynClone + Debug {
     /// that have already been created
     fn write_observations_to_file(
         &self,
-        observations: &[(ArcBody, Spherical<Float>)],
+        observations: &[(Arc, Spherical<Float>)],
         path: &Path,
     ) -> Result<(), std::io::Error>;
 }

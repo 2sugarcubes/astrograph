@@ -1,22 +1,22 @@
 pub mod observatory;
 pub mod rotating;
 
-use std::sync::{Arc, RwLock, Weak};
+use std::sync::{ Arc as StdArc, RwLock, Weak as StdWeak};
 
 use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
 use rotating::Rotating;
 
 use crate::{dynamic::Dynamic, Float};
 
-pub type ArcBody = Arc<RwLock<Body>>;
-type WeakBody = Weak<RwLock<Body>>;
+pub type Arc = StdArc<RwLock<Body>>;
+type Weak = StdWeak<RwLock<Body>>;
 
 #[derive(Debug, Clone)]
 pub struct Body {
     /// The body that this body is orbiting around
-    parent: Option<WeakBody>,
+    parent: Option<Weak>,
     /// Bodies that orbit around this body
-    pub(crate) children: Vec<ArcBody>,
+    pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic + Send + Sync>,
     pub rotation: Option<Rotating>,
@@ -30,12 +30,12 @@ pub struct Body {
 impl Body {
     /// # Panics
     /// Will panic if `parent` is poisoned
-    pub fn new<D>(parent: Option<ArcBody>, dynamic: D) -> Arc<RwLock<Self>>
+    pub fn new<D>(parent: Option<Arc>, dynamic: D) -> Arc
     where
         D: Dynamic + Send + Sync + 'static,
     {
         let b = Arc::new(RwLock::new(Self {
-            parent: parent.clone().map(|p| Arc::<RwLock<Body>>::downgrade(&p)),
+            parent: parent.clone().map(|p| StdArc::<RwLock<Body>>::downgrade(&p)),
             children: Vec::new(),
             dynamic: Box::new(dynamic),
             rotation: None,
@@ -53,7 +53,7 @@ impl Body {
     /// Will panic if any nth order children or sill existing nth order parents have poisoned
     /// locks
     #[must_use]
-    pub fn get_observations_from_here(&self, time: Float) -> Vec<(ArcBody, Vector3<Float>)> {
+    pub fn get_observations_from_here(&self, time: Float) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         results.extend(self.traverse_up(time, Vector3::ORIGIN));
 
@@ -65,7 +65,7 @@ impl Body {
         &self,
         time: Float,
         current_position: Vector3<Float>,
-    ) -> Vec<(ArcBody, Vector3<Float>)> {
+    ) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = Vec::with_capacity(self.children.len());
 
         // For each child
@@ -89,7 +89,7 @@ impl Body {
         &self,
         time: Float,
         current_position: Vector3<Float>,
-    ) -> Vec<(ArcBody, Vector3<Float>)> {
+    ) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = Vec::new();
 
         // If the parent still exists
@@ -113,7 +113,7 @@ mod tests {
     use crate::dynamic::fixed::Fixed;
 
     use super::*;
-    fn get_toy_example() -> (ArcBody, ArcBody) {
+    fn get_toy_example() -> (Arc, Arc) {
         let bodies = generate_parents(5, [0.0, UPWARDS_STEP, 0.0].into());
         // Get the root and the important bodies
         let result = (bodies[0].clone(), bodies.last().unwrap().clone());
@@ -124,7 +124,7 @@ mod tests {
     const UPWARDS_STEP: Float = 13.0;
     const DOWNWARDS_STEP: Float = 7.0;
 
-    fn generate_parents(height: usize, offset: Vector3<Float>) -> Vec<ArcBody> {
+    fn generate_parents(height: usize, offset: Vector3<Float>) -> Vec<Arc> {
         if height == 0 {
             vec![Body::new(None, Fixed::new(offset))]
         } else {
@@ -137,7 +137,7 @@ mod tests {
         }
     }
 
-    fn generate_children(depth: usize, offset: Vector3<Float>, parent: ArcBody) {
+    fn generate_children(depth: usize, offset: Vector3<Float>, parent: Arc) {
         if depth == 0 {
             Body::new(Some(parent), Fixed::new(offset));
         } else {

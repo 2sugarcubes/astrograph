@@ -2,11 +2,11 @@ use std::path::PathBuf;
 
 use derive_builder::Builder;
 
-use crate::body::{observatory::Observatory, ArcBody};
+use crate::body::{observatory::Observatory, Arc};
 
 #[derive(Builder, Clone, Debug)]
 pub struct Program {
-    _root_body: ArcBody,
+    _root_body: Arc,
     #[builder(setter(each(name = "add_observatory")))]
     observatories: Vec<Observatory>,
     #[builder(setter(each(name = "add_output")))]

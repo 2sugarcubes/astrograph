@@ -20,7 +20,7 @@ pub mod testing {
     use xorshift::{Rng, SeedableRng, Xorshift128};
 
     use crate::{
-        body::{ArcBody, Body},
+        body::{Arc, Body},
         consts::float,
         dynamic::keplerian::Keplerian,
         Float,
@@ -29,7 +29,7 @@ pub mod testing {
     pub const DEFAULT_SEED: u64 = 0x064B_DEAF_BEEF_CAFE;
 
     #[must_use]
-    pub fn make_toy_example(seed: u64) -> (ArcBody, ArcBody) {
+    pub fn make_toy_example(seed: u64) -> (Arc, Arc) {
         let mut rng = Xorshift128::from_seed(&[seed, seed]);
 
         let (root, observer) = make_toy_parents(&mut rng, 5);
@@ -41,7 +41,7 @@ pub mod testing {
 
     #[must_use]
     #[allow(clippy::cast_lossless)] // Necesary to enable testing on multiple float types
-    fn make_toy_parents<T: Rng>(rng: &mut T, depth: u8) -> (ArcBody, ArcBody) {
+    fn make_toy_parents<T: Rng>(rng: &mut T, depth: u8) -> (Arc, Arc) {
         if depth == 0 {
             let body = Body::new(None, make_keplernian_dynamic(rng, -(depth as i32)));
             (body.clone(), body)
@@ -53,7 +53,7 @@ pub mod testing {
     }
 
     #[allow(clippy::cast_lossless)]
-    fn make_toy_children<T: Rng>(rng: &mut T, parent: &ArcBody, depth: u8, number_of_children: u8) {
+    fn make_toy_children<T: Rng>(rng: &mut T, parent: &Arc, depth: u8, number_of_children: u8) {
         if depth >= 1 {
             for _ in 0..number_of_children {
                 let child = Body::new(
@@ -118,7 +118,7 @@ pub mod testing {
             );
         }
 
-        fn count_bodies(body: ArcBody) -> u32 {
+        fn count_bodies(body: Arc) -> u32 {
             // Start at one to count this body
             let mut count = 1;
             for child in &body.read().unwrap().children {

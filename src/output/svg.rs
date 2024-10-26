@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::{body::ArcBody, projection::Projection};
+use crate::{body::Arc, projection::Projection};
 
 use super::Output;
 use coordinates::prelude::Spherical;
@@ -20,7 +20,7 @@ impl<T: Projection> Svg<T> {
 
     fn consume_observation(
         &self,
-        observations: &[(ArcBody, Spherical<crate::Float>)],
+        observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
         let mut result =
             Document::new().add(Rectangle::new().set("width", "100%").set("height", "100%"));
@@ -56,7 +56,7 @@ where
 {
     fn write_observations_to_file(
         &self,
-        observations: &[(ArcBody, Spherical<crate::Float>)],
+        observations: &[(Arc, Spherical<crate::Float>)],
         path: &std::path::Path,
     ) -> Result<(), std::io::Error> {
         let path = super::set_extension(&path.to_path_buf(), "svg");
