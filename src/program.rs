@@ -38,7 +38,12 @@ impl Program {
                                 &path.to_str().unwrap_or("[could not display path]")
                             );
                             if cfg!(test) {
-                                panic!("{message}");
+                                // Panic can only occur in internal testing mode when panics are expected
+
+                                #[allow(clippy::missing_panics_doc)]
+                                {
+                                    panic!("{message}");
+                                }
                             } else {
                                 //TODO implement log or something similar
                                 eprintln!("{message}");
