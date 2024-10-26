@@ -34,13 +34,13 @@ pub mod testing {
 
         let (root, observer) = make_toy_parents(&mut rng, 5);
 
-        make_toy_children(&mut rng, observer.clone(), 2, 9);
+        make_toy_children(&mut rng, &observer, 2, 9);
 
         (root, observer)
     }
 
     #[must_use]
-    fn make_toy_parents<T: Rng>(rng: &mut T, depth: usize) -> (ArcBody, ArcBody) {
+    fn make_toy_parents<T: Rng>(rng: &mut T, depth: u8) -> (ArcBody, ArcBody) {
         if depth == 0 {
             let body = Body::new(None, make_keplernian_dynamic(rng, -(depth as i32)));
             (body.clone(), body)
@@ -51,19 +51,14 @@ pub mod testing {
         }
     }
 
-    fn make_toy_children<T: Rng>(
-        rng: &mut T,
-        parent: ArcBody,
-        depth: usize,
-        number_of_children: usize,
-    ) {
+    fn make_toy_children<T: Rng>(rng: &mut T, parent: &ArcBody, depth: u8, number_of_children: u8) {
         if depth >= 1 {
             for _ in 0..number_of_children {
                 let child = Body::new(
                     Some(parent.to_owned()),
                     make_keplernian_dynamic(rng, -(depth as i32)),
                 );
-                make_toy_children(rng, child, depth - 1, number_of_children);
+                make_toy_children(rng, &child, depth - 1, number_of_children);
             }
         }
     }
@@ -98,15 +93,15 @@ pub mod testing {
             const NUMBER_OF_CHILDREN: u32 = 4;
             const NUMBER_OF_PARENTS: u32 = 5;
             let mut rng = Xoroshiro128::from_seed(&[DEFAULT_SEED, DEFAULT_SEED]);
-            let (root, observer) = make_toy_parents(&mut rng, NUMBER_OF_PARENTS as usize);
+            let (root, observer) = make_toy_parents(&mut rng, NUMBER_OF_PARENTS as u8);
 
             // We add one so that we are also counting the observer body
             assert_eq!(count_bodies(root.clone()), NUMBER_OF_PARENTS + 1);
             make_toy_children(
                 &mut rng,
                 observer.clone(),
-                DEPTH_OF_CHILDREN as usize,
-                NUMBER_OF_CHILDREN as usize,
+                DEPTH_OF_CHILDREN as u8,
+                NUMBER_OF_CHILDREN as u8,
             );
 
             let mut expected_children = 0;
