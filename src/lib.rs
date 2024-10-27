@@ -91,6 +91,7 @@ pub mod testing {
         use xorshift::{thread_rng, Xoroshiro128, Xorshift1024};
 
         #[test]
+        #[allow(clippy::cast_lossless)]
         fn right_number_of_bodies() {
             const DEPTH_OF_CHILDREN: u8 = 3;
             const NUMBER_OF_CHILDREN: u8 = 4;
@@ -99,7 +100,7 @@ pub mod testing {
             let (root, observer) = make_toy_parents(&mut rng, NUMBER_OF_PARENTS);
 
             // We add one so that we are also counting the observer body
-            assert_eq!(count_bodies(root.clone()), NUMBER_OF_PARENTS as u32 + 1);
+            assert_eq!(count_bodies(&root), NUMBER_OF_PARENTS as u32 + 1);
             make_toy_children(&mut rng, &observer, DEPTH_OF_CHILDREN, NUMBER_OF_CHILDREN);
 
             let mut expected_children = 0_u32;
@@ -108,17 +109,17 @@ pub mod testing {
             }
 
             assert_eq!(
-                count_bodies(root),
+                count_bodies(&root),
                 NUMBER_OF_PARENTS as u32 + 1 + expected_children
             );
         }
 
-        fn count_bodies(body: Arc) -> u32 {
+        fn count_bodies(body: &Arc) -> u32 {
             // Start at one to count this body
             let mut count = 1;
             for child in &body.read().unwrap().children {
                 // Count the children and their children
-                count += count_bodies(child.to_owned())
+                count += count_bodies(child);
             }
             return count;
         }
@@ -129,7 +130,7 @@ pub mod testing {
 
             for _ in 0..5_000 {
                 let seed = rng.gen();
-                println!("Seed was: {:x?}", seed);
+                println!("Seed was: {seed:x?}");
                 let _ = make_toy_example(seed);
             }
         }
