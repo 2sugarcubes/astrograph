@@ -50,7 +50,7 @@ fn file_output() -> Result<(), ProgramBuilderError> {
                 path.exists(),
                 "Expected path '{}' was not found",
                 path.to_str().unwrap_or("[COULD NOT DISPLAY PATH]")
-            )
+            );
         }
     }
 
