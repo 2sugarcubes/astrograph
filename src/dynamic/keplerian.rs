@@ -4,23 +4,46 @@ use quaternion::Quaternion;
 
 use super::Dynamic;
 
+/// Struct that best fits [kepler's laws of planetary
+/// motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion).
 #[derive(Clone, Copy, Debug)]
 pub struct Keplerian {
     // Size and shape
+    /// Unit: unitless.
+    ///
+    /// Definition: How circular the orbit is.
     eccentricity: Float,
+    /// Unit: light-seconds.
+    ///
+    /// Definition: Half the length of the longest diameter through the elipsis.
     semi_major_axis: Float,
+    /// Unit: light-seconds.
+    ///
+    /// Definition: Half the length of the shortest diameter through the elipsis.
     semi_minor_axis: Float,
 
-    // Orbital Plane, and argument of argument of periapsis
+    // Orbital Plane, and argument of ascending node, argument of periapsis, and inclination.
+    /// Unit: radians, sort of.
+    ///
+    /// Definition: This variable encodes how the orbit is rotated relative to a referance
+    /// direction. encompasing the argument of the periapsis, the orbital inclination, and the
+    /// argument of the ascending node.
     inclination: Quaternion<Float>,
 
-    //argument_of_periapsis: Float,
+    /// Unit: radian
+    ///
+    /// Definition: How far along the orbit this body was at the "start of time" (t=0)
     mean_anomality_at_epoch: Float,
 
+    /// Unit: Hours
+    ///
+    /// Definition: How long it takes for this body to complete one orbit (when the angle between an
+    /// infinitely distant point and the parent body are equal again i.e. the [siderial period](https://en.wikipedia.org/wiki/Orbital_period#Related_periods) as opposed to [tropical period](https://en.wikipedia.org/wiki/Solar_year), or [synodic period](https://en.wikipedia.org/wiki/Orbital_period#Synodic_period))
     orbital_period: Float,
 }
 
 impl Keplerian {
+    /// Generates a new keplerian dynamic with the calculated fields populated
     #[must_use]
     pub fn new(
         eccentricity: Float,
@@ -46,6 +69,8 @@ impl Keplerian {
         )
     }
 
+    /// Generates a new Keplerian dynamic with the calculated fields populated, assuming you know
+    /// the period of this orbit before hand.
     #[must_use]
     pub fn new_with_period(
         eccentricity: Float,
@@ -102,6 +127,7 @@ impl Keplerian {
 }
 
 impl Dynamic for Keplerian {
+    /// Returns the offset from the parent body at a given time.
     fn get_offset(&self, time: crate::Float) -> Vector3<crate::Float> {
         let eccentric_anomaly = self.get_eccentric_anomality(self.get_mean_anomality(time));
         let (sin, cos) = eccentric_anomaly.sin_cos();

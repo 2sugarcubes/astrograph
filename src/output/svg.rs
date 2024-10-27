@@ -10,14 +10,18 @@ use svg::{
     Document,
 };
 
+/// A struct that outputs SVG files from observations.
 #[derive(Debug, Clone)]
 pub struct Svg<T: Projection>(T);
 
 impl<T: Projection> Svg<T> {
+    /// Generates a new Svg with the given projector
+    #[must_use]
     pub fn new(projector: T) -> Self {
         Self(projector)
     }
 
+    /// Converts observations to a SVG document
     fn consume_observation(
         &self,
         observations: &[(Arc, Spherical<crate::Float>)],
@@ -54,6 +58,7 @@ where
     T: Clone,
     T: Debug,
 {
+    /// Outputs [Self::consume_observation] to a given file.
     fn write_observations_to_file(
         &self,
         observations: &[(Arc, Spherical<crate::Float>)],

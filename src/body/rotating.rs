@@ -10,6 +10,9 @@ pub struct Rotating {
 }
 
 impl Rotating {
+    /// Creates a rotating body type that rotates relative to an infinitely distant point every
+    /// `sidereal_period` hours, and rotates around the given `axis` in a counter-clockwise manner
+    /// (like the earth's [geographic north pole](https://en.wikipedia.org/wiki/North_Pole))
     #[must_use]
     pub fn new(sidereal_period: Float, mut axis: Spherical<Float>) -> Self {
         // Set axis to a unit vector
@@ -20,11 +23,13 @@ impl Rotating {
         }
     }
 
+    /// Returns a rotation for a given time.
     #[must_use]
     pub fn get_rotation(&self, time: Float) -> Quaternion<Float> {
         quaternion::axis_angle(self.axis.into(), -self.get_mean_angle(time))
     }
 
+    /// Gets angle relative to the referance direction since last complete revolution
     fn get_mean_angle(&self, time: Float) -> Float {
         time % self.sidereal_period / self.sidereal_period * float::TAU
     }

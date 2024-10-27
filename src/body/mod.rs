@@ -1,7 +1,7 @@
 pub mod observatory;
 pub mod rotating;
 
-use std::sync::{ Arc as StdArc, RwLock, Weak as StdWeak};
+use std::sync::{Arc as StdArc, RwLock, Weak as StdWeak};
 
 use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
 use rotating::Rotating;
@@ -28,6 +28,8 @@ pub struct Body {
 }
 
 impl Body {
+    /// Genereates a new body, adding it to the children of the parent if one is given.
+    ///
     /// # Panics
     /// Will panic if `parent` is poisoned
     pub fn new<D>(parent: Option<Arc>, dynamic: D) -> Arc
@@ -35,7 +37,9 @@ impl Body {
         D: Dynamic + Send + Sync + 'static,
     {
         let b = Arc::new(RwLock::new(Self {
-            parent: parent.clone().map(|p| StdArc::<RwLock<Body>>::downgrade(&p)),
+            parent: parent
+                .clone()
+                .map(|p| StdArc::<RwLock<Body>>::downgrade(&p)),
             children: Vec::new(),
             dynamic: Box::new(dynamic),
             rotation: None,
@@ -50,8 +54,8 @@ impl Body {
     }
 
     /// # Panics
-    /// Will panic if any nth order children or sill existing nth order parents have poisoned
-    /// locks
+    /// Will panic if any decendants or sill existing ancestory have been poisoned by panicing
+    /// while in write mode
     #[must_use]
     pub fn get_observations_from_here(&self, time: Float) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
@@ -60,6 +64,7 @@ impl Body {
         results
     }
 
+    /// Returns the locations of the children relative to `current_position`
     #[must_use]
     fn traverse_down(
         &self,
@@ -84,6 +89,7 @@ impl Body {
         results
     }
 
+    /// Returns the location of parents relative to the `current_position`
     #[must_use]
     fn traverse_up(
         &self,

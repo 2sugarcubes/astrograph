@@ -12,6 +12,7 @@ pub struct Observatory {
 }
 
 impl Observatory {
+    /// Generates an observatory on the given body and location.
     #[must_use]
     pub fn new(location: Spherical<Float>, body: Arc) -> Self {
         let location: Vector3<Float> = location.into();

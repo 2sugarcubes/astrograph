@@ -15,6 +15,8 @@ pub struct Program {
 }
 
 impl Program {
+    /// Generate observations between the start and end time i.e. `[start_time, end_time)`, with
+    /// observations every step_size hours.
     // Precision loss is enevitable since we are going from an intager to a (compile-time) variable length float
     #[allow(clippy::cast_precision_loss)]
     #[allow(clippy::missing_panics_doc)] // Should only panic in unit tests

@@ -4,9 +4,12 @@ use crate::Float;
 
 use super::Dynamic;
 
+/// Returns a struct that returns the same offset for any given time. Especially useful for distant
+/// objects or very slow moving objects
 #[derive(Clone, Copy, Debug)]
 pub struct Fixed(pub(crate) Vector3<Float>);
 impl Fixed {
+    /// Returns a new fixed dynamic at the given location
     #[must_use]
     pub fn new(location: Vector3<Float>) -> Self {
         Fixed(location)
