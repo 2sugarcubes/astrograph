@@ -17,7 +17,7 @@ pub trait Projection {
 }
 
 /// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on the positive z direction, but thanks to the output
-/// of [crate::body::Observatory::observe] observations are already centered on the z axis.
+/// of [crate::body::observatory::Observatory::observe] observations are already centered on the z axis.
 #[derive(Debug, Clone, Copy)]
 pub struct StatelessOrthographic();
 
