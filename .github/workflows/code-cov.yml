@@ -25,7 +25,6 @@ jobs:
       - name: Generate Test Coverage
         run: |
           cargo tarpaulin --follow-exec --engine llvm --verbose --all-features --workspace --timeout 120 --out xml
-
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v4
         env:

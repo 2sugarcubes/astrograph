@@ -16,19 +16,18 @@ env:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        os:
+          - windows-latest:
+            os-flags: "-- --skip ui --exact"
+          - ubuntu-latest:
+            os-flags: ""
+        flags: [--no-default-features, --all-features]
     name: Test suite
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test
-
-  test_windows:
-    name: Test suite (windows)
-    runs-on: windows-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test -- --skip ui --exact
+      - run: cargo test ${{ matrix.flags }} ${{ matrix.os-flags }}
