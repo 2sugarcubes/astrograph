@@ -9,6 +9,10 @@ repository = "https://github.com/2sugarcubes/astrolabe"
 keywords = ["astronomy", "physics", "mathmatics"]
 categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
 
+[features]
+default = ["f64"]
+f64 = []
+
 [dependencies]
 coordinates = "0.3.1"
 quaternion = "1.0.0"

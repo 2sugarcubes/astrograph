@@ -168,7 +168,7 @@ mod tests {
             .read()
             .unwrap()
             .get_observations_from_here(0.0);
-        let sanitized_observations: Vec<&Vector3<f32>> =
+        let sanitized_observations: Vec<&Vector3<Float>> =
             observations.iter().map(|(_, loc)| loc).collect();
 
         println!("{sanitized_observations:?}");

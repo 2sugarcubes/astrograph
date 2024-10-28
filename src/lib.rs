@@ -24,8 +24,12 @@ pub mod projection;
 #[cfg(test)]
 extern crate assert_float_eq;
 
-/// Type alias to enable quick switching by feature flags in a future release.
+/// Type alias to enable compile time configurable precision.
+#[cfg(not(feature = "f64"))]
 pub type Float = f32;
+
+#[cfg(feature = "f64")]
+pub type Float = f64;
 
 /// Useful functions to use while testing to cut down on code repetition.
 pub mod testing {

@@ -107,7 +107,9 @@ mod tests {
             println!("{observations:.2?}");
 
             if observations.is_empty() {
-                assert!(time == 2);
+                // Increased precision leads to there correctly not being any bodies above the
+                // horizon at t=2 or t=3 when f64 is used.
+                assert!(time == 2 || time == 3 && cfg!(feature = "f64"));
             } else {
                 assert_float_absolute_eq!(observations[0].polar_angle, polar_angle);
             }
