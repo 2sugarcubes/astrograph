@@ -4,6 +4,13 @@ use crate::Float;
 pub const GRAVITATIONAL_CONSTANT: Float = 0.0609_109;
 
 /// Constants for the [crate::Float] type alias.
+#[cfg(not(feature = "f64"))]
 pub mod float {
     pub use core::f32::consts::*;
+}
+
+/// Constants for the [crate::Float] type alias.
+#[cfg(feature = "f64")]
+pub mod float {
+    pub use core::f64::consts::*;
 }
