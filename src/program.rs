@@ -2,7 +2,10 @@ use std::path::PathBuf;
 
 use derive_builder::Builder;
 
-use crate::body::{observatory::Observatory, Arc};
+use crate::{
+    body::{observatory::Observatory, Arc},
+    Float,
+};
 
 /// A facade that takes values from [crate::body::observatory::Observatory] in the tree defined at the root of [`Self::_root_body`] that outputs using the given [outputs](crate::output::Output) provided with a [path](Self::output_file_root)
 #[derive(Builder, Clone, Debug)]
@@ -40,7 +43,7 @@ impl Program {
                     .output_file_root
                     // TODO real names
                     .join(format!("TODO OBSERVATORY NAME/{time:010}"));
-                let observations = observatory.observe(time as f32);
+                let observations = observatory.observe(time as Float);
                 for output in &self.outputs {
                     // Write the observations to file, recovering on errors
                     match output.write_observations_to_file(&observations, &path) {
