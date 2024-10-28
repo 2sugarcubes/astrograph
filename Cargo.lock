@@ -17,6 +17,7 @@ dependencies = [
  "derive_builder",
  "dyn-clone",
  "quaternion",
+ "serde",
  "svg",
  "xorshift",
 ]
@@ -35,6 +36,7 @@ checksum = "8cb832df8777bce34879b8b92c55f492c4be377646ef93f16b9b58f3cf5e9bdb"
 dependencies = [
  "num-traits",
  "roots",
+ "serde",
 ]
 
 [[package]]
@@ -233,6 +235,26 @@ name = "roots"
 version = "0.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c36d2bbc763f480668d6d6790ae2fdd2e52ac0c21a3a26d156f3534a3d9eea9"
+
+[[package]]
+name = "serde"
+version = "1.0.214"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f55c3193aca71c12ad7890f1785d2b73e1b9f63a0bbc353c08ef26fe03fc56b5"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.214"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de523f781f095e28fa605cdce0f8307e451cc0fd14e2eb4cd2e98a355b147766"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "strsim"
