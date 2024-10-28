@@ -26,6 +26,7 @@ impl<T: Projection> Svg<T> {
         &self,
         observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
+        // TODO remove some magic values (like "1010", "505", etc.)
         let mut result = Document::new()
             .add(Rectangle::new().set("width", "1010").set("height", "1010"))
             .add(
