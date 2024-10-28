@@ -38,10 +38,10 @@ impl<T: Projection> Svg<T> {
             let circle = Circle::new()
                 // Set radius to a small but still visible value
                 // TODO set radius based on angular diameter
-                .set("r", "0.01")
-                // Map values in the range [-1,1] to [0,1]
-                .set("cx", format!("{}", projected_location.x / 2.0 + 0.5))
-                .set("cy", format!("{}", projected_location.y / 2.0 + 0.5))
+                .set("r", "1.0")
+                // Map values in the range [-1,1] to [0,1000]
+                .set("cx", format!("{}", projected_location.x * 500.0 + 500.0))
+                .set("cy", format!("{}", projected_location.y * 500.0 + 500.0))
                 // TODO set color based on body type? (Will likely require user defined settings)
                 .set("fill", "white");
 
