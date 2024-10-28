@@ -3,9 +3,12 @@ use quaternion::Quaternion;
 
 use crate::{consts::float, Float};
 
+/// A struct that defines the rotation of a body.
 #[derive(Debug, Clone)]
 pub struct Rotating {
+    /// The time for the body to rotate 360 degrees, as opposed to a [solar day](https://en.wikipedia.org/wiki/Synodic_day)
     sidereal_period: Float,
+    /// The direction of the geographic north pole.
     axis: Vector3<Float>,
 }
 

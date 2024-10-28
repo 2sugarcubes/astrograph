@@ -5,9 +5,13 @@ use crate::Float;
 
 use super::Arc;
 
+/// Defines a place on the surface of a body where observations are made of the motion of bodies.
 #[derive(Debug, Clone)]
 pub struct Observatory {
+    /// A quaternion that encodes the rotation from the given longitude and latitude to the
+    /// geographic north pole to make projections easier.
     location: Quaternion<Float>,
+    /// The body that observations are being made from
     body: Arc,
 }
 
@@ -27,7 +31,7 @@ impl Observatory {
     ///
     /// # Panics
     ///
-    /// If it cannot get a clean read lock on the body this observatory is on. i.e. the `RwLock` is
+    /// If it cannot get a clean read lock on the body this observatory is on. i.e. the [`std::sync::RwLock`] is
     /// [poisoned](https://doc.rust-lang.org/std/sync/struct.RwLock.html#poisoning).
     #[must_use]
     pub fn observe(&self, time: Float) -> Vec<(Arc, Spherical<Float>)> {

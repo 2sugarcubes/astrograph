@@ -15,6 +15,8 @@ pub mod output;
 /// A helper [facade](https://en.wikipedia.org/wiki/Facade_pattern) that takes simulation times and
 /// converts them to outputs, such as SVG files.
 pub mod program;
+
+/// Projections that map 3D space to a 2D plane
 pub mod projection;
 
 #[allow(unused_imports)] // Macro_use is required here

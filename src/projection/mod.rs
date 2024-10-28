@@ -17,7 +17,7 @@ pub trait Projection {
 }
 
 /// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on the positive z direction, but thanks to the output
-/// of [crate::body::observatory::Observatory::observe] observations are already centered on the z axis.
+/// of [`crate::body::observatory::Observatory::observe`] observations are already centered on the z axis.
 #[derive(Debug, Clone, Copy)]
 pub struct StatelessOrthographic();
 
@@ -43,9 +43,14 @@ impl Projection for StatelessOrthographic {
     }
 }
 
-/// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on an orbitrary longitude and latitude. In most cases it will be quicker to use the [self::StatelessOrthographic] projection.
+/// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on an orbitrary longitude and latitude. In most cases it will be quicker to use the [`StatelessOrthographic`](self::StatelessOrthographic) projection.
 #[derive(Debug, Clone)]
-pub struct Orthographic(Float, Float);
+pub struct Orthographic(
+    /// Longitude of center of projection.
+    Float,
+    /// Latitude of the center of projection.
+    Float,
+);
 
 impl Projection for Orthographic {
     fn project_with_state(&self, location: &Spherical<Float>) -> Option<Vector2<Float>> {

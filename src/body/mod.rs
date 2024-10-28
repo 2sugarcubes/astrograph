@@ -1,4 +1,7 @@
+/// Contains the definition of observatories that sit on the surface of a body and observe the
+/// motion of other bodies
 pub mod observatory;
+/// Contains logic for rotating bodies
 pub mod rotating;
 
 use std::sync::{Arc as StdArc, RwLock, Weak as StdWeak};
@@ -8,9 +11,12 @@ use rotating::Rotating;
 
 use crate::{dynamic::Dynamic, Float};
 
+/// A convienience wrapper for [`std::sync::Arc`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
 pub type Arc = StdArc<RwLock<Body>>;
+/// A convienience wrapper for [`std::sync::Weak`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
 type Weak = StdWeak<RwLock<Body>>;
 
+/// A representation of a body in the simulation, such as a star, planet, center of mass, or moon.
 #[derive(Debug, Clone)]
 pub struct Body {
     /// The body that this body is orbiting around
@@ -19,6 +25,7 @@ pub struct Body {
     pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic + Send + Sync>,
+    /// If the body has any observatories it is highly recommended to initialize this.
     pub rotation: Option<Rotating>,
     // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
