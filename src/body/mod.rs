@@ -11,9 +11,9 @@ use rotating::Rotating;
 
 use crate::{dynamic::Dynamic, Float};
 
-/// A convienience wrapper for [`std::sync::Arc`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
+/// A convenience wrapper for [`std::sync::Arc`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
 pub type Arc = StdArc<RwLock<Body>>;
-/// A convienience wrapper for [`std::sync::Weak`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
+/// A convenience wrapper for [`std::sync::Weak`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
 type Weak = StdWeak<RwLock<Body>>;
 
 /// A representation of a body in the simulation, such as a star, planet, center of mass, or moon.
@@ -35,7 +35,7 @@ pub struct Body {
 }
 
 impl Body {
-    /// Genereates a new body, adding it to the children of the parent if one is given.
+    /// Generates a new body, adding it to the children of the parent if one is given.
     ///
     /// # Panics
     /// Will panic if `parent` is poisoned
@@ -61,7 +61,7 @@ impl Body {
     }
 
     /// # Panics
-    /// Will panic if any decendants or sill existing ancestory have been poisoned by panicing
+    /// Will panic if any descendants or sill existing ancestry have been poisoned by panicking
     /// while in write mode
     #[must_use]
     pub fn get_observations_from_here(&self, time: Float) -> Vec<(Arc, Vector3<Float>)> {

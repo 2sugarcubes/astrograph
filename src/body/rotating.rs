@@ -32,7 +32,7 @@ impl Rotating {
         quaternion::axis_angle(self.axis.into(), -self.get_mean_angle(time))
     }
 
-    /// Gets angle relative to the referance direction since last complete revolution
+    /// Gets angle relative to the reference direction since last complete revolution
     fn get_mean_angle(&self, time: Float) -> Float {
         time % self.sidereal_period / self.sidereal_period * float::TAU
     }
@@ -50,7 +50,7 @@ mod test {
     use super::Rotating;
 
     #[test]
-    fn normalise_axis() {
+    fn normalize_axis() {
         const EXPECTED_MAGNITUDE: Float = 1.0;
         let axis_small = Spherical {
             radius: 0.5,

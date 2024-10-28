@@ -10,7 +10,7 @@ pub mod body;
 pub mod consts;
 /// Structs that model the orbits that bodies can follow.
 pub mod dynamic;
-/// Objects that assist in outputing data to various types, e.g. HTML canvas, SVG, etc.
+/// Objects that assist in outputting data to various types, e.g. HTML canvas, SVG, etc.
 pub mod output;
 /// A helper [facade](https://en.wikipedia.org/wiki/Facade_pattern) that takes simulation times and
 /// converts them to outputs, such as SVG files.
@@ -65,14 +65,14 @@ pub mod testing {
     /// `([crate::body::Arc], [crate::body::Arc])` where the first `Arc` is the root body, and must
     /// be kept alive to keep all the ancestors of the intended observing body in scope; and the second `Arc` is intended to be the observing body.
     #[must_use]
-    #[allow(clippy::cast_lossless)] // Necesary to enable testing on multiple float types
+    #[allow(clippy::cast_lossless)] // Necessary to enable testing on multiple float types
     fn make_toy_parents<T: Rng>(rng: &mut T, depth: u8) -> (Arc, Arc) {
         if depth == 0 {
-            let body = Body::new(None, make_keplernian_dynamic(rng, -(depth as i32)));
+            let body = Body::new(None, make_keplerian_dynamic(rng, -(depth as i32)));
             (body.clone(), body)
         } else {
             let (root, parent) = make_toy_parents(rng, depth - 1);
-            let body = Body::new(Some(parent), make_keplernian_dynamic(rng, -(depth as i32)));
+            let body = Body::new(Some(parent), make_keplerian_dynamic(rng, -(depth as i32)));
             (root, body)
         }
     }
@@ -84,18 +84,18 @@ pub mod testing {
             for _ in 0..number_of_children {
                 let child = Body::new(
                     Some(parent.clone()),
-                    make_keplernian_dynamic(rng, -(depth as i32)),
+                    make_keplerian_dynamic(rng, -(depth as i32)),
                 );
                 make_toy_children(rng, &child, depth - 1, number_of_children);
             }
         }
     }
 
-    /// Generates a random plausable [crate::dynamic::keplerian::Keplerian] where depth acts as a
+    /// Generates a random plausible [crate::dynamic::keplerian::Keplerian] where depth acts as a
     /// scaling factor where each step deeper halves the size of the variables that it generates
     /// (`semi_major_axis` and `parent_mass`)
-    #[allow(clippy::useless_conversion)] // Necesary for testing with different length floats
-    fn make_keplernian_dynamic<T: Rng>(rng: &mut T, depth: i32) -> Keplerian {
+    #[allow(clippy::useless_conversion)] // Necessary for testing with different length floats
+    fn make_keplerian_dynamic<T: Rng>(rng: &mut T, depth: i32) -> Keplerian {
         let scale = (2.0 as Float).powi(depth.into());
 
         Keplerian::new(
@@ -109,7 +109,7 @@ pub mod testing {
         )
     }
 
-    /// Convenience wrapper that generates a random cannonicali angle, i.e. [0, 2π), in radians
+    /// Convenience wrapper that generates a random canonical angle, i.e. [0, 2π), in radians
     fn make_random_angle<T: Rng>(rng: &mut T) -> Float {
         rng.gen_range(0.0, float::TAU)
     }

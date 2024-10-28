@@ -12,7 +12,7 @@ use crate::{body::Arc, Float};
 pub mod svg;
 
 /// The trait for structs that output to a file. It may be made more general in future to better
-/// accomidate non-file outputs e.g. console loggers, or outputs to screen or streams
+/// accommodate non-file outputs e.g. console loggers, or outputs to screen or streams
 pub trait Output: DynClone + Debug {
     /// # Errors
     /// implementations may panic if there is an error in the filesystem e.g. writing is not

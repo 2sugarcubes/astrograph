@@ -1,6 +1,6 @@
 /// A dynamic that stays in a constant location
 pub mod fixed;
-/// A dynamic that fits the [keplerian laws for planetary modtion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion).
+/// A dynamic that fits the [keplerian laws for planetary motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion).
 pub mod keplerian;
 //mod circular;
 

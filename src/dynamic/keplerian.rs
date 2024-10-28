@@ -15,30 +15,30 @@ pub struct Keplerian {
     eccentricity: Float,
     /// Unit: light-seconds.
     ///
-    /// Definition: Half the length of the longest diameter through the elipsis.
+    /// Definition: Half the length of the longest diameter through the ellipsis.
     semi_major_axis: Float,
     /// Unit: light-seconds.
     ///
-    /// Definition: Half the length of the shortest diameter through the elipsis.
+    /// Definition: Half the length of the shortest diameter through the ellipsis.
     semi_minor_axis: Float,
 
     // Orbital Plane, and argument of ascending node, argument of periapsis, and inclination.
     /// Unit: radians, sort of.
     ///
-    /// Definition: This variable encodes how the orbit is rotated relative to a referance
-    /// direction. encompasing the argument of the periapsis, the orbital inclination, and the
+    /// Definition: This variable encodes how the orbit is rotated relative to a reference
+    /// direction. encompassing the argument of the periapsis, the orbital inclination, and the
     /// argument of the ascending node.
     inclination: Quaternion<Float>,
 
     /// Unit: radian
     ///
     /// Definition: How far along the orbit this body was at the "start of time" (t=0)
-    mean_anomality_at_epoch: Float,
+    mean_anomaly_at_epoch: Float,
 
     /// Unit: Hours
     ///
     /// Definition: How long it takes for this body to complete one orbit (when the angle between an
-    /// infinitely distant point and the parent body are equal again i.e. the [siderial period](https://en.wikipedia.org/wiki/Orbital_period#Related_periods) as opposed to [tropical period](https://en.wikipedia.org/wiki/Solar_year), or [synodic period](https://en.wikipedia.org/wiki/Orbital_period#Synodic_period))
+    /// infinitely distant point and the parent body are equal again i.e. the [sidereal period](https://en.wikipedia.org/wiki/Orbital_period#Related_periods) as opposed to [tropical period](https://en.wikipedia.org/wiki/Solar_year), or [synodic period](https://en.wikipedia.org/wiki/Orbital_period#Synodic_period))
     orbital_period: Float,
 }
 
@@ -78,7 +78,7 @@ impl Keplerian {
         inclination: Float,
         longitude_of_ascending_node: Float,
         argument_of_periapsis: Float,
-        mean_anomality_at_epoch: Float,
+        mean_anomaly_at_epoch: Float,
         orbital_period: Float,
     ) -> Self {
         let semi_minor_axis = 1.0 - eccentricity * eccentricity;
@@ -96,7 +96,7 @@ impl Keplerian {
             semi_major_axis,
             semi_minor_axis,
             inclination,
-            mean_anomality_at_epoch,
+            mean_anomaly_at_epoch,
             orbital_period,
         }
     }
@@ -104,22 +104,22 @@ impl Keplerian {
     /// Calculates the mean anomaly from the time since the epoch
     /// Note: May be larger than Tau, but should be fine since it will be used in sin or cos
     /// functions
-    fn get_mean_anomality(&self, time: Float) -> Float {
-        time % self.orbital_period / self.orbital_period * Float::TAU + self.mean_anomality_at_epoch
+    fn get_mean_anomaly(&self, time: Float) -> Float {
+        time % self.orbital_period / self.orbital_period * Float::TAU + self.mean_anomaly_at_epoch
     }
 
     /// Gets the distance from the central body at a given time
     #[allow(dead_code)] // Will be used in future
-    fn get_radius(&self, mean_anomality: Float) -> Float {
+    fn get_radius(&self, mean_anomaly: Float) -> Float {
         self.semi_major_axis * self.semi_minor_axis
-            / (1.0 + self.eccentricity * mean_anomality.cos())
+            / (1.0 + self.eccentricity * mean_anomaly.cos())
     }
 
-    /// Aproximates the eccentric anomaly using fixed point itteration, should be within ±0.00005 radians.
-    fn get_eccentric_anomality(&self, mean_anomality: Float) -> Float {
-        let mut result = mean_anomality;
+    /// Approximates the eccentric anomaly using fixed point iteration, should be within ±0.00005 radians.
+    fn get_eccentric_anomaly(&self, mean_anomaly: Float) -> Float {
+        let mut result = mean_anomaly;
         for _ in 0..20 {
-            result = mean_anomality + self.eccentricity * result.sin();
+            result = mean_anomaly + self.eccentricity * result.sin();
         }
 
         result
@@ -129,7 +129,7 @@ impl Keplerian {
 impl Dynamic for Keplerian {
     /// Returns the offset from the parent body at a given time.
     fn get_offset(&self, time: crate::Float) -> Vector3<crate::Float> {
-        let eccentric_anomaly = self.get_eccentric_anomality(self.get_mean_anomality(time));
+        let eccentric_anomaly = self.get_eccentric_anomaly(self.get_mean_anomaly(time));
         let (sin, cos) = eccentric_anomaly.sin_cos();
         // Top down view
         let x = self.semi_major_axis * (cos - self.eccentricity);
@@ -192,7 +192,7 @@ mod tests {
     fn anomaly_at_epoch() {
         let earth = get_earth();
 
-        let anomaly = earth.get_mean_anomality(0.0);
+        let anomaly = earth.get_mean_anomaly(0.0);
 
         assert!((anomaly - (100.464_35 as Float).to_radians()).abs() < 0.000_1);
     }
@@ -200,7 +200,7 @@ mod tests {
     #[test]
     fn anomaly_at_three_months() {
         let earth = get_earth();
-        let anomaly = earth.get_mean_anomality(earth.orbital_period / 4.0);
+        let anomaly = earth.get_mean_anomaly(earth.orbital_period / 4.0);
 
         assert!((anomaly - (190.464_35 as Float).to_radians()).abs() < 0.000_1);
     }
@@ -208,7 +208,7 @@ mod tests {
     #[test]
     fn anomaly_at_six_months() {
         let earth = get_earth();
-        let anomaly = earth.get_mean_anomality(earth.orbital_period / 2.0);
+        let anomaly = earth.get_mean_anomaly(earth.orbital_period / 2.0);
 
         assert!((anomaly - (280.464_35 as Float).to_radians()).abs() < 0.000_1);
     }
@@ -263,9 +263,9 @@ mod tests {
 
         for i in 0..u8::MAX {
             let time = Float::from(i);
-            let mean_anomaly = tau_period.get_mean_anomality(time);
+            let mean_anomaly = tau_period.get_mean_anomaly(time);
             assert!(
-                (mean_anomaly - tau_period.get_eccentric_anomality(mean_anomaly)).abs()
+                (mean_anomaly - tau_period.get_eccentric_anomaly(mean_anomaly)).abs()
                     < Float::EPSILON
             );
         }
