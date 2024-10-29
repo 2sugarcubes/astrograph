@@ -1,12 +1,14 @@
 use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 use quaternion::Quaternion;
+use serde::{Deserialize, Serialize};
 
 use crate::Float;
 
 use super::Arc;
 
 /// Defines a place on the surface of a body where observations are made of the motion of bodies.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Observatory {
     /// A quaternion that encodes the rotation from the given longitude and latitude to the
     /// geographic north pole to make projections easier.
