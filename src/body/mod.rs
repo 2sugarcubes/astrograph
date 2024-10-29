@@ -374,7 +374,6 @@ mod tests {
         match serde_json::to_string(&sun) {
             Ok(data) => {
                 println!("{data}");
-                panic!("PLEASE READ DATA")
             }
             Err(e) => panic!("Error parsing:\n{:?}\n Reason: {}", sun, e),
         }
@@ -382,25 +381,10 @@ mod tests {
 
     #[test]
     fn deserialise_from_json_string() -> Result<()> {
-        let json = r#"
-            {
-                dynamic: fixed {
-                    Vector3 {
-                        x: 0,
-                        y: 0,
-                        z: 0,
-                },
-                children: [
-                    body: {
-                        dynamic: keplernian {
-                            
-                        }
-                    }
-
-                ]
-
-            }
-            "#;
+        #[cfg(unix)]
+        let json = include_str!("../../assets/solar-system.json");
+        #[cfg(windows)]
+        let json = include_str!("..\\..\\assets\\solar-system.json");
 
         let sun: Arc = StdArc::new(RwLock::new(serde_json::from_str(json)?));
         Body::hydrate_all(&sun, &None);
