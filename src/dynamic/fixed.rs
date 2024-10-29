@@ -1,4 +1,5 @@
 use coordinates::three_dimensional::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::Float;
 
@@ -6,7 +7,8 @@ use super::Dynamic;
 
 /// Returns a struct that returns the same offset for any given time. Especially useful for distant
 /// objects or very slow moving objects
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Fixed(pub(crate) Vector3<Float>);
 impl Fixed {
     /// Returns a new fixed dynamic at the given location
@@ -16,6 +18,7 @@ impl Fixed {
     }
 }
 
+#[typetag::serde]
 impl Dynamic for Fixed {
     fn get_offset(&self, _: crate::Float) -> Vector3<crate::Float> {
         self.0

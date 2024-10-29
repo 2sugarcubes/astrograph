@@ -1,12 +1,14 @@
 use crate::{consts::GRAVITATIONAL_CONSTANT, Float};
 use coordinates::prelude::*;
 use quaternion::Quaternion;
+use serde::{Deserialize, Serialize};
 
 use super::Dynamic;
 
 /// Struct that best fits [kepler's laws of planetary
 /// motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion).
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Keplerian {
     // Size and shape
     /// Unit: unitless.
@@ -111,8 +113,7 @@ impl Keplerian {
     /// Gets the distance from the central body at a given time
     #[allow(dead_code)] // Will be used in future
     fn get_radius(&self, mean_anomaly: Float) -> Float {
-        self.semi_major_axis * self.semi_minor_axis
-            / (1.0 + self.eccentricity * mean_anomaly.cos())
+        self.semi_major_axis * self.semi_minor_axis / (1.0 + self.eccentricity * mean_anomaly.cos())
     }
 
     /// Approximates the eccentric anomaly using fixed point iteration, should be within ±0.00005 radians.
@@ -126,6 +127,7 @@ impl Keplerian {
     }
 }
 
+#[typetag::serde]
 impl Dynamic for Keplerian {
     /// Returns the offset from the parent body at a given time.
     fn get_offset(&self, time: crate::Float) -> Vector3<crate::Float> {
