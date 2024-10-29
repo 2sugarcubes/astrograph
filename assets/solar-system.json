@@ -1,0 +1,144 @@
+{
+  "children": [
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.20563069,
+          "semiMajorAxis": 193.16236607,
+          "inclination": [
+            0.051196192484218084,
+            [-0.03822015555795604, 0.9968183608894043, 0.04765841980181001]
+          ],
+          "meanAnomalyAtEpoch": 4.402607698921413,
+          "orbitalPeriod": 2111.256
+        }
+      }
+    },
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.00677323,
+          "semiMajorAxis": 360.94266301,
+          "inclination": [
+            -0.9238264026207328,
+            [-0.027009983464240425, -0.3816640243359802, 0.012157760557000855]
+          ],
+          "meanAnomalyAtEpoch": 3.1761454603903005,
+          "orbitalPeriod": 5392.824
+        }
+      }
+    },
+    {
+      "children": [
+        {
+          "children": [],
+          "dynamic": {
+            "Keplerian": {
+              "eccentricity": 0.0549,
+              "semiMajorAxis": 1.28243,
+              "inclination": [
+                0.24429100986546537,
+                [
+                  -0.016061626216258496, -0.968662672397927,
+                  -0.04191126060030411
+                ]
+              ],
+              "meanAnomalyAtEpoch": 2.0135060728802663,
+              "orbitalPeriod": 655.7064
+            }
+          }
+        }
+      ],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.01671022,
+          "semiMajorAxis": 499.00005489,
+          "inclination": [
+            0.7636500663488981,
+            [-3.4135201227962216e-7, 0.6456303711607232, 2.717805936400417e-7]
+          ],
+          "meanAnomalyAtEpoch": 1.7534336883759651,
+          "orbitalPeriod": 8766.144
+        }
+      }
+    },
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.09341233,
+          "semiMajorAxis": 760.30749269,
+          "inclination": [
+            -0.7921974004240908,
+            [-0.0033519187498277925, -0.6100512201823614, -0.015797219882604643]
+          ],
+          "meanAnomalyAtEpoch": 6.203830771145011,
+          "orbitalPeriod": 16487.52
+        }
+      }
+    },
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.04839266,
+          "semiMajorAxis": 2596.47814199,
+          "inclination": [
+            -0.30788591567410917,
+            [-0.001462515602951256, 0.9513550946598579, 0.011296364121232364]
+          ],
+          "meanAnomalyAtEpoch": 0.6004697081072867,
+          "orbitalPeriod": 1039814.1359999999
+        }
+      }
+    },
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.0541506,
+          "semiMajorAxis": 4758.99808968,
+          "inclination": [
+            -0.9390593591759231,
+            [-0.015651441911780098, 0.34307073276192257, 0.015000821057007325]
+          ],
+          "meanAnomalyAtEpoch": 0.8716928266696543,
+          "orbitalPeriod": 258136.776
+        }
+      }
+    },
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.04716771,
+          "semiMajorAxis": 9576.440701070002,
+          "inclination": [
+            -0.9379404084715283,
+            [-0.006697370424724883, 0.3467313878720357, 0.0005291974948740349]
+          ],
+          "meanAnomalyAtEpoch": 5.466932864199532,
+          "orbitalPeriod": 736449.6000000001
+        }
+      }
+    },
+    {
+      "children": [],
+      "dynamic": {
+        "Keplerian": {
+          "eccentricity": 0.00858587,
+          "semiMajorAxis": 15004.412776520001,
+          "inclination": [
+            -0.9002674054424251,
+            [-0.005904418247220066, 0.43506350957251383, 0.014264612913539698]
+          ],
+          "meanAnomalyAtEpoch": 5.321160347079087,
+          "orbitalPeriod": 1444536.432
+        }
+      }
+    }
+  ],
+  "dynamic": { "Fixed": { "x": 0.0, "y": 0.0, "z": 0.0 } }
+}
