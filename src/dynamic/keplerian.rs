@@ -19,10 +19,6 @@ pub struct Keplerian {
     ///
     /// Definition: Half the length of the longest diameter through the ellipsis.
     semi_major_axis: Float,
-    /// Unit: Unitless.
-    ///
-    /// Definition: Cached value that will speed up computations.
-    one_minus_eccentricity_squared: Float,
 
     // Orbital Plane, and argument of ascending node, argument of periapsis, and inclination.
     /// Unit: radians, sort of.
@@ -83,7 +79,6 @@ impl Keplerian {
         mean_anomaly_at_epoch: Float,
         orbital_period: Float,
     ) -> Self {
-        let semi_minor_axis = 1.0 - eccentricity * eccentricity;
         let inclination = quaternion::euler_angles(0.0, longitude_of_ascending_node, inclination);
         let inclination = quaternion::mul(
             inclination,
@@ -96,7 +91,6 @@ impl Keplerian {
         Self {
             eccentricity,
             semi_major_axis,
-            one_minus_eccentricity_squared: semi_minor_axis,
             inclination,
             mean_anomaly_at_epoch,
             orbital_period,
@@ -113,7 +107,8 @@ impl Keplerian {
     /// Gets the distance from the central body at a given time
     #[allow(dead_code)] // Will be used in future
     fn get_radius(&self, mean_anomaly: Float) -> Float {
-        self.semi_major_axis * self.one_minus_eccentricity_squared / (1.0 + self.eccentricity * mean_anomaly.cos())
+        self.semi_major_axis * (1.0 - self.eccentricity.powi(2))
+            / (1.0 + self.eccentricity * mean_anomaly.cos())
     }
 
     /// Approximates the eccentric anomaly using fixed point iteration, should be within ±0.00005 radians.
@@ -135,7 +130,7 @@ impl Dynamic for Keplerian {
         let (sin, cos) = eccentric_anomaly.sin_cos();
         // Top down view
         let x = self.semi_major_axis * (cos - self.eccentricity);
-        let z = self.semi_major_axis * (self.one_minus_eccentricity_squared).sqrt() * sin;
+        let z = self.semi_major_axis * (1.0 - self.eccentricity.powi(2)).sqrt() * sin;
 
         // Convert to 3d by rotating around the `longitude of the ascending node` by `inclination`
         // radians
