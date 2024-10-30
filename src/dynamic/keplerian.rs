@@ -8,7 +8,7 @@ use super::Dynamic;
 /// Struct that best fits [kepler's laws of planetary
 /// motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(from = "IntermediateKeplerian", into = "IntermediateKeplerian")]
 pub struct Keplerian {
     // Size and shape
     /// Unit: unitless.
@@ -38,6 +38,15 @@ pub struct Keplerian {
     /// Definition: How long it takes for this body to complete one orbit (when the angle between an
     /// infinitely distant point and the parent body are equal again i.e. the [sidereal period](https://en.wikipedia.org/wiki/Orbital_period#Related_periods) as opposed to [tropical period](https://en.wikipedia.org/wiki/Solar_year), or [synodic period](https://en.wikipedia.org/wiki/Orbital_period#Synodic_period))
     orbital_period: Float,
+
+    calculated_fields: CalculatedFields,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct CalculatedFields {
+    longitude_of_ascending_node: Float,
+    argument_of_periapsis: Float,
+    inclination: Float,
 }
 
 impl Keplerian {
@@ -79,9 +88,10 @@ impl Keplerian {
         mean_anomaly_at_epoch: Float,
         orbital_period: Float,
     ) -> Self {
-        let inclination = quaternion::euler_angles(0.0, longitude_of_ascending_node, inclination);
-        let inclination = quaternion::mul(
-            inclination,
+        let inclination_quaternion =
+            quaternion::euler_angles(0.0, longitude_of_ascending_node, inclination);
+        let inclination_quaternion = quaternion::mul(
+            inclination_quaternion,
             quaternion::axis_angle(
                 [0.0, 1.0, 0.0],
                 argument_of_periapsis + longitude_of_ascending_node,
@@ -91,9 +101,14 @@ impl Keplerian {
         Self {
             eccentricity,
             semi_major_axis,
-            inclination,
+            inclination: inclination_quaternion,
             mean_anomaly_at_epoch,
             orbital_period,
+            calculated_fields: CalculatedFields {
+                argument_of_periapsis,
+                longitude_of_ascending_node,
+                inclination,
+            },
         }
     }
 
@@ -136,6 +151,59 @@ impl Dynamic for Keplerian {
         // radians
         let location = [x, 0.0, z];
         quaternion::rotate_vector(self.inclination, location).into()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct IntermediateKeplerian {
+    /// eccentricity
+    e: Float,
+    /// Semi-major axis (Maximum diameter of orbit)
+    #[serde(rename="a")]
+    semimajor_axis: Float,
+
+    /// inclination from the reference plane
+    #[serde(rename="i")]
+    inclination: Float,
+    /// Location where orbit intersects the reference plane from below to above
+    #[serde(rename="ascendingNode")]
+    longitude_of_ascending_node: Float,
+
+    /// Anomaly at T=0
+    true_anomaly: Float,
+    /// Location of periapsis relative to a reference point
+    #[serde(rename="argPeri")]
+    argument_of_periapsis: Float,
+
+    /// Time to complete one orbit, in hours
+    period: Float,
+}
+
+impl From<IntermediateKeplerian> for Keplerian {
+    fn from(value: IntermediateKeplerian) -> Self {
+        Keplerian::new_with_period(
+            value.e,
+            value.semimajor_axis,
+            value.inclination,
+            value.longitude_of_ascending_node,
+            value.argument_of_periapsis,
+            value.true_anomaly,
+            value.period,
+        )
+    }
+}
+impl From<Keplerian> for IntermediateKeplerian {
+    fn from(value: Keplerian) -> Self {
+        IntermediateKeplerian {
+            e: value.eccentricity,
+            semimajor_axis: value.semi_major_axis,
+            inclination: value.calculated_fields.inclination,
+            argument_of_periapsis: value.calculated_fields.argument_of_periapsis,
+            longitude_of_ascending_node: value.calculated_fields.longitude_of_ascending_node,
+            true_anomaly: value.mean_anomaly_at_epoch,
+            period: value.orbital_period,
+        }
     }
 }
 
