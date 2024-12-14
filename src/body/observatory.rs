@@ -1,12 +1,14 @@
 use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 use quaternion::Quaternion;
+use serde::{Deserialize, Serialize};
 
 use crate::Float;
 
 use super::Arc;
 
 /// Defines a place on the surface of a body where observations are made of the motion of bodies.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase", from = "WeakObservatory")]
 pub struct Observatory {
     /// A quaternion that encodes the rotation from the given longitude and latitude to the
     /// geographic north pole to make projections easier.
@@ -62,6 +64,46 @@ impl Observatory {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct WeakObservatory {
+    location: Spherical<Float>,
+    body_id: Vec<usize>,
+}
+
+pub(crate) fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observatory {
+    let mut body = root.clone();
+    for child_id in weak_observatory.body_id {
+        let b = body.read().unwrap().children[child_id].clone();
+        body = b
+    }
+
+    Observatory::new(weak_observatory.location, body.clone())
+}
+
+impl From<Observatory> for WeakObservatory {
+    fn from(value: Observatory) -> Self {
+        let (qw, [qx, qy, qz]) = value.location;
+        // From https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+
+        // asin(2*qx*qy + 2*qz*qw)
+        // We take acos because we are using a polar angle, not a latitude
+        let polar_angle = (2.0 - qx * qy + 2.0 * qz * qw).acos();
+
+        // atan2(2*qy*qw-2*qx*qz , 1 - 2*qy^2 - 2*qz^2)
+        let azimuthal_angle =
+            (2.0 * qy * qw - 2.0 * qx * qz).atan2(1.0 - 2.0 * qy * qy - 2.0 * qz * qz);
+
+        WeakObservatory {
+            location: Spherical {
+                polar_angle,
+                azimuthal_angle,
+                radius: 1.0,
+            },
+            body_id: value.body.read().unwrap().get_id(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     //FIXME write some tests later, my head hurts
@@ -69,7 +111,11 @@ mod tests {
     use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 
     use crate::{
-        body::{observatory::Observatory, rotating::Rotating, Arc, Body},
+        body::{
+            observatory::{Observatory, WeakObservatory},
+            rotating::Rotating,
+            Arc, Body,
+        },
         consts::float,
         dynamic::fixed::Fixed,
         Float,
@@ -114,5 +160,14 @@ mod tests {
                 assert_float_absolute_eq!(observations[0].polar_angle, polar_angle);
             }
         }
+    }
+
+    #[test]
+    fn load_from_file() {
+        let file = include_str!("../../assets/solar-system.observatories.json");
+
+        let observatories: Vec<WeakObservatory> = serde_json::from_str(file).unwrap();
+
+        assert_eq!(observatories.len(), 6);
     }
 }

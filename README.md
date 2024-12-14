@@ -4,7 +4,7 @@
 
 [![codecov](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests)](https://github.com/2sugarcubes/astrolabe/actions)
-[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]()
+[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]
 
 [![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/issues)
 
@@ -30,7 +30,7 @@ Predict bodies in a n-body problem, a situation where each body influences the m
 - [x] Different projections, default will be an orthographic projection, but other projections will likely be added on a low priority
 - [x] Writing to file, probably an SVG, but possibly PNG/BMP/etc if I see a need for it.
 - [x] Configurable precision, i.e. [F32](https://en.wikipedia.org/wiki/Single-precision_floating-point_format), [F64](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), and possibly [F128](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format)
-- [ ] Serialisation, most likely json, but other [supported serialisation data formats](https://serde.rs/#data-formats) will be added on an as needed basis
+- [x] Serialisation, most likely json, but other [supported serialisation data formats](https://serde.rs/#data-formats) will be added on an as needed basis
 - [ ] Procedurally generated universes
 - [ ] Color coded Bodies
 - [ ] Body classes (e.g. `planet-rocky`, `planet-gas`, `star-M-class`, `moon-icy`, `black-hole`), useful for filtering bodies in results
