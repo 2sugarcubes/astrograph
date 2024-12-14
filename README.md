@@ -4,7 +4,7 @@
 
 [![codecov](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests)](https://github.com/2sugarcubes/astrolabe/actions)
-[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]()
+[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]
 
 [![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/issues)
 
