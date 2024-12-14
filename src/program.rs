@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// A facade that takes values from [crate::body::observatory::Observatory] in the tree defined at the root of [`Self::_root_body`] that outputs using the given [outputs](crate::output::Output) provided with a [path](Self::output_file_root)
-#[derive(Builder, Clone, Debug, Serialize)]
+#[derive(Builder, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", from = "DeserializedProgram")]
 pub struct Program {
     /// The root of the tree, we need to reference it here to prevent the reference counter from
@@ -77,6 +77,8 @@ impl Program {
     }
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct DeserializedProgram {
     root_body: Arc,
     observatories: Vec<WeakObservatory>,
@@ -97,5 +99,38 @@ impl From<DeserializedProgram> for Program {
             output_file_root: value.output_file_root,
             outputs: Vec::new(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn deserialize_from_parts() {
+        let bodies = include_str!("../assets/solar-system.json");
+        let observatoies = include_str!("../assets/solar-system.observatories.json");
+
+        let root: Arc = serde_json::from_str(bodies).unwrap();
+        let observatories: Vec<WeakObservatory> = serde_json::from_str(observatoies).unwrap();
+
+        let dp = DeserializedProgram {
+            root_body: root.clone(),
+            observatories,
+            output_file_root: PathBuf::default(),
+        };
+
+        let program: Program = dp.into();
+
+        assert_eq!(6, program.observatories.len());
+    }
+
+    #[test]
+    fn deserialize() {
+        let program = include_str!("../assets/solar-system.program.json");
+
+        let program: Program = serde_json::from_str(program).unwrap();
+
+        assert_eq!(6, program.observatories.len());
     }
 }
