@@ -8,11 +8,13 @@ use std::fmt::Debug;
 
 use coordinates::three_dimensional::Vector3;
 use dyn_clone::DynClone;
+use dyn_partial_eq::dyn_partial_eq;
 
 use crate::Float;
 
 /// Interface to be used by any dynamic.
 #[typetag::serde]
+#[dyn_partial_eq]
 pub trait Dynamic: Debug + Send + Sync + DynClone {
     /// Returns the position relative to the parent body at a given time.
     #[must_use]

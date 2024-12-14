@@ -1,5 +1,6 @@
 use crate::{consts::GRAVITATIONAL_CONSTANT, Float};
 use coordinates::prelude::*;
+use dyn_partial_eq::DynPartialEq;
 use quaternion::Quaternion;
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +8,7 @@ use super::Dynamic;
 
 /// Struct that best fits [kepler's laws of planetary
 /// motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion).
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, DynPartialEq)]
 #[serde(from = "IntermediateKeplerian", into = "IntermediateKeplerian")]
 pub struct Keplerian {
     // Size and shape
@@ -40,6 +41,16 @@ pub struct Keplerian {
     orbital_period: Float,
 
     calculated_fields: CalculatedFields,
+}
+
+impl PartialEq for Keplerian {
+    fn eq(&self, other: &Self) -> bool {
+        self.eccentricity == other.eccentricity
+            && self.semi_major_axis == other.semi_major_axis
+            && self.mean_anomaly_at_epoch == other.mean_anomaly_at_epoch
+            && self.orbital_period == other.orbital_period
+            && self.inclination == other.inclination
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -160,20 +171,20 @@ struct IntermediateKeplerian {
     /// eccentricity
     e: Float,
     /// Semi-major axis (Maximum diameter of orbit)
-    #[serde(rename="a")]
+    #[serde(rename = "a")]
     semimajor_axis: Float,
 
     /// inclination from the reference plane
-    #[serde(rename="i")]
+    #[serde(rename = "i")]
     inclination: Float,
     /// Location where orbit intersects the reference plane from below to above
-    #[serde(rename="ascendingNode")]
+    #[serde(rename = "ascendingNode")]
     longitude_of_ascending_node: Float,
 
     /// Anomaly at T=0
     true_anomaly: Float,
     /// Location of periapsis relative to a reference point
-    #[serde(rename="argPeri")]
+    #[serde(rename = "argPeri")]
     argument_of_periapsis: Float,
 
     /// Time to complete one orbit, in hours

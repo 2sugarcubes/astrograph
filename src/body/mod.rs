@@ -28,7 +28,7 @@ pub struct Body {
     pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
     dynamic: Box<dyn Dynamic>,
-    /// If the body has any observatories it is highly recommended to initialize this.
+    /// If the body has any o1fservatories it is highly recommended to initialize this.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     pub rotation: Option<Rotating>,
@@ -37,6 +37,14 @@ pub struct Body {
     //mass: Float,
     //radius: Float,
     //color: [u8,h8,u8],
+}
+
+impl PartialEq for Body {
+    fn eq(&self, other: &Self) -> bool {
+        self.dynamic == other.dynamic
+            && self.rotation == other.rotation
+            && self.parent.is_some() == other.parent.is_some()
+    }
 }
 
 impl Body {
@@ -81,6 +89,39 @@ impl Body {
         let weak = StdArc::downgrade(this);
         for child in &this.read().unwrap().children {
             Self::hydrate_all(child, &Some(weak.clone()));
+        }
+    }
+
+    /// Returns the indexes of each child that must be decended into to reach this body.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use astrolabe::dynamic::fixed::Fixed;
+    /// use astrolabe::body::Body;
+    /// use coordinates::prelude::{Vector3, ThreeDimensionalConsts};
+    /// // Root returns an empty Vector
+    /// let body = Body::new(None, Fixed::new(Vector3::ORIGIN));
+    ///
+    /// let id = body.read().unwrap().get_id();
+    ///
+    /// assert_eq!(id, vec![]);
+    /// ```
+    pub fn get_id(&self) -> Vec<usize> {
+        if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
+            let parent = parent.read().unwrap();
+            let mut id = parent.get_id();
+            id.push(
+                parent
+                    .clone()
+                    .children
+                    .into_iter()
+                    .position(|c| c.read().unwrap().eq(self))
+                    .unwrap(),
+            );
+            id
+        } else {
+            vec![]
         }
     }
 

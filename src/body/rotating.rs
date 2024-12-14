@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{consts::float, Float};
 
 /// A struct that defines the rotation of a body.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Rotating {
     /// The time for the body to rotate 360 degrees, as opposed to a [solar day](https://en.wikipedia.org/wiki/Synodic_day)
