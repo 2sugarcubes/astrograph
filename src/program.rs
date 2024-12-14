@@ -1,14 +1,19 @@
 use std::path::PathBuf;
 
 use derive_builder::Builder;
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    body::{observatory::Observatory, Arc},
+    body::{
+        observatory::{to_observatory, Observatory, WeakObservatory},
+        Arc,
+    },
     Float,
 };
 
 /// A facade that takes values from [crate::body::observatory::Observatory] in the tree defined at the root of [`Self::_root_body`] that outputs using the given [outputs](crate::output::Output) provided with a [path](Self::output_file_root)
-#[derive(Builder, Clone, Debug)]
+#[derive(Builder, Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase", from = "DeserializedProgram")]
 pub struct Program {
     /// The root of the tree, we need to reference it here to prevent the reference counter from
     /// reaching zero prematurely.
@@ -19,6 +24,7 @@ pub struct Program {
     observatories: Vec<Observatory>,
     /// List of outputs to use.
     #[builder(setter(each(name = "add_output")))]
+    #[serde(skip)]
     outputs: Vec<Box<dyn crate::output::Output>>,
     /// Location where output files will be stored, typically under a subdirectory for which
     /// observatory made that observation.
@@ -67,6 +73,29 @@ impl Program {
                     }
                 }
             }
+        }
+    }
+}
+
+struct DeserializedProgram {
+    root_body: Arc,
+    observatories: Vec<WeakObservatory>,
+    output_file_root: PathBuf,
+}
+
+impl From<DeserializedProgram> for Program {
+    fn from(value: DeserializedProgram) -> Self {
+        let mut observatories = Vec::with_capacity(value.observatories.len());
+
+        for o in value.observatories {
+            observatories.push(to_observatory(o, &value.root_body))
+        }
+
+        Program {
+            _root_body: value.root_body,
+            observatories,
+            output_file_root: value.output_file_root,
+            outputs: Vec::new(),
         }
     }
 }
