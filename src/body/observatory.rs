@@ -111,7 +111,11 @@ mod tests {
     use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 
     use crate::{
-        body::{observatory::Observatory, rotating::Rotating, Arc, Body},
+        body::{
+            observatory::{Observatory, WeakObservatory},
+            rotating::Rotating,
+            Arc, Body,
+        },
         consts::float,
         dynamic::fixed::Fixed,
         Float,
@@ -156,5 +160,14 @@ mod tests {
                 assert_float_absolute_eq!(observations[0].polar_angle, polar_angle);
             }
         }
+    }
+
+    #[test]
+    fn load_from_file() {
+        let file = include_str!("../../assets/solar-system.observatories.json");
+
+        let observatories: Vec<WeakObservatory> = serde_json::from_str(file).unwrap();
+
+        assert_eq!(observatories.len(), 6);
     }
 }
