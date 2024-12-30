@@ -2,7 +2,8 @@
 
 use std::ops::Range;
 
-use coordinates::prelude::{Cylindrical, ThreeDimensionalConsts, Vector3};
+use coordinates::prelude::{Cylindrical, Spherical, ThreeDimensionalConsts, Vector3};
+use quaternion::Quaternion;
 
 use crate::{
     body::{self, rotating::Rotating, Arc, Body},
@@ -132,23 +133,24 @@ struct MainSequenceStar {
     planetary_zone: Range<Float>,
     frost_line: Float,
     is_habitable: bool,
+    north_pole: Spherical<Float>,
     planets: Vec<Planet>,
 }
 
 impl MainSequenceStar {
     fn new<G: rand::Rng>(rng: &mut G) -> Self {
         let mass: Float = rng.gen_range(0.02..16.0);
-        Self::new_from_mass(mass)
+        Self::new_from_mass(rng, mass)
     }
 
     fn new_habitable<G: rand::Rng>(rng: &mut G) -> Self {
         let mass: Float = rng.gen_range(0.6..1.4);
-        Self::new_from_mass(mass)
+        Self::new_from_mass(rng, mass)
     }
 
     /// # Note
     /// Mass is in solar masses, not jupiter masses as used throughout the rest of this library
-    fn new_from_mass(mass: Float) -> Self {
+    fn new_from_mass<G: rand::Rng>(rng: &mut G, mass: Float) -> Self {
         let luminosity = mass.powi(3);
         let sqrt_luminosity = luminosity.sqrt();
         Self {
@@ -160,6 +162,7 @@ impl MainSequenceStar {
             planetary_zone: au_to_ls(0.1 * mass)..au_to_ls(40.0 * mass),
             frost_line: au_to_ls(4.85 * sqrt_luminosity),
             is_habitable: (0.6..1.4).contains(&mass),
+            north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
             planets: Vec::new(),
         }
     }
@@ -212,6 +215,7 @@ struct Planet {
     mass: Float,
     radius: Float,
     planet_type: PlanetType,
+    north_pole: Spherical<Float>,
 }
 
 #[derive(Debug, Clone)]
@@ -232,6 +236,7 @@ impl Planet {
             mass,
             radius,
             planet_type: PlanetType::GasGiant,
+            north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
         }
     }
 
@@ -242,11 +247,26 @@ impl Planet {
             let semi_major_axis = rng.gen_range(sma_range);
             let (mass, radius) = Self::generate_terestial_parameters(rng);
 
+            let mut north_pole: Vector3<Float> = Spherical::new(
+                1.0,
+                rng.gen_range(-80.0 as Float..80.0).to_radians()
+                    + if rng.gen_bool(0.1) { float::PI } else { 0.0 },
+                random_angle(rng),
+            )
+            .into();
+
+            const UP: Vector3<Float> = Vector3::<Float>::UP;
+            let star_north_pole: Vector3<Float> = parent_star.north_pole.into();
+            let rotation = quaternion::rotation_from_to(UP.into(), star_north_pole.into());
+
+            north_pole = quaternion::rotate_vector(rotation, north_pole.into()).into();
+
             Some(Self {
                 semi_major_axis,
                 mass,
                 radius,
                 planet_type: PlanetType::Habitable,
+                north_pole: north_pole.into(),
             })
         } else {
             None
@@ -261,6 +281,7 @@ impl Planet {
             mass,
             radius,
             planet_type: PlanetType::Terestrial,
+            north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
         }
     }
 
@@ -272,6 +293,7 @@ impl Planet {
             mass,
             radius,
             planet_type: PlanetType::GasGiant,
+            north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
         }
     }
 
@@ -326,16 +348,27 @@ impl Planet {
         parent_star: &MainSequenceStar,
         parent: &Arc,
     ) -> Arc {
+        let longitude_of_ascending_node = parent_star.north_pole.azimuthal_angle
+            + float::FRAC_PI_2
+            + rng.gen_range(-float::FRAC_PI_8..float::FRAC_PI_8) / 2.0;
+
+        let inclination =
+            parent_star.north_pole.polar_angle + rng.gen_range(-10.0 as Float..10.0).to_radians();
+
         let dynamic = match self.planet_type {
-            PlanetType::GasGiant => keplerian::Keplerian::new(
-                rng.gen_range(0.001..0.1),
-                self.semi_major_axis,
-                Float::to_radians(rng.gen_range(0.0..4.0)),
-                random_angle(rng),
-                random_angle(rng),
-                random_angle(rng),
-                parent_star.mass,
-            ),
+            PlanetType::GasGiant => {
+                let inclination = parent_star.north_pole.polar_angle
+                    + rng.gen_range(-4.0 as Float..4.0).to_radians();
+                keplerian::Keplerian::new(
+                    rng.gen_range(0.001..0.1),
+                    self.semi_major_axis,
+                    inclination,
+                    longitude_of_ascending_node,
+                    random_angle(rng),
+                    random_angle(rng),
+                    parent_star.mass,
+                )
+            }
             PlanetType::Habitable => {
                 // Habitable world
                 // Make sure the eccentricity will not take us out of the habitable zone AT ALL
@@ -348,7 +381,7 @@ impl Planet {
                 keplerian::Keplerian::new(
                     eccentricity,
                     self.semi_major_axis,
-                    0.000_01,
+                    inclination,
                     random_angle(rng),
                     random_angle(rng),
                     random_angle(rng),
@@ -361,7 +394,7 @@ impl Planet {
                 keplerian::Keplerian::new(
                     rng.gen_range(0.0..0.25),
                     self.semi_major_axis,
-                    rng.gen_range(0.0..10.0),
+                    inclination,
                     random_angle(rng),
                     random_angle(rng),
                     random_angle(rng),
@@ -663,8 +696,10 @@ impl Moon {
             dynamic::keplerian::Keplerian::new(
                 eccentricity,
                 self.semi_major_axis,
-                inclination,
-                random_angle(rng),
+                inclination + parent.north_pole.polar_angle,
+                parent.north_pole.azimuthal_angle
+                    + float::FRAC_PI_2
+                    + rng.gen_range(-10.0 as Float..10.0).to_radians(),
                 random_angle(rng),
                 random_angle(rng),
                 parent.mass,
