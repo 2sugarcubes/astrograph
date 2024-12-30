@@ -3,7 +3,6 @@
 use std::ops::Range;
 
 use coordinates::prelude::{Cylindrical, ThreeDimensionalConsts, Vector3};
-use rich_progress_bar::RichProgressBar;
 
 use crate::{
     body::{self, rotating::Rotating, Arc, Body},
@@ -18,17 +17,11 @@ pub struct Artifexian {}
 
 impl Generator for Artifexian {
     fn generate<G: rand::Rng>(rng: &mut G) -> crate::body::Arc {
-        let mut progress = RichProgressBar::new();
-
-        progress
-            .set_total(1_000)
-            .set_color(rich_progress_bar::Colors::Blue)
-            .set_progress_character('#')
-            .set_bar_length(100);
-
         let root = Body::new(None, Fixed::new(Vector3::ORIGIN));
-        for i in 0..1_000 {
-            let _ = progress.inc();
+
+        let i_max = if cfg!(test) { 1_000 } else { 1_000_000 };
+
+        for i in 0..i_max {
             // At least 1% of stars are habitable
             let mut star = if i % 100 == 0 {
                 MainSequenceStar::new_habitable(rng)
@@ -51,8 +44,8 @@ impl Generator for Artifexian {
             if let Some(habitable_planet) = Planet::new_habitable(rng, &star) {
                 // We have a habitable planet to add
                 let mut has_added_habitable_planet = false;
-                let habitable_zone = habitable_planet.semi_major_axis / 1.4
-                    ..habitable_planet.semi_major_axis * 1.4;
+                let habitable_zone =
+                    habitable_planet.semi_major_axis / 1.4..habitable_planet.semi_major_axis * 1.4;
 
                 // While we can add a planet
                 while star.planetary_zone.contains(&distance) {
@@ -244,7 +237,9 @@ impl Planet {
 
     fn new_habitable<G: rand::Rng>(rng: &mut G, parent_star: &MainSequenceStar) -> Option<Self> {
         if parent_star.is_habitable {
-            let semi_major_axis = rng.gen_range(parent_star.habitable_zone.clone());
+            let sma_range =
+                parent_star.habitable_zone.start / 0.996..parent_star.habitable_zone.end / 1.003;
+            let semi_major_axis = rng.gen_range(sma_range);
             let (mass, radius) = Self::generate_terestial_parameters(rng);
 
             Some(Self {
@@ -547,7 +542,8 @@ impl Moon {
             )
         };
         let mass = radius.powi(3) * float::FRAC_2_PI * 2.0 / 3.0 * density;
-        let roche_limit = radius * (2.0 * parent.mass / mass).cbrt();
+        // Add some wriggle room since eccentricity will not be less than 0.001
+        let roche_limit = radius * (2.0 * parent.mass / mass).cbrt() / 0.996;
 
         // Set the lower bound so that if the moon has eccentricity 0.5 it will still not pass
         // inside the roche limit
