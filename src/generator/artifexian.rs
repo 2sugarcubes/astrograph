@@ -20,7 +20,7 @@ impl Generator for Artifexian {
     fn generate<G: rand::Rng>(rng: &mut G) -> crate::body::Arc {
         let root = Body::new(None, Fixed::new(Vector3::ORIGIN));
 
-        let i_max = if cfg!(test) { 1_000 } else { 1_000_000 };
+        let i_max = if cfg!(test) { 1_000_000 } else { 1_000_000 };
 
         for i in 0..i_max {
             // At least 1% of stars are habitable
@@ -718,7 +718,15 @@ mod test {
     fn flame_test() {
         //let mut rng = rand::rngs::mock::StepRng::new(0, 1);
         let mut rng = rand_xorshift::XorShiftRng::seed_from_u64(42_123);
-        let _ = Artifexian::generate(&mut rng);
+        let root = Artifexian::generate(&mut rng);
+
+        println!("x\ty\tz");
+        for p in &root.read().unwrap().children {
+            let loc: Vector3<Float> = p.read().unwrap().dynamic.get_offset(0.0).into();
+            println!("{}\t{}\t{}", loc.x, loc.y, loc.z);
+        }
+
+        drop(root);
         //TODO there seems to be a problem with distributions when inc contains more than 7
         //consecuive zeros
         const INC: u64 = 0x0101_0101_0101_0101;

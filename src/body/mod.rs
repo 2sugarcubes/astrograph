@@ -27,7 +27,7 @@ pub struct Body {
     /// Bodies that orbit around this body
     pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
-    dynamic: Box<dyn Dynamic>,
+    pub(crate) dynamic: Box<dyn Dynamic>,
     /// If the body has any o1fservatories it is highly recommended to initialize this.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -107,7 +107,8 @@ impl Body {
     ///
     /// assert_eq!(id, vec![]);
     /// ```
-    #[must_use] pub fn get_id(&self) -> Vec<usize> {
+    #[must_use]
+    pub fn get_id(&self) -> Vec<usize> {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             let parent = parent.read().unwrap();
             let mut id = parent.get_id();
