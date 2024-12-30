@@ -95,7 +95,7 @@ where
     T: Clone,
     T: Debug,
 {
-    /// Outputs [Self::consume_observation] to a given file.
+    /// Outputs [`Self::consume_observation`] to a given file.
     fn write_observations_to_file(
         &self,
         observations: &[(Arc, Spherical<crate::Float>)],

@@ -115,11 +115,7 @@ impl Keplerian {
             inclination: inclination_quaternion,
             mean_anomaly_at_epoch,
             orbital_period,
-            calculated_fields: CalculatedFields {
-                argument_of_periapsis,
-                longitude_of_ascending_node,
-                inclination,
-            },
+            calculated_fields: CalculatedFields { longitude_of_ascending_node, argument_of_periapsis, inclination },
         }
     }
 

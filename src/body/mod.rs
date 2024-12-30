@@ -107,7 +107,7 @@ impl Body {
     ///
     /// assert_eq!(id, vec![]);
     /// ```
-    pub fn get_id(&self) -> Vec<usize> {
+    #[must_use] pub fn get_id(&self) -> Vec<usize> {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             let parent = parent.read().unwrap();
             let mut id = parent.get_id();
@@ -416,7 +416,7 @@ mod tests {
             Ok(data) => {
                 println!("{data}");
             }
-            Err(e) => panic!("Error parsing:\n{:?}\n Reason: {}", sun, e),
+            Err(e) => panic!("Error parsing:\n{sun:?}\n Reason: {e}"),
         }
     }
 

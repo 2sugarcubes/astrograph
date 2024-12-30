@@ -74,7 +74,7 @@ pub(crate) fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> O
     let mut body = root.clone();
     for child_id in weak_observatory.body_id {
         let b = body.read().unwrap().children[child_id].clone();
-        body = b
+        body = b;
     }
 
     Observatory::new(weak_observatory.location, body.clone())
