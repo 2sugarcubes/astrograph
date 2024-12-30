@@ -36,11 +36,6 @@ impl Generator for Artifexian {
                 MainSequenceStar::new(rng)
             };
 
-            //println!("Star mass: {}", star.mass);
-            //println!(
-            //    "Planet zone: {}..{}",
-            //    star.planetary_zone.start, star.planetary_zone.end
-            //);
             let first_gas_giant = Planet::new_from_frost_line(rng, &star);
             let mut planets = vec![first_gas_giant.clone()];
 
@@ -50,8 +45,6 @@ impl Generator for Artifexian {
 
                 distance *= rng.gen_range(1.4..2.0);
             }
-            let total_gas_giants = planets.len();
-            //println!("Added {total_gas_giants} gas giants");
 
             distance = (&first_gas_giant).semi_major_axis / rng.gen_range(1.4..2.0);
             // If we have a habitable planet to add
@@ -183,7 +176,6 @@ impl MainSequenceStar {
         const SIGMA_SQUARED: Float = SIGMA * SIGMA;
         let maximum =
             (2600.0 / (float::TAU.sqrt() * SIGMA)).powf(radius * radius / (2.0 * SIGMA_SQUARED));
-        //println!("Got allowed height {}", maximum * 1.029e8);
         // Convert pc to ls
         maximum * 1.029e8
     }
@@ -191,14 +183,10 @@ impl MainSequenceStar {
     fn to_body<G: rand::Rng>(&self, rng: &mut G, root: &Arc) -> Arc {
         const WIDTH_OF_MILKY_WAY: Float = 3e12;
 
-        //println!("Generating star position");
         let d = rand_distr::Normal::new(0.0, 0.44).unwrap();
 
-        //println!("Calculating radius");
         let radius = (rng.sample(d) * WIDTH_OF_MILKY_WAY).abs();
-        //println!("Calculating height");
         let height = rng.sample(d) * Self::allowed_height(radius);
-        //println!("Calculating theta");
         let theta = float::TAU // Convert revs to radians
             * (if rng.gen() {
                 // The primary arm
@@ -211,13 +199,11 @@ impl MainSequenceStar {
 
         // Use fixed as a performance saver since their periods would be on the order of millions
         // of years
-        //println!("Packing star to body");
         let b = Body::new(
             Some(root.clone()),
             dynamic::fixed::Fixed(Cylindrical::new(radius, height, theta).into()),
         );
 
-        //println!("Adding bodies");
         // Add planets to this body
         for p in &self.planets {
             p.to_body(rng, self, &b);
@@ -705,8 +691,10 @@ mod test {
         //let mut rng = rand::rngs::mock::StepRng::new(0, 1);
         let mut rng = rand_xorshift::XorShiftRng::seed_from_u64(42_123);
         let _ = Artifexian::generate(&mut rng);
+        //TODO there seems to be a problem with distributions when inc contains more than 7
+        //consecuive zeros
         const INC: u64 = 0x0101_0101_0101_0101;
-        let mut rng = rand::rngs::mock::StepRng::new(INC, INC);
+        let mut rng = rand::rngs::mock::StepRng::new(INC + (INC >> 8) + (INC >> 16), INC);
         let _ = Artifexian::generate(&mut rng);
     }
 }
