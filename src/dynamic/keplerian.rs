@@ -15,11 +15,11 @@ pub struct Keplerian {
     /// Unit: unitless.
     ///
     /// Definition: How circular the orbit is.
-    eccentricity: Float,
+    pub(crate) eccentricity: Float,
     /// Unit: light-seconds.
     ///
     /// Definition: Half the length of the longest diameter through the ellipsis.
-    semi_major_axis: Float,
+    pub(crate) semi_major_axis: Float,
 
     // Orbital Plane, and argument of ascending node, argument of periapsis, and inclination.
     /// Unit: radians, sort of.
