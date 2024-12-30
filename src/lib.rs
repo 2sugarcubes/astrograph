@@ -19,6 +19,8 @@ pub mod program;
 /// Projections that map 3D space to a 2D plane
 pub mod projection;
 
+pub mod generator;
+
 #[allow(unused_imports)] // Macro_use is required here
 #[macro_use]
 #[cfg(test)]
