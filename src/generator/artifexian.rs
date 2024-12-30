@@ -39,20 +39,20 @@ impl Generator for Artifexian {
             let first_gas_giant = Planet::new_from_frost_line(rng, &star);
             let mut planets = vec![first_gas_giant.clone()];
 
-            let mut distance = (&first_gas_giant).semi_major_axis * rng.gen_range(1.4..2.0);
+            let mut distance = first_gas_giant.semi_major_axis * rng.gen_range(1.4..2.0);
             while star.planetary_zone.contains(&distance) {
                 planets.push(Planet::new_gas_giant(rng, distance));
 
                 distance *= rng.gen_range(1.4..2.0);
             }
 
-            distance = (&first_gas_giant).semi_major_axis / rng.gen_range(1.4..2.0);
+            distance = first_gas_giant.semi_major_axis / rng.gen_range(1.4..2.0);
             // If we have a habitable planet to add
             if let Some(habitable_planet) = Planet::new_habitable(rng, &star) {
                 // We have a habitable planet to add
                 let mut has_added_habitable_planet = false;
-                let habitable_zone = (&habitable_planet).semi_major_axis / 1.4
-                    ..(&habitable_planet).semi_major_axis * 1.4;
+                let habitable_zone = habitable_planet.semi_major_axis / 1.4
+                    ..habitable_planet.semi_major_axis * 1.4;
 
                 // While we can add a planet
                 while star.planetary_zone.contains(&distance) {
@@ -60,9 +60,9 @@ impl Generator for Artifexian {
                     if (habitable_zone).contains(&distance) {
                         // Planet is too close to the habitable planet, so skip it
                         planets.push(habitable_planet.clone());
-                        distance = (&habitable_planet).semi_major_axis;
+                        distance = habitable_planet.semi_major_axis;
                         has_added_habitable_planet = true;
-                    } else if distance < (&habitable_planet).semi_major_axis
+                    } else if distance < habitable_planet.semi_major_axis
                         && !has_added_habitable_planet
                     {
                         // The next planet isn't too close to the habitable planet
@@ -383,23 +383,20 @@ impl Planet {
             m.to_body(rng, self, &b, hill_sphere_limit);
         }
 
-        match self.planet_type {
-            PlanetType::Habitable => {
-                // Put some rotation on it
-                b.write().unwrap().rotation = Some(Rotating::new(
-                    // 12 to 36 hour rotation speed
-                    rng.gen_range(12.0..36.0),
-                    coordinates::prelude::Spherical {
-                        radius: 1.0,
-                        polar_angle: (rng.gen_range(0.0..80.0) as Float
-                            // Make it rotate retrograde 20% of the time
-                            + if rng.gen_bool(0.2) { 90.0 } else { 0.0 })
-                        .to_radians(),
-                        azimuthal_angle: random_angle(rng),
-                    },
-                ));
-            }
-            _ => (),
+        if let PlanetType::Habitable = self.planet_type {
+            // Put some rotation on it
+            b.write().unwrap().rotation = Some(Rotating::new(
+                // 12 to 36 hour rotation speed
+                rng.gen_range(12.0..36.0),
+                coordinates::prelude::Spherical {
+                    radius: 1.0,
+                    polar_angle: (rng.gen_range(0.0..80.0) as Float
+                        // Make it rotate retrograde 20% of the time
+                        + if rng.gen_bool(0.2) { 90.0 } else { 0.0 })
+                    .to_radians(),
+                    azimuthal_angle: random_angle(rng),
+                },
+            ));
         }
         b
     }
