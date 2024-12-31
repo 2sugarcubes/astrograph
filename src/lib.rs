@@ -19,6 +19,8 @@ pub mod program;
 /// Projections that map 3D space to a 2D plane
 pub mod projection;
 
+pub mod generator;
+
 #[allow(unused_imports)] // Macro_use is required here
 #[macro_use]
 #[cfg(test)]
@@ -44,7 +46,7 @@ pub mod testing {
 
     pub const DEFAULT_SEED: u64 = 0x064B_DEAF_BEEF_CAFE;
 
-    /// Generates an example [crate::body::Body] tree from a seed, at the moment this will only
+    /// Generates an example [`crate::body::Body`] tree from a seed, at the moment this will only
     /// generate a tree with five ancestors of the observing body, the observing body, nine
     /// children of the observing body, and 9 children of those children (81 descendants in total)
     ///
@@ -95,7 +97,7 @@ pub mod testing {
         }
     }
 
-    /// Generates a random plausible [crate::dynamic::keplerian::Keplerian] where depth acts as a
+    /// Generates a random plausible [`crate::dynamic::keplerian::Keplerian`] where depth acts as a
     /// scaling factor where each step deeper halves the size of the variables that it generates
     /// (`semi_major_axis` and `parent_mass`)
     #[allow(clippy::useless_conversion)] // Necessary for testing with different length floats

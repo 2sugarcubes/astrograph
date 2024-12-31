@@ -15,11 +15,11 @@ pub struct Keplerian {
     /// Unit: unitless.
     ///
     /// Definition: How circular the orbit is.
-    eccentricity: Float,
+    pub(crate) eccentricity: Float,
     /// Unit: light-seconds.
     ///
     /// Definition: Half the length of the longest diameter through the ellipsis.
-    semi_major_axis: Float,
+    pub(crate) semi_major_axis: Float,
 
     // Orbital Plane, and argument of ascending node, argument of periapsis, and inclination.
     /// Unit: radians, sort of.
@@ -115,11 +115,7 @@ impl Keplerian {
             inclination: inclination_quaternion,
             mean_anomaly_at_epoch,
             orbital_period,
-            calculated_fields: CalculatedFields {
-                argument_of_periapsis,
-                longitude_of_ascending_node,
-                inclination,
-            },
+            calculated_fields: CalculatedFields { longitude_of_ascending_node, argument_of_periapsis, inclination },
         }
     }
 

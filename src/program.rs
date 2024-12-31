@@ -11,7 +11,7 @@ use crate::{
     Float,
 };
 
-/// A facade that takes values from [crate::body::observatory::Observatory] in the tree defined at the root of [`Self::_root_body`] that outputs using the given [outputs](crate::output::Output) provided with a [path](Self::output_file_root)
+/// A facade that takes values from [`crate::body::observatory::Observatory`] in the tree defined at the root of [`Self::_root_body`] that outputs using the given [outputs](crate::output::Output) provided with a [path](Self::output_file_root)
 #[derive(Builder, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", from = "DeserializedProgram")]
 pub struct Program {
@@ -33,7 +33,7 @@ pub struct Program {
 
 impl Program {
     /// Generate observations between the start and end time i.e. `[start_time, end_time)`, with
-    /// observations every step_size hours.
+    /// observations every `step_size` hours.
     ///
     /// # Outputs
     ///
@@ -90,7 +90,7 @@ impl From<DeserializedProgram> for Program {
         let mut observatories = Vec::with_capacity(value.observatories.len());
 
         for o in value.observatories {
-            observatories.push(to_observatory(o, &value.root_body))
+            observatories.push(to_observatory(o, &value.root_body));
         }
 
         Program {

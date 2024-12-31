@@ -27,7 +27,7 @@ pub struct Body {
     /// Bodies that orbit around this body
     pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
-    dynamic: Box<dyn Dynamic>,
+    pub(crate) dynamic: Box<dyn Dynamic>,
     /// If the body has any o1fservatories it is highly recommended to initialize this.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -82,7 +82,7 @@ impl Body {
     /// while writing to it)
     pub fn hydrate_all(this: &Arc, parent: &Option<Weak>) {
         if parent.is_some() {
-            this.write().unwrap().parent = parent.clone();
+            this.write().unwrap().parent.clone_from(parent);
         }
 
         // A weak pointer to this body.
@@ -107,6 +107,11 @@ impl Body {
     ///
     /// assert_eq!(id, vec![]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// Will panic if any ancestor bodies are poisioned
+    #[must_use]
     pub fn get_id(&self) -> Vec<usize> {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             let parent = parent.read().unwrap();
@@ -416,7 +421,7 @@ mod tests {
             Ok(data) => {
                 println!("{data}");
             }
-            Err(e) => panic!("Error parsing:\n{:?}\n Reason: {}", sun, e),
+            Err(e) => panic!("Error parsing:\n{sun:?}\n Reason: {e}"),
         }
     }
 
