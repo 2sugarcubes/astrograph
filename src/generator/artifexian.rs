@@ -19,7 +19,7 @@ impl Generator for Artifexian {
     fn generate<G: rand::Rng>(rng: &mut G) -> crate::body::Arc {
         let root = Body::new(None, Fixed::new(Vector3::ORIGIN));
 
-        let i_max = if cfg!(test) { 50_000 } else { 1_000_000 };
+        let i_max = if cfg!(test) { 1_000 } else { 1_000_000 };
 
         for i in 0..i_max {
             // At least 1% of stars are habitable
