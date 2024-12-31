@@ -15,19 +15,47 @@ env:
   RUSTFLAGS: -Dwarnings
 
 jobs:
-  test:
+  targets:
+    name: Test suite
+    runs-on: ${{matrix.os}}-latest
     strategy:
       matrix:
         os:
-          - windows-latest:
+          - windows:
             os-flags: "-- --skip ui --exact"
-          - ubuntu-latest:
+          - ubuntu:
             os-flags: ""
         flags: [--no-default-features, --all-features]
-    name: Test suite
-    runs-on: ${{ matrix.os }}
+        toolchain: [stable, beta]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test ${{ matrix.flags }} ${{ matrix.os-flags }}
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.toolchain}}
+      - run: cargo test ${{matrix.flags}} ${{matrix.os-flags}}
+
+  clippy_check:
+    strategy:
+      matrix:
+        arguments: [--feature f64, --no-default-features]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Clippy
+        run: cargo clippy --all-targets ${{ matrix.arguments }}
+      - name: Run Clippy (Pedantic)
+        run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D cippy::pedantic
+        continue-on-error: true
+
+  miri:
+    name: Miri
+    runs-on: unbuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@miri
+      - run: cargo miri setup
+      - run: cargo miri test
+        env:
+          MIRIFLAGS: -Zmiri-strict-provenance
