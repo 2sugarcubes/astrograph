@@ -87,10 +87,10 @@ impl Generator for Artifexian {
 
             filtered_planets.push(previous_planet.clone());
 
-            for i in 1..planets.len() {
-                if previous_planet.semi_major_axis < &planets[i].semi_major_axis - au_to_ls(0.15) {
-                    filtered_planets.push(planets[i].clone());
-                    previous_planet = &planets[i];
+            for i in planets.iter().skip(1) {
+                if previous_planet.semi_major_axis < i.semi_major_axis - au_to_ls(0.15) {
+                    filtered_planets.push(i.clone());
+                    previous_planet = i;
                 }
             }
 
@@ -111,11 +111,11 @@ fn solar_masses_to_jupiter_masses(sm: Float) -> Float {
 }
 
 fn earth_masses_to_jupiter_masses(em: Float) -> Float {
-    em * 0.003146
+    em * 0.003_146
 }
 
 fn earth_radii_to_ls(er: Float) -> Float {
-    er * 0.021251398
+    er * 0.021_251_398
 }
 
 fn random_angle<G: rand::Rng>(rng: &mut G) -> Float {
@@ -167,7 +167,7 @@ impl MainSequenceStar {
     }
 
     fn allowed_height(radius: Float) -> Float {
-        const SIGMA: Float = 40963.2174964452;
+        const SIGMA: Float = 40_963.217_496_445_2;
         const SIGMA_SQUARED: Float = SIGMA * SIGMA;
         let maximum =
             (2600.0 / (float::TAU.sqrt() * SIGMA)).powf(radius * radius / (2.0 * SIGMA_SQUARED));
@@ -216,7 +216,7 @@ struct Planet {
     semi_major_axis: Float,
     mass: Float,
     radius: Float,
-    planet_type: PlanetType,
+    kind: PlanetType,
     north_pole: Spherical<Float>,
 }
 
@@ -237,13 +237,14 @@ impl Planet {
             semi_major_axis,
             mass,
             radius,
-            planet_type: PlanetType::GasGiant,
+            kind: PlanetType::GasGiant,
             north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
         }
     }
 
     fn new_habitable<G: rand::Rng>(rng: &mut G, parent_star: &MainSequenceStar) -> Option<Self> {
         if parent_star.is_habitable {
+            const UP: Vector3<Float> = Vector3::<Float>::UP;
             let sma_range =
                 parent_star.habitable_zone.start / 0.996..parent_star.habitable_zone.end / 1.003;
             let semi_major_axis = rng.gen_range(sma_range);
@@ -257,7 +258,6 @@ impl Planet {
             )
             .into();
 
-            const UP: Vector3<Float> = Vector3::<Float>::UP;
             let star_north_pole: Vector3<Float> = parent_star.north_pole.into();
             let rotation = quaternion::rotation_from_to(UP.into(), star_north_pole.into());
 
@@ -267,7 +267,7 @@ impl Planet {
                 semi_major_axis,
                 mass,
                 radius,
-                planet_type: PlanetType::Habitable,
+                kind: PlanetType::Habitable,
                 north_pole: north_pole.into(),
             })
         } else {
@@ -282,7 +282,7 @@ impl Planet {
             semi_major_axis,
             mass,
             radius,
-            planet_type: PlanetType::Terestrial,
+            kind: PlanetType::Terestrial,
             north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
         }
     }
@@ -294,23 +294,22 @@ impl Planet {
             semi_major_axis,
             mass,
             radius,
-            planet_type: PlanetType::GasGiant,
+            kind: PlanetType::GasGiant,
             north_pole: Spherical::new(1.0, random_angle(rng), random_angle(rng)),
         }
     }
 
+    #[allow(clippy::cast_precision_loss, clippy::cast_sign_loss)]
     fn max_terestrial_moons(&self, planetary_zone_end: Float) -> (u8, u8) {
-        let minor_moons = match self.planet_type {
-            PlanetType::GasGiant => {
-                todo!()
-            }
+        let minor_moons = match self.kind {
+            PlanetType::GasGiant => 0,
             PlanetType::Habitable | PlanetType::Terestrial => {
                 let x = self.semi_major_axis / planetary_zone_end;
                 ((2.0 as Float).powf(x) * x * 6.0).floor() as u8
             }
         };
 
-        let major_moons = match self.planet_type {
+        let major_moons = match self.kind {
             PlanetType::Terestrial => 0,
             PlanetType::Habitable => 1,
             PlanetType::GasGiant => todo!(),
@@ -357,7 +356,7 @@ impl Planet {
         let inclination =
             parent_star.north_pole.polar_angle + rng.gen_range(-10.0 as Float..10.0).to_radians();
 
-        let dynamic = match self.planet_type {
+        let dynamic = match self.kind {
             PlanetType::GasGiant => {
                 let inclination = parent_star.north_pole.polar_angle
                     + rng.gen_range(-4.0 as Float..4.0).to_radians();
@@ -405,7 +404,7 @@ impl Planet {
             }
         };
 
-        let hill_sphere_limit = &dynamic.semi_major_axis
+        let hill_sphere_limit = dynamic.semi_major_axis
             * (1.0 - &dynamic.eccentricity)
             * (self.mass / (3.0 * (self.mass + parent_star.mass))).cbrt();
         let b = body::Body::new(Some(parent.clone()), dynamic);
@@ -413,7 +412,7 @@ impl Planet {
             m.to_body(rng, self, &b, hill_sphere_limit);
         }
 
-        if let PlanetType::Habitable = self.planet_type {
+        if let PlanetType::Habitable = self.kind {
             // Put some rotation on it
             b.write().unwrap().rotation = Some(Rotating::new(
                 // 12 to 36 hour rotation speed
@@ -438,7 +437,7 @@ impl Planet {
     ) -> Vec<Moon> {
         let mut moons = Vec::new();
 
-        match self.planet_type {
+        match self.kind {
             PlanetType::GasGiant => {
                 moons.extend(Moon::new_group_a_moons(rng, self));
                 moons.extend(Moon::new_group_b_moons(rng, self));
@@ -514,7 +513,7 @@ struct Moon {
     radius: Float,
     mass: Float,
     semi_major_axis: Float,
-    moon_type: MoonType,
+    kind: MoonType,
 }
 
 impl Moon {
@@ -538,12 +537,12 @@ impl Moon {
             Self::LUNA_DENSITY * rng.gen_range(0.95..1.05)
         };
 
-        let (hill_limit, radius, moon_type) = if is_major {
-            let radius = rng.gen_range(0.001001..parent.radius * 0.75);
+        let (hill_limit, radius, kind) = if is_major {
+            let radius = rng.gen_range(0.001_001..parent.radius * 0.75);
 
             // If this moon is orbiting a terrestial planet then divide the maximum semi-major axis
             // by two
-            match parent.planet_type {
+            match parent.kind {
                 PlanetType::GasGiant => (
                     hill_sphere_limit,
                     radius,
@@ -606,7 +605,7 @@ impl Moon {
             semi_major_axis: distance,
             mass,
             radius,
-            moon_type,
+            kind,
         })
     }
 
@@ -624,7 +623,7 @@ impl Moon {
                 semi_major_axis,
                 radius,
                 mass,
-                moon_type: MoonType::MinorRocky,
+                kind: MoonType::MinorRocky,
             });
 
             semi_major_axis += rng.gen_range(0.00532..0.0319);
@@ -640,7 +639,7 @@ impl Moon {
 
         while semi_major_axis <= 15.0 * parent.radius {
             let is_icy = rng.gen_bool(0.333);
-            let min_mass = (0.001001 as Float).powi(3) * float::FRAC_2_PI * 2.0 / 3.0
+            let min_mass = (0.001_001 as Float).powi(3) * float::FRAC_2_PI * 2.0 / 3.0
                 * if is_icy { 21.3 } else { Self::LUNA_DENSITY };
             let mass = rng.gen_range(min_mass..0.0001 * parent.mass);
             let radius = (mass / (float::FRAC_2_PI * 2.0 / 3.0 * Self::LUNA_DENSITY)).cbrt();
@@ -649,7 +648,7 @@ impl Moon {
                 semi_major_axis,
                 mass,
                 radius,
-                moon_type: if is_icy {
+                kind: if is_icy {
                     MoonType::MajorIcy
                 } else {
                     MoonType::MajorRocky
@@ -668,7 +667,7 @@ impl Moon {
         hill_sphere_limit: Float,
     ) -> Arc {
         let roche_limit = self.radius * (2.0 * parent.mass / self.mass).cbrt();
-        let (inclination, eccentricity) = match self.moon_type {
+        let (inclination, eccentricity) = match self.kind {
             MoonType::MinorIcy | MoonType::MinorRocky => (
                 rng.gen_range(-5.0 as Float..5.0).to_radians(),
                 rng.gen_range(0.0..0.08),
@@ -676,7 +675,7 @@ impl Moon {
             MoonType::MajorIcy | MoonType::MajorRocky => {
                 // Clamp bounds to sensable values
 
-                let eccentricity_range = match parent.planet_type {
+                let eccentricity_range = match parent.kind {
                     PlanetType::GasGiant => 0.001..0.5,
                     PlanetType::Habitable | PlanetType::Terestrial => {
                         // Max eccentricity before hitting roche limit
@@ -724,7 +723,7 @@ mod test {
 
         println!("x\ty\tz");
         for p in &root.read().unwrap().children {
-            let loc: Vector3<Float> = p.read().unwrap().dynamic.get_offset(0.0).into();
+            let loc: Vector3<Float> = p.read().unwrap().dynamic.get_offset(0.0);
             println!("{}\t{}\t{}", loc.x, loc.y, loc.z);
         }
 
