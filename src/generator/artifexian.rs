@@ -166,6 +166,7 @@ impl MainSequenceStar {
         }
     }
 
+    #[allow(clippy::excessive_precision)] // Needs to work for f32 and f64 versions
     fn allowed_height(radius: Float) -> Float {
         const SIGMA: Float = 40_963.217_496_445_2;
         const SIGMA_SQUARED: Float = SIGMA * SIGMA;
