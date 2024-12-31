@@ -37,7 +37,7 @@ jobs:
   clippy_check:
     strategy:
       matrix:
-        arguments: [--feature f64, --no-default-features]
+        arguments: [--features f64, --no-default-features]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
