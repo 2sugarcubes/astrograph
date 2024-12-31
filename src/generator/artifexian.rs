@@ -299,7 +299,11 @@ impl Planet {
         }
     }
 
-    #[allow(clippy::cast_precision_loss, clippy::cast_sign_loss)]
+    #[allow(
+        clippy::cast_precision_loss,
+        clippy::cast_sign_loss,
+        clippy::cast_possible_truncation
+    )]
     fn max_terestrial_moons(&self, planetary_zone_end: Float) -> (u8, u8) {
         let minor_moons = match self.kind {
             PlanetType::GasGiant => 0,
