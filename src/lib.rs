@@ -160,6 +160,7 @@ pub mod testing {
             return count;
         }
 
+        //#[ignore = "long running"]
         #[test]
         fn fuzz_toy_examples() {
             let mut rng: Xorshift1024 = thread_rng();

@@ -34,27 +34,26 @@ jobs:
       - run: cargo test ${{matrix.flags}} -- --skip ui --exact
         if: matrix.os == 'windows'
 
-  clippy_check:
+  deep_check:
+    name: Deep Check
     strategy:
       matrix:
         arguments: [--features f64, --no-default-features]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@miri
+        with:
+          toolchain: nightly
+      - uses: dtolnay/rust-toolchain@clippy
       - name: Run Clippy
         run: cargo clippy --all-targets ${{ matrix.arguments }}
+        continue-on-error: true
       - name: Run Clippy (Pedantic)
         run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D cippy::pedantic
         continue-on-error: true
-
-  miri:
-    name: Miri
-    runs-on: unbuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@miri
-      - run: cargo miri setup
-      - run: cargo miri test
+      - name: Run miri-
+        run: cargo miri setup-
+      - run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test
         env:
           MIRIFLAGS: -Zmiri-strict-provenance

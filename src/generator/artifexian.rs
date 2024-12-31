@@ -720,6 +720,7 @@ mod test {
 
     use super::*;
 
+    //#[ignore = "long running"]
     #[test]
     fn flame_test() {
         //let mut rng = rand::rngs::mock::StepRng::new(0, 1);
