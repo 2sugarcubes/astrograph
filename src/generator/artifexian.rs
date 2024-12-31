@@ -3,7 +3,6 @@
 use std::ops::Range;
 
 use coordinates::prelude::{Cylindrical, Spherical, ThreeDimensionalConsts, Vector3};
-use quaternion::Quaternion;
 
 use crate::{
     body::{self, rotating::Rotating, Arc, Body},
@@ -20,7 +19,7 @@ impl Generator for Artifexian {
     fn generate<G: rand::Rng>(rng: &mut G) -> crate::body::Arc {
         let root = Body::new(None, Fixed::new(Vector3::ORIGIN));
 
-        let i_max = if cfg!(test) { 1_000_000 } else { 1_000_000 };
+        let i_max = if cfg!(test) { 50_000 } else { 1_000_000 };
 
         for i in 0..i_max {
             // At least 1% of stars are habitable
@@ -179,20 +178,23 @@ impl MainSequenceStar {
     fn to_body<G: rand::Rng>(&self, rng: &mut G, root: &Arc) -> Arc {
         const WIDTH_OF_MILKY_WAY: Float = 3e12;
 
-        let d = rand_distr::Normal::new(0.0, 0.44).unwrap();
+        let d = rand_distr::Pert::new(-1.0, 1.0, 0.0).unwrap();
 
         let radius = (rng.sample(d) * WIDTH_OF_MILKY_WAY).abs();
         let height = rng.sample(d) * Self::allowed_height(radius);
-        let theta = float::TAU // Convert revs to radians
+        let theta = if radius > 5e11 {
+            float::TAU // Convert revs to radians
             * (if rng.gen() {
                 // The primary arm
                 rng.sample(d) * 0.25
             } else {
                 // Make a second arm, half a turn from the primary
-                rng.sample(d)* 0.25 + 0.5
-            } + radius / (WIDTH_OF_MILKY_WAY * 1.5)); // Make theta map out one and a half turns on
-                                                      // the way from the centre to the outer rim
-
+                rng.sample(d) * 0.25 + 0.5
+            } + 1.0 + radius * 1.352 / (WIDTH_OF_MILKY_WAY)) // Make theta map out one and a half turns on
+                                                             // the way from the centre to the outer rim
+        } else {
+            random_angle(rng)
+        };
         // Use fixed as a performance saver since their periods would be on the order of millions
         // of years
         let b = Body::new(
