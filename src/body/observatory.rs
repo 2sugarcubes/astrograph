@@ -65,6 +65,7 @@ impl Observatory {
 }
 
 #[derive(Serialize, Deserialize)]
+#[allow(clippy::module_name_repetitions)]
 pub struct WeakObservatory {
     location: Spherical<Float>,
     body_id: Vec<usize>,

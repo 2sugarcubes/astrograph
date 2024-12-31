@@ -27,6 +27,8 @@ impl<T: Projection> Svg<T> {
         observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
         // TODO remove some magic values (like "1010", "505", etc.)
+        // Create lines of longitude through the circle to more easily read it.
+        const NUMBER_OF_BISECTIONS: u8 = 4;
         let mut result = Document::new()
             .add(Rectangle::new().set("width", "1010").set("height", "1010"))
             .add(
@@ -40,8 +42,6 @@ impl<T: Projection> Svg<T> {
                     ),
             );
 
-        // Create lines of longitude through the circle to more easily read it.
-        const NUMBER_OF_BISECTIONS: u8 = 4;
         for i in 0..NUMBER_OF_BISECTIONS {
             let theta = float::TAU * (i as Float / (NUMBER_OF_BISECTIONS * 2) as Float);
             let starting_point: Vector2<Float> = Polar {

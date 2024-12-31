@@ -82,7 +82,7 @@ impl Body {
     /// while writing to it)
     pub fn hydrate_all(this: &Arc, parent: &Option<Weak>) {
         if parent.is_some() {
-            this.write().unwrap().parent = parent.clone();
+            this.write().unwrap().parent.clone_from(parent);
         }
 
         // A weak pointer to this body.
@@ -107,6 +107,10 @@ impl Body {
     ///
     /// assert_eq!(id, vec![]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// Will panic if any ancestor bodies are poisioned
     #[must_use]
     pub fn get_id(&self) -> Vec<usize> {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
