@@ -20,11 +20,7 @@ jobs:
     runs-on: ${{matrix.os}}-latest
     strategy:
       matrix:
-        os:
-          - windows:
-            os-flags: "-- --skip ui --exact"
-          - ubuntu:
-            os-flags: ""
+        os: [windows, ubuntu]
         flags: [--no-default-features, --all-features]
         toolchain: [stable, beta]
     timeout-minutes: 45
@@ -33,7 +29,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.toolchain}}
-      - run: cargo test ${{matrix.flags}} ${{matrix.os-flags}}
+      - run: cargo test ${{matrix.flags}}
+        if: matrix.os == 'ubuntu'
+      - run: cargo test ${{matrix.flags}} -- --skip ui --exact
+        if: matrix.os == 'windows'
 
   clippy_check:
     strategy:
