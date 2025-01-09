@@ -52,7 +52,7 @@ jobs:
         run: cargo clippy --all-targets ${{ matrix.arguments }}
         continue-on-error: true
       - name: Run Clippy (Pedantic)
-        run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D cippy::pedantic
+        run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D clippy::pedantic
         continue-on-error: true
       #- name: Run miri
       #  run: cargo miri setup
