@@ -19,6 +19,7 @@ jobs:
     name: Test suite
     runs-on: ${{matrix.os}}-latest
     strategy:
+      fail-fast: false
       matrix:
         os: [windows, ubuntu]
         flags: [--no-default-features, --all-features]
@@ -37,6 +38,7 @@ jobs:
   deep_check:
     name: Deep Check
     strategy:
+      fail-fast: false
       matrix:
         arguments: [--features f64, --no-default-features]
     runs-on: ubuntu-latest
@@ -53,7 +55,7 @@ jobs:
         run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D cippy::pedantic
         continue-on-error: true
       - name: Run miri-
-        run: cargo miri setup-
+        run: cargo miri setup
       - run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test
         env:
           MIRIFLAGS: -Zmiri-strict-provenance
