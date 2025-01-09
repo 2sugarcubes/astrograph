@@ -115,7 +115,11 @@ impl Keplerian {
             inclination: inclination_quaternion,
             mean_anomaly_at_epoch,
             orbital_period,
-            calculated_fields: CalculatedFields { longitude_of_ascending_node, argument_of_periapsis, inclination },
+            calculated_fields: CalculatedFields {
+                longitude_of_ascending_node,
+                argument_of_periapsis,
+                inclination,
+            },
         }
     }
 
@@ -141,6 +145,10 @@ impl Keplerian {
         }
 
         result
+    }
+
+    pub fn get_inclination(&self) -> &Quaternion<Float> {
+        &self.inclination
     }
 }
 
