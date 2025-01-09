@@ -23,78 +23,80 @@ impl Generator for Artifexian {
 
         for i in 0..i_max {
             // At least 1% of stars are habitable
-            let mut star = if i % 100 == 0 {
-                MainSequenceStar::new_habitable(rng)
-            } else {
+            let star = if i % 100 != 0 {
+                // Skip planet gen to save memory
                 MainSequenceStar::new(rng)
-            };
-
-            let first_gas_giant = Planet::new_from_frost_line(rng, &star);
-            let mut planets = vec![first_gas_giant.clone()];
-
-            let mut distance = first_gas_giant.semi_major_axis * rng.gen_range(1.4..2.0);
-            while star.planetary_zone.contains(&distance) {
-                planets.push(Planet::new_gas_giant(rng, distance));
-
-                distance *= rng.gen_range(1.4..2.0);
-            }
-
-            distance = first_gas_giant.semi_major_axis / rng.gen_range(1.4..2.0);
-            // If we have a habitable planet to add
-            if let Some(habitable_planet) = Planet::new_habitable(rng, &star) {
-                // We have a habitable planet to add
-                let mut has_added_habitable_planet = false;
-                let habitable_zone =
-                    habitable_planet.semi_major_axis / 1.4..habitable_planet.semi_major_axis * 1.4;
-
-                // While we can add a planet
-                while star.planetary_zone.contains(&distance) {
-                    // If adding a planet would not be too close to the habitable planet
-                    if (habitable_zone).contains(&distance) {
-                        // Planet is too close to the habitable planet, so skip it
-                        planets.push(habitable_planet.clone());
-                        distance = habitable_planet.semi_major_axis;
-                        has_added_habitable_planet = true;
-                    } else if distance < habitable_planet.semi_major_axis
-                        && !has_added_habitable_planet
-                    {
-                        // The next planet isn't too close to the habitable planet
-                        planets.push(habitable_planet.clone());
-                        planets.push(Planet::new_terrestial(rng, distance));
-                        has_added_habitable_planet = true;
-                    } else {
-                        planets.push(Planet::new_terrestial(rng, distance));
-                    }
-
-                    // TODO break when distance between bodies is less than 0.15
-                    distance /= rng.gen_range(1.4..2.0);
-                }
             } else {
-                // We don't have a habitable planet to add
+                // Habitable star, so generate planets
+                let mut star = MainSequenceStar::new_habitable(rng);
+                let first_gas_giant = Planet::new_from_frost_line(rng, &star);
+                let mut planets = vec![first_gas_giant.clone()];
+
+                let mut distance = first_gas_giant.semi_major_axis * rng.gen_range(1.4..2.0);
                 while star.planetary_zone.contains(&distance) {
-                    planets.push(Planet::new_terrestial(rng, distance));
+                    planets.push(Planet::new_gas_giant(rng, distance));
 
-                    // TODO break when distance between bodies is less than 0.15
-                    distance /= rng.gen_range(1.4..2.0);
+                    distance *= rng.gen_range(1.4..2.0);
                 }
-            }
 
-            let mut filtered_planets = Vec::with_capacity(planets.len());
+                distance = first_gas_giant.semi_major_axis / rng.gen_range(1.4..2.0);
+                // If we have a habitable planet to add
+                if let Some(habitable_planet) = Planet::new_habitable(rng, &star) {
+                    // We have a habitable planet to add
+                    let mut has_added_habitable_planet = false;
+                    let habitable_zone = habitable_planet.semi_major_axis / 1.4
+                        ..habitable_planet.semi_major_axis * 1.4;
 
-            planets.sort_by_key(|p| p.semi_major_axis.to_bits());
+                    // While we can add a planet
+                    while star.planetary_zone.contains(&distance) {
+                        // If adding a planet would not be too close to the habitable planet
+                        if (habitable_zone).contains(&distance) {
+                            // Planet is too close to the habitable planet, so skip it
+                            planets.push(habitable_planet.clone());
+                            distance = habitable_planet.semi_major_axis;
+                            has_added_habitable_planet = true;
+                        } else if distance < habitable_planet.semi_major_axis
+                            && !has_added_habitable_planet
+                        {
+                            // The next planet isn't too close to the habitable planet
+                            planets.push(habitable_planet.clone());
+                            planets.push(Planet::new_terrestial(rng, distance));
+                            has_added_habitable_planet = true;
+                        } else {
+                            planets.push(Planet::new_terrestial(rng, distance));
+                        }
 
-            let mut previous_planet = &planets[0];
+                        // TODO break when distance between bodies is less than 0.15
+                        distance /= rng.gen_range(1.4..2.0);
+                    }
+                } else {
+                    // We don't have a habitable planet to add
+                    while star.planetary_zone.contains(&distance) {
+                        planets.push(Planet::new_terrestial(rng, distance));
 
-            filtered_planets.push(previous_planet.clone());
-
-            for i in planets.iter().skip(1) {
-                if previous_planet.semi_major_axis < i.semi_major_axis - au_to_ls(0.15) {
-                    filtered_planets.push(i.clone());
-                    previous_planet = i;
+                        // TODO break when distance between bodies is less than 0.15
+                        distance /= rng.gen_range(1.4..2.0);
+                    }
                 }
-            }
 
-            star.planets = filtered_planets;
+                let mut filtered_planets = Vec::with_capacity(planets.len());
+
+                planets.sort_by_key(|p| p.semi_major_axis.to_bits());
+
+                let mut previous_planet = &planets[0];
+
+                filtered_planets.push(previous_planet.clone());
+
+                for i in planets.iter().skip(1) {
+                    if previous_planet.semi_major_axis < i.semi_major_axis - au_to_ls(0.15) {
+                        filtered_planets.push(i.clone());
+                        previous_planet = i;
+                    }
+                }
+
+                star.planets = filtered_planets;
+                star
+            };
 
             star.to_body(rng, &root);
         }
