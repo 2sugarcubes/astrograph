@@ -130,6 +130,15 @@ impl Body {
         }
     }
 
+    #[must_use]
+    pub fn get_children(&self) -> &Vec<Arc> {
+        &self.children
+    }
+
+    #[must_use]
+    pub fn get_dynamic(&self) -> &Box<dyn Dynamic> {
+        &self.dynamic
+    }
     /// # Panics
     /// Will panic if any descendants or sill existing ancestry have been poisoned by panicking
     /// while in write mode
