@@ -30,11 +30,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.toolchain}}
-      - name: Buld SolarSystem.program
-        run: |
-          cd assets;
-          ./packSolarSystem.sh;
-          cd ..
       - run: cargo test ${{matrix.flags}}
         if: matrix.os == 'ubuntu'
       - run: cargo test ${{matrix.flags}} -- --skip ui --exact
@@ -53,18 +48,13 @@ jobs:
         with:
           toolchain: nightly
       - uses: dtolnay/rust-toolchain@clippy
-      - name: Build SolarSystem.program
-        run: |
-          cd assets;
-          ./packSolarSystem.sh;
-          cd ..
       - name: Run Clippy
         run: cargo clippy --all-targets ${{ matrix.arguments }}
         continue-on-error: true
       - name: Run Clippy (Pedantic)
         run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D cippy::pedantic
         continue-on-error: true
-      - name: Run miri-
+      - name: Run miri
         run: cargo miri setup
       - run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test
         env:

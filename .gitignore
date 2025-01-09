@@ -1,6 +1,5 @@
 /target
 .vscode
-/assets/solar-system.program.json
 **/*.tsv
 **/*.ods
 **/*.svg
