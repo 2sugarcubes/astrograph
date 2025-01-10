@@ -8,8 +8,11 @@ use dyn_clone::DynClone;
 
 use crate::{body::Arc, Float};
 
+/// An output for SVG files
 pub mod svg;
 
+/// The trait for structs that output to a file. It may be made more general in future to better
+/// accommodate non-file outputs e.g. console loggers, or outputs to screen or streams
 pub trait Output: DynClone + Debug {
     /// # Errors
     /// implementations may panic if there is an error in the filesystem e.g. writing is not
@@ -23,6 +26,7 @@ pub trait Output: DynClone + Debug {
 }
 dyn_clone::clone_trait_object!(Output);
 
+/// Changes the extension of the given path, even when the last element is perceived to be a directory
 fn set_extension(path: &Path, extension: &str) -> PathBuf {
     let mut path = path.to_path_buf();
     // Make sure Rust isn't trying to be clever and take our file without an extension and convert

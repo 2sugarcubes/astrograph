@@ -2,6 +2,10 @@ name: Unit Tests
 
 on:
   push:
+    branches:
+      - dev
+      - master
+      - "release-candidate/**"
   pull_request:
 
 permissions:
@@ -11,20 +15,45 @@ env:
   RUSTFLAGS: -Dwarnings
 
 jobs:
-  test:
+  targets:
     name: Test suite
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows, ubuntu]
+        flags: [--no-default-features, --all-features]
+        toolchain: [stable, beta]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.toolchain}}
+      - run: cargo test ${{matrix.flags}}
+        if: matrix.os == 'ubuntu'
+      - run: cargo test ${{matrix.flags}} -- --skip ui --exact
+        if: matrix.os == 'windows'
 
-  test_windows:
-    name: Test suite (windows)
-    runs-on: windows-latest
-    timeout-minutes: 45
+  deep_check:
+    name: Clippy Check
+    strategy:
+      fail-fast: false
+      matrix:
+        arguments: [--features f64, --no-default-features]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo test -- --skip ui --exact
+      - uses: dtolnay/rust-toolchain@miri
+        with:
+          toolchain: nightly
+      - uses: dtolnay/rust-toolchain@clippy
+      - name: Run Clippy
+        run: cargo clippy --all-targets ${{ matrix.arguments }}
+      - name: Run Clippy (Pedantic)
+        run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D clippy::pedantic
+      #- name: Run miri
+      #  run: cargo miri setup
+      #- run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test
+      #  env:
+      #    MIRIFLAGS: -Zmiri-strict-provenance

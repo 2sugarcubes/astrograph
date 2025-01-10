@@ -1,2 +1,6 @@
 /target
 .vscode
+**/*.tsv
+**/*.ods
+**/*.svg
+**/*.csv

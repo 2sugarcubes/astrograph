@@ -2,19 +2,30 @@ use coordinates::prelude::{Spherical, Vector2};
 
 use crate::{consts::float, Float};
 
+/// Trait that encapsulates the core functionality of a projector, a set of equations that convert
+/// a point from three-dimensional space onto a two-dimensional plane.
 pub trait Projection {
+    /// Projects from 3D to 2D while taking into account any state the projector has.
     //#[inline(always)]
     fn project_with_state(&self, location: &Spherical<Float>) -> Option<Vector2<Float>> {
         // default behaviour when there is no state
         Self::project(location)
     }
+    /// Projects from 3D to 2D without taking into account any state the projector has, generally
+    /// centered on the Z axis (up/down), but check the implementation you are using to be sure.
     fn project(location: &Spherical<Float>) -> Option<Vector2<Float>>;
 }
 
+/// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on the positive z direction, but thanks to the output
+/// of [`crate::body::observatory::Observatory::observe`] observations are already centered on the z axis.
 #[derive(Debug, Clone, Copy)]
 pub struct StatelessOrthographic();
 
 impl Projection for StatelessOrthographic {
+    /// # Returns
+    ///
+    /// None if the point cannot be projected i.e. it is over the horizon, the projected point
+    /// otherwise.
     fn project(location: &Spherical<Float>) -> Option<Vector2<Float>> {
         // If the location is on the other hemisphere
         if location.polar_angle > float::FRAC_PI_2 {
@@ -32,8 +43,14 @@ impl Projection for StatelessOrthographic {
     }
 }
 
+/// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on an orbitrary longitude and latitude. In most cases it will be quicker to use the [`StatelessOrthographic`](self::StatelessOrthographic) projection.
 #[derive(Debug, Clone)]
-pub struct Orthographic(Float, Float);
+pub struct Orthographic(
+    /// Longitude of center of projection.
+    Float,
+    /// Latitude of the center of projection.
+    Float,
+);
 
 impl Projection for Orthographic {
     fn project_with_state(&self, location: &Spherical<Float>) -> Option<Vector2<Float>> {

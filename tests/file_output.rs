@@ -5,6 +5,8 @@ use astrolabe::{
     projection,
 };
 
+/// Makes sure that a user could generate outputs for arbitrary times, and check that the files
+/// exist.
 #[test]
 fn file_output() -> Result<(), ProgramBuilderError> {
     use coordinates::prelude::{Spherical, ThreeDimensionalConsts};

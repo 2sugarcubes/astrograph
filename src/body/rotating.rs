@@ -1,15 +1,23 @@
 use coordinates::prelude::{Spherical, Vector3};
 use quaternion::Quaternion;
+use serde::{Deserialize, Serialize};
 
 use crate::{consts::float, Float};
 
-#[derive(Debug, Clone)]
+/// A struct that defines the rotation of a body.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct Rotating {
+    /// The time for the body to rotate 360 degrees, as opposed to a [solar day](https://en.wikipedia.org/wiki/Synodic_day)
     sidereal_period: Float,
+    /// The direction of the geographic north pole.
     axis: Vector3<Float>,
 }
 
 impl Rotating {
+    /// Creates a rotating body type that rotates relative to an infinitely distant point every
+    /// `sidereal_period` hours, and rotates around the given `axis` in a counter-clockwise manner
+    /// (like the earth's [geographic north pole](https://en.wikipedia.org/wiki/North_Pole))
     #[must_use]
     pub fn new(sidereal_period: Float, mut axis: Spherical<Float>) -> Self {
         // Set axis to a unit vector
@@ -20,11 +28,13 @@ impl Rotating {
         }
     }
 
+    /// Returns a rotation for a given time.
     #[must_use]
     pub fn get_rotation(&self, time: Float) -> Quaternion<Float> {
         quaternion::axis_angle(self.axis.into(), -self.get_mean_angle(time))
     }
 
+    /// Gets angle relative to the reference direction since last complete revolution
     fn get_mean_angle(&self, time: Float) -> Float {
         time % self.sidereal_period / self.sidereal_period * float::TAU
     }
@@ -42,7 +52,7 @@ mod test {
     use super::Rotating;
 
     #[test]
-    fn normalise_axis() {
+    fn normalize_axis() {
         const EXPECTED_MAGNITUDE: Float = 1.0;
         let axis_small = Spherical {
             radius: 0.5,
