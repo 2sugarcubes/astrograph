@@ -19,7 +19,7 @@ fn inclinations() {
             if let Some(planet_dynamic) = planet.get_dynamic().as_any().downcast_ref::<Keplerian>()
             {
                 let planet_inclination = planet_dynamic.get_inclination().to_owned();
-                inclinations.push(planet_inclination.clone());
+                inclinations.push(planet_inclination);
 
                 for moon in planet.get_children() {
                     let moon = moon.read().unwrap();

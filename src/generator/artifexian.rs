@@ -725,6 +725,10 @@ mod test {
     //#[ignore = "long running"]
     #[test]
     fn flame_test() {
+        //TODO there seems to be a problem with distributions when inc contains more than 7
+        //consecuive zeros
+        const INC: u64 = 0x0101_0101_0101_0101;
+
         //let mut rng = rand::rngs::mock::StepRng::new(0, 1);
         let mut rng = rand_xorshift::XorShiftRng::seed_from_u64(42_123);
         let root = Artifexian::generate(&mut rng);
@@ -736,9 +740,6 @@ mod test {
         }
 
         drop(root);
-        //TODO there seems to be a problem with distributions when inc contains more than 7
-        //consecuive zeros
-        const INC: u64 = 0x0101_0101_0101_0101;
         let mut rng = rand::rngs::mock::StepRng::new(INC + (INC >> 8) + (INC >> 16), INC);
         let _ = Artifexian::generate(&mut rng);
     }
