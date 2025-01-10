@@ -109,10 +109,10 @@ mod tests {
     #[test]
     fn deserialize_from_parts() {
         let bodies = include_str!("../assets/solar-system.json");
-        let observatoies = include_str!("../assets/solar-system.observatories.json");
+        let observatoies_str = include_str!("../assets/solar-system.observatories.json");
 
         let root: Arc = serde_json::from_str(bodies).unwrap();
-        let observatories: Vec<WeakObservatory> = serde_json::from_str(observatoies).unwrap();
+        let observatories: Vec<WeakObservatory> = serde_json::from_str(observatoies_str).unwrap();
 
         let dp = DeserializedProgram {
             root_body: root.clone(),

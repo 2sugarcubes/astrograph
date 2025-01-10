@@ -147,6 +147,7 @@ impl Keplerian {
         result
     }
 
+    #[must_use]
     pub fn get_inclination(&self) -> &Quaternion<Float> {
         &self.inclination
     }

@@ -136,8 +136,10 @@ impl Body {
     }
 
     #[must_use]
-    pub fn get_dynamic(&self) -> &Box<dyn Dynamic> {
-        &self.dynamic
+    pub fn get_dynamic(&self) -> &dyn Dynamic {
+        // Deref the box, yeilding `dyn Dynamic`, then add a thin reference by putting & in front
+        // of the *
+        &*self.dynamic
     }
     /// # Panics
     /// Will panic if any descendants or sill existing ancestry have been poisoned by panicking
@@ -208,6 +210,23 @@ mod tests {
     use crate::dynamic::{fixed::Fixed, keplerian::Keplerian};
 
     use super::*;
+    macro_rules! new_planet {
+        ($name:ident, $parent:ident, $period:tt, $sma:tt, $ecc:tt, $inc:tt, $lan:expr, $aop:tt, $mae:tt) => {
+            let $name = Body::new(
+                Some($parent.clone()),
+                Keplerian::new_with_period(
+                    $ecc,
+                    $sma * AU_TO_LS,
+                    ($inc as Float).to_radians(),
+                    ($lan as Float).to_radians(),
+                    ($aop as Float).to_radians(),
+                    ($mae as Float).to_radians(),
+                    $period * DAYS_TO_HOURS,
+                ),
+            );
+        };
+    }
+
     fn get_toy_example() -> (Arc, Arc) {
         let bodies = generate_parents(5, [0.0, UPWARDS_STEP, 0.0].into());
         // Get the root and the important bodies
@@ -290,30 +309,13 @@ mod tests {
             );
         }
     }
-
+    #[allow(clippy::excessive_precision)] // Tests need to pass with f64 as well as f32
     #[test]
     fn serialize_to_json_string() {
-        let sun = Body::new(None, Fixed::new(Vector3::ORIGIN));
-
         const AU_TO_LS: Float = 499.0;
         const DAYS_TO_HOURS: Float = 24.0;
 
-        macro_rules! new_planet {
-            ($name:ident, $parent:ident, $period:tt, $sma:tt, $ecc:tt, $inc:tt, $lan:expr, $aop:tt, $mae:tt) => {
-                let $name = Body::new(
-                    Some($parent.clone()),
-                    Keplerian::new_with_period(
-                        $ecc,
-                        $sma * AU_TO_LS,
-                        ($inc as Float).to_radians(),
-                        ($lan as Float).to_radians(),
-                        ($aop as Float).to_radians(),
-                        ($mae as Float).to_radians(),
-                        $period * DAYS_TO_HOURS,
-                    ),
-                );
-            };
-        }
+        let sun = Body::new(None, Fixed::new(Vector3::ORIGIN));
 
         // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
         new_planet!(
@@ -426,12 +428,8 @@ mod tests {
             304.880_03
         );
 
-        match serde_json::to_string(&sun) {
-            Ok(data) => {
-                println!("{data}");
-            }
-            Err(e) => panic!("Error parsing:\n{sun:?}\n Reason: {e}"),
-        }
+        // Panics if the resulting json is unreadable
+        serde_json::to_string(&sun).unwrap();
     }
 
     #[test]
