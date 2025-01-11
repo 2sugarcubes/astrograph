@@ -1,9 +1,5 @@
 # To-do lists
 
-## For me
-
-- [ ] 33 clippy lints
-
 ## Before each merge
 
 - [ ] Add documentation
@@ -15,3 +11,9 @@
 
 - [ ] Program hangs when Artifexian generator is run with the mock RNG and
       more than seven consecutive bits are 0
+
+## Non-functional requirements
+
+- [ ] Tweak Artifexian generator (or generators in general) to only generate
+      stars in a sphere around the observing body to make the sky more densely
+      populated while also less computationally demanding
