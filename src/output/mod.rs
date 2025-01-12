@@ -11,6 +11,9 @@ use crate::{body::Arc, Float};
 /// An output for SVG files
 pub mod svg;
 
+/// An output for the website
+pub mod web;
+
 /// The trait for structs that output to a file. It may be made more general in future to better
 /// accommodate non-file outputs e.g. console loggers, or outputs to screen or streams
 pub trait Output: DynClone + Debug {
