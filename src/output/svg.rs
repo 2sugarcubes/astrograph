@@ -22,7 +22,7 @@ impl<T: Projection> Svg<T> {
     }
 
     /// Converts observations to a SVG document
-    fn consume_observation(
+    pub(super) fn consume_observation(
         &self,
         observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
