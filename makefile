@@ -1,6 +1,6 @@
 wasm: 
 	# Massively reduce bundle size
-	wasm-pack build --target web --release . 
+	wasm-pack build --target web --release -d web/pkg
 
 test:
 	cargo test
