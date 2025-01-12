@@ -17,3 +17,6 @@
 - [ ] Tweak Artifexian generator (or generators in general) to only generate
       stars in a sphere around the observing body to make the sky more densely
       populated while also less computationally demanding
+- [ ] Make compile time smaller by making wasm-bindgen inclusion dependant on
+      target arch
+- [ ] Make serde an optional dependency to reduce compile time and binary size
