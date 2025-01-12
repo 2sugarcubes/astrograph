@@ -1,10 +1,15 @@
 wasm: 
 	# Massively reduce bundle size
-	wasm-pack build --target web --release . -Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort
+	wasm-pack build --target web --release . 
 
 test:
 	cargo test
 
 pre-push:
-	cargo fmt && cargo clippy -- -Dclippy::pedantic && cargo test && echo '✅ Good to push 👍'
+	cargo fmt && \
+		cargo clippy --all-features -- -Dclippy::pedantic && \
+		cargo clippy --no-default-features && \
+		echo "\tf64 tests" && cargo test && \
+		echo "\tf32 tests" && cargo test --no-default-features && \
+		echo '✅ Good to push 👍'
 
