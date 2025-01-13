@@ -13,3 +13,5 @@ pre-push:
 		echo "\tf32 tests" && cargo test --no-default-features && \
 		echo '✅ Good to push 👍'
 
+serve:
+	make wasm && cd ./web/ && python -m http.server; cd ..
