@@ -23,7 +23,7 @@ type Weak = StdWeak<RwLock<Body>>;
 pub struct Body {
     /// The body that this body is orbiting around
     #[serde(skip)]
-    parent: Option<Weak>,
+    pub(crate) parent: Option<Weak>,
     /// Bodies that orbit around this body
     pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
@@ -103,9 +103,9 @@ impl Body {
     /// // Root returns an empty Vector
     /// let body = Body::new(None, Fixed::new(Vector3::ORIGIN));
     ///
-    /// let id = body.read().unwrap().get_id();
+    /// let id: Vec<usize> = body.read().unwrap().get_id();
     ///
-    /// assert_eq!(id, vec![]);
+    /// assert_eq!(id, Vec::<usize>::new());
     /// ```
     ///
     /// # Panics
