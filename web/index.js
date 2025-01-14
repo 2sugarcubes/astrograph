@@ -55,7 +55,7 @@ window.simulate = async function simulate() {
     console.info("Loaded Solar System");
     const observatories = [
       {
-        body_id: [1],
+        body_id: [2],
         location: { r: 1.0, theta: 2.146716234, phi: 2.587676113 },
       },
     ];
