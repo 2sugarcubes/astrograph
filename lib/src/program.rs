@@ -76,6 +76,11 @@ impl Program {
             }
         }
     }
+
+    /// Set the output root
+    pub fn set_output<T: Into<PathBuf>>(&mut self, output: T) {
+        self.output_file_root = output.into();
+    }
 }
 
 #[derive(Deserialize)]
@@ -109,8 +114,8 @@ mod tests {
 
     #[test]
     fn deserialize_from_parts() {
-        let bodies = include_str!("../assets/solar-system.json");
-        let observatoies_str = include_str!("../assets/solar-system.observatories.json");
+        let bodies = include_str!("../../assets/solar-system.json");
+        let observatoies_str = include_str!("../../assets/solar-system.observatories.json");
 
         let root: Arc = serde_json::from_str(bodies).unwrap();
         let observatories: Vec<WeakObservatory> = serde_json::from_str(observatoies_str).unwrap();
@@ -128,7 +133,7 @@ mod tests {
 
     #[test]
     fn deserialize() {
-        let program = include_str!("../assets/solar-system.program.json");
+        let program = include_str!("../../assets/solar-system.program.json");
 
         let program: Program = serde_json::from_str(program).unwrap();
 

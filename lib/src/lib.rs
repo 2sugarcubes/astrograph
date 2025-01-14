@@ -33,13 +33,14 @@ pub type Float = f32;
 #[cfg(all(feature = "f64", not(target_arch = "wasm32")))]
 pub type Float = f64;
 
-//#[cfg(or(target_arch = "wasm32", target_arch = "wasm64"))]
+#[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
 /// WebAssembly bindings
 pub mod wasm;
 
 /// Useful functions to use while testing to cut down on code repetition.
 pub mod testing {
-    use xorshift::{Rng, SeedableRng, Xorshift128};
+    use rand::{Rng, SeedableRng};
+    use rand_xorshift::XorShiftRng;
 
     use crate::{
         body::{Arc, Body},
@@ -48,7 +49,7 @@ pub mod testing {
         Float,
     };
 
-    pub const DEFAULT_SEED: u64 = 0x064B_DEAF_BEEF_CAFE;
+    pub const DEFAULT_SEED: u128 = 0x064B_DEAF_BEEF_CAFE_064B_DEAF_BEEF_CAFE;
 
     /// Generates an example [`crate::body::Body`] tree from a seed, at the moment this will only
     /// generate a tree with five ancestors of the observing body, the observing body, nine
@@ -59,8 +60,9 @@ pub mod testing {
     /// `([crate::body::Arc], [crate::body::Arc])` where the first `Arc` is the root body, and must
     /// be kept alive to keep all the ancestors of the intended observing body in scope; and the second `Arc` is intended to be the observing body.
     #[must_use]
-    pub fn make_toy_example(seed: u64) -> (Arc, Arc) {
-        let mut rng = Xorshift128::from_seed(&[seed, seed]);
+    pub fn make_toy_example(seed: u128) -> (Arc, Arc) {
+        let seed = seed.to_be_bytes();
+        let mut rng = XorShiftRng::from_seed(seed);
 
         let (root, observer) = make_toy_parents(&mut rng, 5);
 
@@ -109,26 +111,25 @@ pub mod testing {
         let scale = (2.0 as Float).powi(depth.into());
 
         Keplerian::new(
-            rng.gen_range(0.01, 1.0),
-            rng.gen_range(200.0, 19_700.0) * scale,
+            rng.gen_range(0.01 as Float..1.0),
+            rng.gen_range(200.0 as Float..19_700.0) * scale,
             make_random_angle(rng),
             make_random_angle(rng),
             make_random_angle(rng),
             make_random_angle(rng),
-            rng.gen_range(0.95, 1.05) * scale,
+            rng.gen_range(0.95 as Float..1.05) * scale,
         )
     }
 
     /// Convenience wrapper that generates a random canonical angle, i.e. [0, 2π), in radians
     fn make_random_angle<T: Rng>(rng: &mut T) -> Float {
-        rng.gen_range(0.0, float::TAU)
+        rng.gen_range(0.0..float::TAU)
     }
 
     #[cfg(test)]
     mod tests {
-
         use super::*;
-        use xorshift::{thread_rng, Xoroshiro128, Xorshift1024};
+        use rand::thread_rng;
 
         #[test]
         #[allow(clippy::cast_lossless)]
@@ -136,7 +137,7 @@ pub mod testing {
             const DEPTH_OF_CHILDREN: u8 = 3;
             const NUMBER_OF_CHILDREN: u8 = 4;
             const NUMBER_OF_PARENTS: u8 = 5;
-            let mut rng = Xoroshiro128::from_seed(&[DEFAULT_SEED, DEFAULT_SEED]);
+            let mut rng = XorShiftRng::from_seed(DEFAULT_SEED.to_be_bytes());
             let (root, observer) = make_toy_parents(&mut rng, NUMBER_OF_PARENTS);
 
             // We add one so that we are also counting the observer body
@@ -167,8 +168,7 @@ pub mod testing {
         //#[ignore = "long running"]
         #[test]
         fn fuzz_toy_examples() {
-            let mut rng: Xorshift1024 = thread_rng();
-
+            let mut rng: XorShiftRng = XorShiftRng::from_rng(thread_rng()).unwrap();
             for _ in 0..5_000 {
                 let seed = rng.gen();
                 println!("Seed was: {seed:x?}");

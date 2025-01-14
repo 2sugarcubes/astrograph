@@ -12,6 +12,7 @@ use crate::{body::Arc, Float};
 pub mod svg;
 
 /// An output for the website
+#[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
 pub mod web;
 
 /// The trait for structs that output to a file. It may be made more general in future to better

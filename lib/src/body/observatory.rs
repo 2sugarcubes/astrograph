@@ -71,7 +71,13 @@ pub struct WeakObservatory {
     body_id: Vec<usize>,
 }
 
-pub(crate) fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observatory {
+/// Converts a [`WeakObservatory`] to a regular [`Observatory`] by adding back reference counted
+/// variables correctly.
+///
+/// # Panics
+///
+/// Panics if a body in the tree has a poisoned lock
+pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observatory {
     let mut body = root.clone();
     for child_id in weak_observatory.body_id {
         let b = body.read().unwrap().children[child_id].clone();
@@ -165,7 +171,7 @@ mod tests {
 
     #[test]
     fn load_from_file() {
-        let file = include_str!("../../assets/solar-system.observatories.json");
+        let file = include_str!("../../../assets/solar-system.observatories.json");
 
         let observatories: Vec<WeakObservatory> = serde_json::from_str(file).unwrap();
 

@@ -20,3 +20,5 @@
 - [ ] Make compile time smaller by making wasm-bindgen inclusion dependant on
       target arch
 - [ ] Make serde an optional dependency to reduce compile time and binary size
+- [ ] [clap man gen](https://crates.io/crates/clap_mangen)
+- [ ] [clap complete](https://crates.io/crates/clap_complete)
