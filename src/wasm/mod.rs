@@ -1,4 +1,4 @@
-use std::sync::{Arc, RwLock, Weak};
+use std::sync::{Arc, RwLock};
 
 use crate::{
     body::{
@@ -14,7 +14,7 @@ use crate::{
 use gloo_utils::format::JsValueSerdeExt;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use wasm_bindgen::prelude::*;
 
 /// # Errors
@@ -102,7 +102,7 @@ fn upgrade_body(body: &self::Body, parent: Option<Arc<RwLock<body::Body>>>) -> b
     };
 
     let result = Arc::new(RwLock::new(body::Body {
-        parent: parent.map(|p| Arc::downgrade(&p)),
+        parent: parent.as_ref().map(|p| Arc::downgrade(&p)),
         dynamic,
         rotation: body.rotation.clone(),
         children: Vec::with_capacity(body.children.len()),
@@ -111,6 +111,7 @@ fn upgrade_body(body: &self::Body, parent: Option<Arc<RwLock<body::Body>>>) -> b
     if let Ok(mut lock) = result.write() {
         for c in &body.children {
             let child = upgrade_body(c, Some(result.clone()));
+            assert!(child.read().unwrap().parent.is_some());
             lock.children.push(child);
         }
     }
