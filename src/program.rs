@@ -28,6 +28,7 @@ pub struct Program {
     outputs: Vec<Box<dyn crate::output::Output>>,
     /// Location where output files will be stored, typically under a subdirectory for which
     /// observatory made that observation.
+    #[builder(default)]
     output_file_root: PathBuf,
 }
 

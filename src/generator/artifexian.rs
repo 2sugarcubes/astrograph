@@ -11,8 +11,11 @@ use crate::{
     Float,
 };
 
+use wasm_bindgen::prelude::*;
+
 use super::Generator;
 
+#[wasm_bindgen]
 pub struct Artifexian {}
 
 impl Generator for Artifexian {

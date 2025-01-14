@@ -4,3 +4,4 @@
 **/*.ods
 **/*.svg
 **/*.csv
+web/pkg/

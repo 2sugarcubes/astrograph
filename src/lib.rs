@@ -27,11 +27,15 @@ pub mod generator;
 extern crate assert_float_eq;
 
 /// Type alias to enable compile time configurable precision.
-#[cfg(not(feature = "f64"))]
+#[cfg(any(target_arch = "wasm32", not(feature = "f64")))]
 pub type Float = f32;
 
-#[cfg(feature = "f64")]
+#[cfg(all(feature = "f64", not(target_arch = "wasm32")))]
 pub type Float = f64;
+
+//#[cfg(or(target_arch = "wasm32", target_arch = "wasm64"))]
+/// WebAssembly bindings
+pub mod wasm;
 
 /// Useful functions to use while testing to cut down on code repetition.
 pub mod testing {

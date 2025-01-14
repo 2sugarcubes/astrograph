@@ -34,10 +34,10 @@ Predict bodies in a n-body problem, a situation where each body influences the m
 - [x] Procedurally generated universes
   - [x] Arbitrary elliptic planes around stars
   - [x] Arbitrary elliptic planes around planets
-- [ ] WASM target
-- [ ] Color coded Bodies
-- [ ] Body classes (e.g. `planet-rocky`, `planet-gas`, `star-M-class`, `moon-icy`, `black-hole`), useful for filtering bodies in results
-- [ ] Constellations
+- [x] WASM target
 - [ ] Eclipses
 - [ ] web page
 - [ ] Summary output format (Similar to an [almanac](https://en.wikipedia.org/wiki/Almanac) e.g. [Astronomical Almanac, 2016, by The Stationery Office, U.S. Nautical Almanac Office, and Defense Department](https://openlibrary.org/books/OL50688251M/Astronomical_Almanac))
+- [ ] Constellations
+- [ ] Color coded/labeled Bodies
+- [ ] Body classes (e.g. `planet-rocky`, `planet-gas`, `star-M-class`, `moon-icy`, `black-hole`), useful for filtering bodies in results
