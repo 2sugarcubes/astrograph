@@ -434,10 +434,7 @@ mod tests {
 
     #[test]
     fn deserialise_from_json_string() -> Result<()> {
-        #[cfg(not(windows))]
         let json = include_str!("../../../assets/solar-system.json");
-        #[cfg(windows)]
-        let json = include_str!("..\\..\\assets\\solar-system.json");
 
         let sun: Arc = StdArc::new(RwLock::new(serde_json::from_str(json)?));
         Body::hydrate_all(&sun, &None);
