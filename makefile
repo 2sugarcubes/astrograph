@@ -7,6 +7,9 @@ test:
 
 pre-push:
 	cargo fmt && \
+		cd assets && \
+		./packSolarSystem.sh && \
+		cd - && \
 		cargo clippy --all-features -- -Dclippy::pedantic && \
 		cargo clippy --no-default-features && \
 		echo "\tf64 tests" && cargo test && \

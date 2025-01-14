@@ -431,7 +431,7 @@ impl Planet {
                     radius: 1.0,
                     polar_angle: (rng.gen_range(0.0..80.0) as Float
                         // Make it rotate retrograde 20% of the time
-                        + if rng.gen_bool(0.2) { 90.0 } else { 0.0 })
+                        + if rng.gen_bool(0.2) { 100.0 } else { 0.0 })
                     .to_radians(),
                     azimuthal_angle: random_angle(rng),
                 },

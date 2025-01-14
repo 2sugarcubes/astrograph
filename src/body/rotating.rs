@@ -5,13 +5,38 @@ use serde::{Deserialize, Serialize};
 use crate::{consts::float, Float};
 
 /// A struct that defines the rotation of a body.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(from = "SerializableRotating", into = "SerializableRotating")]
 pub struct Rotating {
     /// The time for the body to rotate 360 degrees, as opposed to a [solar day](https://en.wikipedia.org/wiki/Synodic_day)
     sidereal_period: Float,
     /// The direction of the geographic north pole.
     axis: Vector3<Float>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+struct SerializableRotating {
+    sidereal_period: Float,
+    axis: Spherical<Float>,
+}
+
+impl From<Rotating> for SerializableRotating {
+    fn from(value: Rotating) -> Self {
+        SerializableRotating {
+            sidereal_period: value.sidereal_period,
+            axis: value.axis.into(),
+        }
+    }
+}
+
+impl From<SerializableRotating> for Rotating {
+    fn from(value: SerializableRotating) -> Self {
+        Rotating {
+            sidereal_period: value.sidereal_period,
+            axis: value.axis.into(),
+        }
+    }
 }
 
 impl Rotating {
