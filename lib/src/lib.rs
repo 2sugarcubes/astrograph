@@ -33,7 +33,7 @@ pub type Float = f32;
 #[cfg(all(feature = "f64", not(target_arch = "wasm32")))]
 pub type Float = f64;
 
-//#[cfg(or(target_arch = "wasm32", target_arch = "wasm64"))]
+#[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
 /// WebAssembly bindings
 pub mod wasm;
 
@@ -168,8 +168,7 @@ pub mod testing {
         //#[ignore = "long running"]
         #[test]
         fn fuzz_toy_examples() {
-            let mut rng: Xorshift1024 = thread_rng();
-
+            let mut rng: XorShiftRng = XorShiftRng::from_rng(thread_rng()).unwrap();
             for _ in 0..5_000 {
                 let seed = rng.gen();
                 println!("Seed was: {seed:x?}");

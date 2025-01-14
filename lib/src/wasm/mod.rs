@@ -20,7 +20,7 @@ use wasm_bindgen::prelude::*;
 /// # Errors
 /// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
 /// required fields
-#[wasm_bindgen]
+#[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
 pub fn generate_observations_from_json(
     root: &str,
     observatories: &str,
@@ -55,14 +55,14 @@ pub fn generate_observations_from_json(
     Ok(())
 }
 
-#[wasm_bindgen]
+#[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
 pub fn generate_universe_from_seed(seed: u64) -> JsValue {
     JsValue::from_serde(&Artifexian::generate(&mut XorShiftRng::seed_from_u64(seed))).unwrap()
 }
 
-#[wasm_bindgen]
+#[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
 pub fn generate_universe() -> JsValue {
