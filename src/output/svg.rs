@@ -6,7 +6,7 @@ use super::Output;
 use coordinates::prelude::{Polar, Spherical, Vector2};
 use svg::{
     self,
-    node::element::{Circle, Line, Rectangle},
+    node::element::{Circle, Line, Style, Text},
     Document, Node,
 };
 
@@ -24,45 +24,54 @@ impl<T: Projection> Svg<T> {
     /// Converts observations to a SVG document
     pub(super) fn consume_observation(
         &self,
+        time: String,
         observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
         // TODO remove some magic values (like "1010", "505", etc.)
         // Create lines of longitude through the circle to more easily read it.
         const NUMBER_OF_BISECTIONS: u8 = 4;
+
+        const TOP_LEFT: Float = -1.02;
+        const BOTTOM_RIGHT: Float = 2.0 * 1.02;
+
         let mut result = Document::new()
-            .add(Rectangle::new().set("width", "1010").set("height", "1010"))
+            .set("preserveAspectRatio", "xMidYMid meet")
+            .set(
+                "viewBox",
+                format!("{TOP_LEFT} {TOP_LEFT} {BOTTOM_RIGHT} {BOTTOM_RIGHT}"),
+            )
+            .set("style", "background-color: #000")
+            .add(Style::new(include_str!("svgStyle.css")))
             .add(
                 Circle::new()
-                    .set("r", "500.0")
-                    .set("cy", "505.0")
-                    .set("cx", "505.0")
-                    .set(
-                        "style",
-                        "fill: #000; stroke-width: 1; fill-opacity: 0; stroke: #555; stroke-opacity: 1;",
-                    ),
+                    .set("r", "1")
+                    .set("cy", "0")
+                    .set("cx", "0")
+                    .set("class", "outer"),
+            )
+            .add(
+                Text::new(format!("t={time}"))
+                    .set("class", "heading")
+                    .set("y", format!("{}", -0.95))
+                    .set("x", format!("{}", -0.98)),
             );
 
         for i in 0..NUMBER_OF_BISECTIONS {
-            let theta = float::TAU * (i as Float / (NUMBER_OF_BISECTIONS * 2) as Float);
-            let starting_point: Vector2<Float> = Polar {
-                radius: 500.0,
-                theta,
-            }
-            .into();
+            let theta = float::PI * (i as Float / NUMBER_OF_BISECTIONS as Float);
+            let starting_point: Vector2<Float> = Polar { radius: 1.0, theta }.into();
 
             let ending_point: Vector2<Float> = Polar {
-                radius: 500.0,
+                radius: 1.0,
                 theta: theta + float::PI,
             }
             .into();
 
             result.append(
                 Line::new()
-                    .set("x1", (starting_point.x + 505.0).to_string())
-                    .set("y1", (starting_point.y + 505.0).to_string())
-                    .set("x2", (ending_point.x + 505.0).to_string())
-                    .set("y2", (ending_point.y + 505.0).to_string())
-                    .set("style", "stroke: #555; stroke-width: 1"),
+                    .set("x1", starting_point.x)
+                    .set("y1", starting_point.y)
+                    .set("x2", ending_point.x)
+                    .set("y2", ending_point.y),
             );
         }
 
@@ -75,12 +84,11 @@ impl<T: Projection> Svg<T> {
             let circle = Circle::new()
                 // Set radius to a small but still visible value
                 // TODO set radius based on angular diameter
-                .set("r", "1.0")
-                // Map values in the range [-1,1] to [5,1005]
-                .set("cx", format!("{}", projected_location.x * 500.0 + 505.0))
-                .set("cy", format!("{}", projected_location.y * 500.0 + 505.0))
+                .set("r", "0.02")
+                .set("cx", projected_location.x)
+                .set("cy", projected_location.y)
                 // TODO set color based on body type? (Will likely require user defined settings)
-                .set("fill", "white");
+                .set("fill", "#FFF");
 
             result.append(circle);
         }
@@ -102,9 +110,17 @@ where
         path: &std::path::Path,
     ) -> Result<(), std::io::Error> {
         let path = super::set_extension(path, "svg");
+        let time = path
+            .file_name()
+            .and_then(|x| x.to_str())
+            .and_then(|x| x.strip_suffix(".svg"))
+            .unwrap_or("Could not find Time")
+            .to_string();
+
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        svg::save(path, &self.consume_observation(observations))
+
+        svg::save(path, &self.consume_observation(time, observations))
     }
 }

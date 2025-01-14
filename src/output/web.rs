@@ -24,14 +24,16 @@ impl Output for Web {
         )],
         path: &std::path::Path,
     ) -> Result<(), std::io::Error> {
-        let observations = self.svg.consume_observation(observations);
-
         let time: u64 = path
             .file_name()
             .and_then(|x| x.to_str())
             .unwrap()
             .parse()
             .unwrap();
+
+        let observations = self
+            .svg
+            .consume_observation(format!("{time}"), observations);
 
         draw_observation(time, observations.to_string());
 
