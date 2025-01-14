@@ -11,8 +11,8 @@ pre-push:
 		./packSolarSystem.sh && \
 		cd - && \
 		cargo clippy --all-features -- -Dclippy::pedantic && \
-		cargo clippy --no-default-features && \
-		echo "\tf64 tests" && cargo test && \
+		cargo clippy --no-default-features -- -Dclippy::pedantic && \
+		echo "\tf64 tests" && cargo test --all-features && \
 		echo "\tf32 tests" && cargo test --no-default-features && \
 		cargo run -- build -c 100 -s 0x100000000000000000000 && \
 		rm universe.json && \
