@@ -1,0 +1,15 @@
+[package]
+name = "astrolabe-bin"
+version = "0.1.0"
+edition = "2021"
+license = "LGPL-3.0-or-later"
+description = "A library dedicated to provinding astronomical predictions of non-chaotic and deterministic bodies."
+readme = "README.md"
+repository = "https://github.com/2sugarcubes/astrolabe"
+keywords = ["astronomy", "physics", "mathmatics", "simulation"]
+categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
+
+[dependencies]
+clap = { version = "4.5.26", features = ["derive"] }
+astrolabe = { path = "../lib", version = "0.1" }
+rand_xorshift = "0.3.0"

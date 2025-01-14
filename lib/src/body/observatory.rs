@@ -165,7 +165,7 @@ mod tests {
 
     #[test]
     fn load_from_file() {
-        let file = include_str!("../../assets/solar-system.observatories.json");
+        let file = include_str!("../../../assets/solar-system.observatories.json");
 
         let observatories: Vec<WeakObservatory> = serde_json::from_str(file).unwrap();
 
