@@ -16,8 +16,8 @@ pre-push:
 		echo "\tf32 tests" && cargo test --no-default-features && \
 		cargo run -- build -c 100 -s 0x100000000000000000000 && \
 		rm universe.json && \
-		cargo run -- simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -b assets/solar-system.observatories.json -o /tmp/ && \
-		cargo run -- simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json -o /tmp/ && \
+		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
+		cargo run -- -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json && \
 		echo '✅ Good to push 👍'
 
 serve:
