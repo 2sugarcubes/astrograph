@@ -73,6 +73,10 @@ pub struct WeakObservatory {
 
 /// Converts a [`WeakObservatory`] to a regular [`Observatory`] by adding back reference counted
 /// variables correctly.
+///
+/// # Panics
+///
+/// Panics if a body in the tree has a poisoned lock
 pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observatory {
     let mut body = root.clone();
     for child_id in weak_observatory.body_id {

@@ -92,8 +92,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             seed,
         } => {
             let seed_num = seed
-                .map(|s| parse_int::parse::<i128>(&s).unwrap())
-                .unwrap_or_else(|| rand::thread_rng().to_owned().gen())
+                .map_or_else(
+                    || rand::thread_rng().clone().gen(),
+                    |s| parse_int::parse::<i128>(&s).unwrap(),
+                )
                 .to_be_bytes();
 
             eprintln!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
@@ -153,26 +155,23 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .and_then(|json| serde_json::from_str::<Program>(&json).ok())
             {
                 program
+            } else if let (Some(universe), Some(observatories)) = (
+                universe
+                    .clone()
+                    .map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
+                observatories
+                    .clone()
+                    .map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
+            ) {
+                println!(
+                    "Cannot parse observatories at: {universe}, or universe at: {observatories}"
+                );
+                return Err(Box::new(crate::ReadError {
+                    file_path: format!("universe: {universe}, observatories: {observatories}"),
+                }));
             } else {
-                if let (Some(universe), Some(observatories)) = (
-                    universe
-                        .clone()
-                        .map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
-                    observatories
-                        .clone()
-                        .map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
-                ) {
-                    println!(
-                        "Cannot parse observatories at: {}, or universe at: {}",
-                        universe, observatories
-                    );
-                    return Err(Box::new(crate::ReadError {
-                        file_path: format!("universe: {universe}, observatories: {observatories}"),
-                    }));
-                } else {
-                    println!("Cannot parse program at: {program}");
-                    return Err(Box::new(crate::ReadError { file_path: program }));
-                }
+                println!("Cannot parse program at: {program}");
+                return Err(Box::new(crate::ReadError { file_path: program }));
             };
 
             program.set_output(args.output);
