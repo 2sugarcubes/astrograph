@@ -33,7 +33,7 @@ impl Output for Web {
 
         let observations = self
             .svg
-            .consume_observation(format!("{time}"), observations);
+            .consume_observation(&format!("{time}"), observations);
 
         draw_observation(time, observations.to_string());
 

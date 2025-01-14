@@ -24,7 +24,7 @@ impl<T: Projection> Svg<T> {
     /// Converts observations to a SVG document
     pub(super) fn consume_observation(
         &self,
-        time: String,
+        time: &str,
         observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
         // TODO remove some magic values (like "1010", "505", etc.)
@@ -121,6 +121,6 @@ where
             std::fs::create_dir_all(parent)?;
         }
 
-        svg::save(path, &self.consume_observation(time, observations))
+        svg::save(path, &self.consume_observation(&time, observations))
     }
 }

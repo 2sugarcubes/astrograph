@@ -75,7 +75,7 @@ pub fn generate_universe() -> JsValue {
 #[serde(rename_all = "camelCase")]
 struct Body {
     /// Bodies that orbit around this body
-    children: Vec<Box<Body>>,
+    children: Vec<Body>,
     /// The way this body moves around the parent
     dynamic: Dynamic,
     /// If the body has any o1fservatories it is highly recommended to initialize this.
@@ -95,14 +95,14 @@ enum Dynamic {
     Keplerian(Keplerian),
 }
 
-fn upgrade_body(body: &self::Body, parent: Option<Arc<RwLock<body::Body>>>) -> body::Arc {
+fn upgrade_body(body: &self::Body, parent: Option<&Arc<RwLock<body::Body>>>) -> body::Arc {
     let dynamic: Box<dyn crate::dynamic::Dynamic> = match body.dynamic {
         Dynamic::Fixed(f) => Box::new(f),
         Dynamic::Keplerian(k) => Box::new(k),
     };
 
     let result = Arc::new(RwLock::new(body::Body {
-        parent: parent.as_ref().map(|p| Arc::downgrade(&p)),
+        parent: parent.as_ref().map(|p| Arc::downgrade(p)),
         dynamic,
         rotation: body.rotation.clone(),
         children: Vec::with_capacity(body.children.len()),
@@ -110,7 +110,7 @@ fn upgrade_body(body: &self::Body, parent: Option<Arc<RwLock<body::Body>>>) -> b
 
     if let Ok(mut lock) = result.write() {
         for c in &body.children {
-            let child = upgrade_body(c, Some(result.clone()));
+            let child = upgrade_body(c, Some(&result.clone()));
             assert!(child.read().unwrap().parent.is_some());
             lock.children.push(child);
         }
