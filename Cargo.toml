@@ -13,9 +13,11 @@ keywords = ["astronomy", "physics", "mathmatics", "simulation"]
 categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
 authors = ["Lucy <105619409+2sugarcubes@users.noreply.github.com>"]
 
-
 [profile.release]
-strip = true
-lto = "fat"
+opt-level = 3
+debug = false
+strip = "none"
+lto = true
 codegen-units = 1
+incremental = false
 panic = "abort"
