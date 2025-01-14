@@ -9,13 +9,27 @@ async function loadJsonFile(url, callback) {
     .then((json) => callback(json));
 }
 
-window.draw_observation = function draw_observation(time, svg_data) {
-  console.debug(time, svg_data.split("\n").length);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+var frame = document.getElementById("slides");
+const firstNavButton = document.getElementById("navButtonPrev");
+
+window.draw_observation = function draw_observation(time, svgData) {
+  const lines = svgData.split("\n").length;
+
+  var dataURL =
+    "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgData);
+
+  if (lines > 40) {
+    console.debug(time, lines);
+  }
+  var slide = document.createElement("img");
+  slide.src = dataURL;
+  slide.classList.add("slide");
+  frame.insertBefore(slide, firstNavButton);
 };
 
 window.simulate = async function simulate() {
-  await init();
-
   console.info("Creating a whole universe");
   const root = generate_universe();
   const observatories = [
@@ -30,28 +44,43 @@ window.simulate = async function simulate() {
     JSON.stringify(root),
     JSON.stringify(observatories),
     BigInt(0),
-    BigInt(10),
-    100,
+    BigInt(100),
+    10,
   );
 
-  await loadJsonFile(
-    "./assets/solar-system.json",
-    async function (solarsystem) {
-      console.info("Loaded Solar System");
-      await loadJsonFile(
-        "./assets/solar-system.observatories.json",
-        function (observatories) {
-          console.info("Loaded observatories");
-          console.info("Generating 100 observations");
-          generate_observations_from_json(
-            JSON.stringify(solarsystem),
-            JSON.stringify(observatories),
-            BigInt(0),
-            BigInt(100),
-            1,
-          );
-        },
-      );
-    },
-  );
+  return;
+  await loadJsonFile("/assets/solar-system.json", async function (solarsystem) {
+    console.info("Loaded Solar System");
+    const observatories = [
+      {
+        body_id: [1],
+        location: { r: 1.0, theta: 2.146716234, phi: 2.587676113 },
+      },
+    ];
+    /*await loadJsonFile(
+      "/assets/solar-system.observatories.json",
+      function (observatories) {
+        console.info("Loaded observatories");
+        console.info("Generating 100 observations"); */
+    frame.querySelectorAll(":scope > img").forEach((e) => e.remove());
+    generate_observations_from_json(
+      JSON.stringify(solarsystem),
+      JSON.stringify(observatories),
+      BigInt(0),
+      BigInt(100),
+      1,
+    );
+
+    /*
+      //updateLoop(BigInt(0), 1, BigInt(100));
+      },
+    );*/
+  });
 };
+
+console.debug(frame);
+console.debug(firstNavButton);
+
+console.debug("Initializing wasm modules");
+await init();
+console.debug("Finished initializing wasm modules");
