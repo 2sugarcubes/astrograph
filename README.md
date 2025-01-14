@@ -35,6 +35,7 @@ Predict bodies in a n-body problem, a situation where each body influences the m
   - [x] Arbitrary elliptic planes around stars
   - [x] Arbitrary elliptic planes around planets
 - [x] WASM target
+- [ ] binary target
 - [ ] Eclipses
 - [ ] web page
 - [ ] Summary output format (Similar to an [almanac](https://en.wikipedia.org/wiki/Almanac) e.g. [Astronomical Almanac, 2016, by The Stationery Office, U.S. Nautical Almanac Office, and Defense Department](https://openlibrary.org/books/OL50688251M/Astronomical_Almanac))
