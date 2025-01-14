@@ -52,5 +52,5 @@ function showSlides(n = 1) {
     slides[slideIndex].style.display = "block";
   }
   console.debug(`Auto slide: ${slideIndex}`);
-  setTimeout(showSlides, 2000); // Change image every 2 seconds
+  setTimeout(showSlides, 1000);
 }

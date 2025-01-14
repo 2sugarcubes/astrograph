@@ -30,6 +30,8 @@ window.draw_observation = function draw_observation(time, svgData) {
 };
 
 window.simulate = async function simulate() {
+  /*
+
   console.info("Creating a whole universe");
   const root = generate_universe();
   const observatories = [
@@ -38,17 +40,17 @@ window.simulate = async function simulate() {
       location: { r: 1.0, theta: 2.146716234, phi: 2.587676113 },
     },
   ];
-
+  
   console.info("Generating 10 observatons");
   generate_observations_from_json(
     JSON.stringify(root),
     JSON.stringify(observatories),
     BigInt(0),
-    BigInt(100),
-    10,
+    BigInt(121),
+    12,
   );
 
-  return;
+  await sleep(10500); */
   await loadJsonFile("/assets/solar-system.json", async function (solarsystem) {
     console.info("Loaded Solar System");
     const observatories = [
