@@ -55,6 +55,10 @@
           "argPeri": 1.7967674211761813,
           "period": 8766.144
         }
+      },
+      "rotation": {
+        "siderealPeriod": 23.934472,
+        "axis": { "r": 1, "phi": 0.4093, "theta": 0 }
       }
     },
     {
@@ -69,6 +73,10 @@
           "argPeri": 5.865019079167462,
           "period": 16487.52
         }
+      },
+      "rotation": {
+        "siderealPeriod": 24.6229622,
+        "axis": { "r": 1, "phi": 0.4396, "theta": 0 }
       }
     },
     {
