@@ -2,7 +2,7 @@ use std::{
     error::Error,
     fmt::Display,
     fs,
-    path::PathBuf,
+    path::{Path, PathBuf},
     str::FromStr,
     sync::{Arc, RwLock},
 };
@@ -87,34 +87,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args = Arguments::parse();
 
     match args.sub_command {
-        Commands::Build {
-            star_count: _,
-            seed,
-        } => {
-            let seed_num = seed
-                .map_or_else(
-                    || rand::thread_rng().clone().gen(),
-                    |s| parse_int::parse::<i128>(&s).unwrap(),
-                )
-                .to_be_bytes();
-
-            eprintln!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
-
-            let mut rng = XorShiftRng::from_seed(seed_num);
-            let tree = Artifexian::generate(&mut rng);
-
-            let json = serde_json::to_string(&tree)?;
-
-            let mut output_file = args.output;
-            if output_file.is_dir() {
-                output_file.push(PathBuf::from_str("universe.json").unwrap());
-            }
-            eprintln!(
-                "Writing universe to file {}",
-                output_file.to_str().unwrap_or("UNPRINTABLE PATH")
-            );
-            std::fs::write(output_file, json)?;
-        }
+        Commands::Build { star_count, seed } => build(seed.as_ref(), star_count, &args.output),
         Commands::Simulate {
             start_time,
             end_time,
@@ -122,72 +95,116 @@ fn main() -> Result<(), Box<dyn Error>> {
             universe,
             observatories,
             program,
-        } => {
-            let mut program: Program = if let (Some(universe), Some(observatories)) = (
-                universe
-                    .as_ref()
-                    .and_then(|path| fs::read_to_string(path).ok())
-                    .and_then(|json| {
-                        let res: Result<Body, _> = serde_json::from_str(&json);
-                        res.ok()
-                    }),
-                observatories
-                    .as_ref()
-                    .and_then(|path| fs::read_to_string(path).ok())
-                    .and_then(|json| {
-                        let res: Result<Vec<WeakObservatory>, _> = serde_json::from_str(&json);
-                        res.ok()
-                    }),
-            ) {
-                let root: astrolabe::body::Arc = Arc::new(RwLock::new(universe));
+        } => simulate(
+            start_time,
+            end_time,
+            step_size,
+            universe.as_ref(),
+            observatories.as_ref(),
+            &program,
+            &args.output,
+        ),
+    }
+}
 
-                let mut program_builder = ProgramBuilder::default();
-                program_builder.add_output(Box::new(Svg::new(StatelessOrthographic())));
+fn build(seed: Option<&String>, _star_count: u64, output: &Path) -> Result<(), Box<dyn Error>> {
+    let seed_num = seed
+        .map_or_else(
+            || rand::thread_rng().clone().gen(),
+            |s| parse_int::parse::<i128>(s).unwrap(),
+        )
+        .to_be_bytes();
 
-                for o in observatories {
-                    program_builder
-                        .add_observatory(astrolabe::body::observatory::to_observatory(o, &root));
-                }
+    eprintln!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
 
-                program_builder._root_body(root).build().unwrap()
-            } else if let Some(program) = fs::read_to_string(&program)
-                .ok()
-                .and_then(|json| serde_json::from_str::<Program>(&json).ok())
-            {
-                program
-            } else if let (Some(universe), Some(observatories)) = (
-                universe
-                    .clone()
-                    .map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
-                observatories
-                    .clone()
-                    .map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
-            ) {
-                println!(
-                    "Cannot parse observatories at: {universe}, or universe at: {observatories}"
-                );
-                return Err(Box::new(crate::ReadError {
-                    file_path: format!("universe: {universe}, observatories: {observatories}"),
-                }));
-            } else {
-                println!("Cannot parse program at: {program}");
-                return Err(Box::new(crate::ReadError { file_path: program }));
-            };
+    let mut rng = XorShiftRng::from_seed(seed_num);
+    let tree = Artifexian::generate(&mut rng);
 
-            program.set_output(args.output);
+    let json = serde_json::to_string(&tree)?;
 
-            program.make_observations(
-                start_time,
-                end_time,
-                if step_size == 0 {
-                    None
-                } else {
-                    Some(step_size)
-                },
-            );
+    let mut output_file: PathBuf = output.into();
+    if output_file.is_dir() {
+        output_file.push(PathBuf::from_str("universe.json").unwrap());
+    }
+    eprintln!(
+        "Writing universe to file {}",
+        output_file.to_str().unwrap_or("UNPRINTABLE PATH")
+    );
+    std::fs::write(output_file, json)?;
+    Ok(())
+}
+
+fn simulate(
+    start_time: i128,
+    end_time: i128,
+    step_size: usize,
+    universe: Option<&PathBuf>,
+    observatories: Option<&PathBuf>,
+    program: &str,
+    output: &Path,
+) -> Result<(), Box<dyn Error>> {
+    let mut program: Program = if let (Some(universe), Some(observatories)) = (
+        universe
+            .as_ref()
+            .and_then(|path| fs::read_to_string(path).ok())
+            .and_then(|json| {
+                let res: Result<Body, _> = serde_json::from_str(&json);
+                res.ok()
+            }),
+        observatories
+            .as_ref()
+            .and_then(|path| fs::read_to_string(path).ok())
+            .and_then(|json| {
+                let res: Result<Vec<WeakObservatory>, _> = serde_json::from_str(&json);
+                res.ok()
+            }),
+    ) {
+        let root: astrolabe::body::Arc = Arc::new(RwLock::new(universe));
+
+        let mut program_builder = ProgramBuilder::default();
+        program_builder.add_output(Box::new(Svg::new(StatelessOrthographic())));
+        eprintln!(
+            "Created a program from parts with {} observatories",
+            observatories.len()
+        );
+
+        for o in observatories {
+            program_builder.add_observatory(astrolabe::body::observatory::to_observatory(o, &root));
         }
+
+        program_builder._root_body(root).build().unwrap()
+    } else if let Some(mut program) = fs::read_to_string(program)
+        .ok()
+        .and_then(|json| serde_json::from_str::<Program>(&json).ok())
+    {
+        program.add_output(Box::new(Svg::new(StatelessOrthographic())));
+        program
+    } else if let (Some(universe), Some(observatories)) = (
+        universe.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
+        observatories.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
+    ) {
+        println!("Cannot parse observatories at: {universe}, or universe at: {observatories}");
+        return Err(Box::new(crate::ReadError {
+            file_path: format!("universe: {universe}, observatories: {observatories}"),
+        }));
+    } else {
+        println!("Cannot parse program at: {program}");
+        return Err(Box::new(crate::ReadError {
+            file_path: program.to_string(),
+        }));
     };
 
+    program.set_output_path(output);
+
+    program.make_observations(
+        start_time,
+        end_time,
+        if step_size == 0 {
+            None
+        } else {
+            Some(step_size)
+        },
+    );
     Ok(())
 }
 
@@ -210,7 +227,8 @@ impl Error for ReadError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
     }
-
+    #[allow(unknown_lints)] // causes issue on github actions
+    #[allow(clippy::unnecessary_literal_bound)]
     fn description(&self) -> &str {
         "Problem while parsing a file"
     }
