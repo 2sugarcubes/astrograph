@@ -44,7 +44,7 @@ impl Projection for StatelessOrthographic {
 }
 
 /// An [orthographic projector](https://en.wikipedia.org/wiki/Orthographic_map_projection) that is centered on an orbitrary longitude and latitude. In most cases it will be quicker to use the [`StatelessOrthographic`](self::StatelessOrthographic) projection.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Orthographic(
     /// Longitude of center of projection.
     Float,
