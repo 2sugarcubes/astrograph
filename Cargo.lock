@@ -87,7 +87,9 @@ version = "0.1.0"
 dependencies = [
  "astrolabe",
  "clap",
+ "rand",
  "rand_xorshift",
+ "serde_json",
 ]
 
 [[package]]
