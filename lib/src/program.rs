@@ -8,6 +8,7 @@ use crate::{
         observatory::{to_observatory, Observatory, WeakObservatory},
         Arc,
     },
+    output::Output,
     Float,
 };
 
@@ -78,8 +79,12 @@ impl Program {
     }
 
     /// Set the output root
-    pub fn set_output<T: Into<PathBuf>>(&mut self, output: T) {
+    pub fn set_output_path<T: Into<PathBuf>>(&mut self, output: T) {
         self.output_file_root = output.into();
+    }
+
+    pub fn add_output(&mut self, output_method: Box<dyn Output>) {
+        self.outputs.push(output_method);
     }
 }
 
