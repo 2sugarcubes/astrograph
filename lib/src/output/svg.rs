@@ -6,7 +6,7 @@ use super::Output;
 use coordinates::prelude::{Polar, Spherical, Vector2};
 use svg::{
     self,
-    node::element::{Circle, Line, Style, Text},
+    node::element::{Circle, Line, Rectangle, Style, Text},
     Document, Node,
 };
 
@@ -42,6 +42,13 @@ impl<T: Projection> Svg<T> {
             )
             .set("style", "background-color: #000")
             .add(Style::new(include_str!("svgStyle.css")))
+            .add(
+                Rectangle::new()
+                    .set("width", "100%")
+                    .set("height", "100%")
+                    .set("x", TOP_LEFT)
+                    .set("y", TOP_LEFT),
+            )
             .add(
                 Circle::new()
                     .set("r", "1")
