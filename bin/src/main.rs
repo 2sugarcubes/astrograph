@@ -143,7 +143,7 @@ fn simulate(
     program: &str,
     output: &Path,
 ) -> Result<(), Box<dyn Error>> {
-    let mut program: Program = if let (Some(universe), Some(observatories)) = (
+    let program: Program = if let (Some(universe), Some(observatories)) = (
         universe
             .as_ref()
             .and_then(|path| fs::read_to_string(path).ok())
@@ -161,8 +161,11 @@ fn simulate(
     ) {
         let root: astrolabe::body::Arc = Arc::new(RwLock::new(universe));
 
+        astrolabe::body::Body::hydrate_all(&root, &None);
         let mut program_builder = ProgramBuilder::default();
-        program_builder.add_output(Box::new(Svg::new(StatelessOrthographic())));
+        program_builder
+            .add_output(Box::new(Svg::new(StatelessOrthographic())))
+            .output_file_root(output.to_owned());
         eprintln!(
             "Created a program from parts with {} observatories",
             observatories.len()
@@ -178,6 +181,7 @@ fn simulate(
         .and_then(|json| serde_json::from_str::<Program>(&json).ok())
     {
         program.add_output(Box::new(Svg::new(StatelessOrthographic())));
+        program.set_output_path(output);
         program
     } else if let (Some(universe), Some(observatories)) = (
         universe.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
@@ -193,8 +197,6 @@ fn simulate(
             file_path: program.to_string(),
         }));
     };
-
-    program.set_output_path(output);
 
     program.make_observations(
         start_time,
