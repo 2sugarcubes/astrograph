@@ -35,8 +35,10 @@ pub struct Body {
     // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
-    //radius: Float,
+    /// Radius of the body in light seconds
+    radius: Option<Float>,
     //color: [u8,h8,u8],
+    name: Option<String>,
 }
 
 impl PartialEq for Body {
@@ -63,6 +65,8 @@ impl Body {
             children: Vec::new(),
             dynamic: Box::new(dynamic),
             rotation: None,
+            radius: None,
+            name: None,
         }));
         if let Some(p) = parent {
             //TODO resolve poisoned lock
@@ -128,6 +132,19 @@ impl Body {
         } else {
             vec![]
         }
+    }
+
+    /// Get the angular radius (`angular diameter / 2`) in radians
+    #[must_use]
+    pub fn get_angular_radius(&self, distance: Float) -> Float {
+        self.radius.map_or(0.01, |r| (r / distance).asin())
+    }
+
+    #[must_use]
+    pub fn get_name(&self) -> String {
+        self.name
+            .clone()
+            .unwrap_or_else(|| observatory::to_name(&self.get_id()))
     }
 
     #[must_use]
@@ -198,10 +215,16 @@ impl Body {
         if let Some(p) = &self.parent.clone().and_then(|weak| weak.upgrade()) {
             // Calculate the parent's location by getting our offset
             let location = current_position - self.dynamic.get_offset(time);
+
             //TODO resolve poisoned locks
             let parent = p.read().unwrap();
             // Add the grandparent, great-grandparent, etc.
             results.append(&mut parent.traverse_up(time, location));
+
+            // If the parent is the root
+            if parent.parent.is_none() {
+                results.push((p.clone(), location))
+            }
         }
 
         results
