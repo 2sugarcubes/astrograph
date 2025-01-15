@@ -5,3 +5,4 @@
 **/*.svg
 **/*.csv
 web/pkg/
+.cargo/config.toml
