@@ -162,7 +162,8 @@
       },
       "body_id": [
         2
-      ]
+      ],
+      "name": "Mauna Kea Observatory"
     },
     {
       "location": {
@@ -172,7 +173,8 @@
       },
       "body_id": [
         2
-      ]
+      ],
+      "name": "Royal Observatory Grenwich"
     },
     {
       "location": {
@@ -182,7 +184,8 @@
       },
       "body_id": [
         2
-      ]
+      ],
+      "name": "Arecibo Dish"
     },
     {
       "location": {
@@ -192,7 +195,8 @@
       },
       "body_id": [
         2
-      ]
+      ],
+      "name": "Parkes Observatory"
     },
     {
       "location": {
@@ -203,7 +207,8 @@
       "body_id": [
         2,
         0
-      ]
+      ],
+      "name": "Apolo 11 LRRR"
     },
     {
       "location": {
@@ -213,7 +218,8 @@
       },
       "body_id": [
         3
-      ]
+      ],
+      "name": "Spirit Landing Site"
     }
   ],
   "outputFileRoot": "./output/"

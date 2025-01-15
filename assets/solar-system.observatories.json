@@ -1,19 +1,23 @@
 [
   {
     "location": { "r": 1.0, "theta": 1.224833672, "phi": 3.569636398 },
-    "body_id": [2]
+    "body_id": [2],
+    "name": "Mauna Kea Observatory"
   },
   {
     "location": { "r": 1.0, "theta": 0.672338702, "phi": 6.283161047 },
-    "body_id": [2]
+    "body_id": [2],
+    "name": "Royal Observatory Grenwich"
   },
   {
     "location": { "r": 1.0, "theta": 1.250629638, "phi": 5.118129162 },
-    "body_id": [2]
+    "body_id": [2],
+    "name": "Arecibo Dish"
   },
   {
     "location": { "r": 1.0, "theta": 2.146716234, "phi": 2.587676113 },
-    "body_id": [2]
+    "body_id": [2],
+    "name": "Parkes Observatory"
   },
   {
     "location": {
@@ -21,7 +25,8 @@
       "theta": 1.55904327961197,
       "phi": 0.409682880649881
     },
-    "body_id": [2, 0]
+    "body_id": [2, 0],
+    "name": "Apolo 11 LRRR"
   },
   {
     "location": {
@@ -29,6 +34,7 @@
       "theta": 1.82506287354244,
       "phi": 3.06257524535353
     },
-    "body_id": [3]
+    "body_id": [3],
+    "name": "Spirit Landing Site"
   }
 ]
