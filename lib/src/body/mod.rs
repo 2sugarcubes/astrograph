@@ -147,7 +147,9 @@ impl Body {
     #[must_use]
     pub fn get_observations_from_here(&self, time: Float) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
-        results.extend(self.traverse_up(time, Vector3::ORIGIN));
+        if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
+            results.extend(parent.read().unwrap().traverse_up(time, Vector3::ORIGIN));
+        }
 
         results
     }
@@ -186,12 +188,16 @@ impl Body {
     ) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = Vec::new();
 
+        for c in &self.children {
+            // Add parents and cousins
+            let location = current_position - c.read().unwrap().dynamic.get_offset(time);
+            results.push((c.clone(), location));
+        }
+
         // If the parent still exists
         if let Some(p) = &self.parent.clone().and_then(|weak| weak.upgrade()) {
             // Calculate the parent's location by getting our offset
             let location = current_position - self.dynamic.get_offset(time);
-            // Add the parent
-            results.push((p.clone(), location));
             //TODO resolve poisoned locks
             let parent = p.read().unwrap();
             // Add the grandparent, great-grandparent, etc.

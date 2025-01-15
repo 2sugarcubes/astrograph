@@ -104,6 +104,8 @@ impl From<DeserializedProgram> for Program {
             observatories.push(to_observatory(o, &value.root_body));
         }
 
+        crate::body::Body::hydrate_all(&value.root_body, &None);
+
         Program {
             _root_body: value.root_body,
             observatories,
