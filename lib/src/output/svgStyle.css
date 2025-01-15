@@ -1,6 +1,6 @@
 text {
   fill: #888;
-  font-size: 0.01px;
+  font-size: 0.1%;
   font-family: serif;
 }
 
@@ -14,7 +14,7 @@ circle {
 
 text.heading {
   fill: #fff;
-  font-size: 0.05px;
+  font-size: 0.5%;
   font-family: monospace;
 }
 
