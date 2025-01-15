@@ -219,7 +219,7 @@
       "body_id": [
         3
       ],
-      "name": "Spirit Landing Site"
+      "comment": "Name is Spirit Landing Site, but has been left intentionally blank for testing purposes"
     }
   ],
   "outputFileRoot": "./output/"
