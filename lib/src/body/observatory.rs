@@ -15,16 +15,19 @@ pub struct Observatory {
     location: Quaternion<Float>,
     /// The body that observations are being made from
     body: Arc,
+    name: Result<String, Vec<usize>>,
 }
 
 impl Observatory {
     /// Generates an observatory on the given body and location.
     #[must_use]
-    pub fn new(location: Spherical<Float>, body: Arc) -> Self {
+    pub fn new(location: Spherical<Float>, body: Arc, name: Result<String, Vec<usize>>) -> Self {
         let location: Vector3<Float> = location.into();
+
         Self {
             location: quaternion::rotation_from_to(location.into(), Vector3::UP.into()),
             body,
+            name,
         }
     }
 
@@ -62,6 +65,22 @@ impl Observatory {
             })
             .collect()
     }
+
+    #[must_use]
+    pub fn get_name(&self) -> String {
+        let lat_long = Spherical::from(Vector3::from(quaternion::rotate_vector(
+            self.location,
+            Vector3::UP.into(),
+        )));
+        self.name.clone().unwrap_or_else(|id| {
+            format!(
+                "{}{:.2}N{:.2}E",
+                to_name(&id),
+                lat_long.polar_angle.to_degrees() - 90.0,
+                lat_long.azimuthal_angle.to_degrees() - 180.0
+            )
+        })
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -69,6 +88,8 @@ impl Observatory {
 pub struct WeakObservatory {
     location: Spherical<Float>,
     body_id: Vec<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
 }
 
 /// Converts a [`WeakObservatory`] to a regular [`Observatory`] by adding back reference counted
@@ -79,12 +100,31 @@ pub struct WeakObservatory {
 /// Panics if a body in the tree has a poisoned lock
 pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observatory {
     let mut body = root.clone();
-    for child_id in weak_observatory.body_id {
-        let b = body.read().unwrap().children[child_id].clone();
+    for child_id in &weak_observatory.body_id {
+        let b = body.read().unwrap().children[*child_id].clone();
         body = b;
     }
 
-    Observatory::new(weak_observatory.location, body.clone())
+    Observatory::new(
+        weak_observatory.location,
+        body.clone(),
+        weak_observatory.name.ok_or(weak_observatory.body_id),
+    )
+}
+
+fn to_name(id: &[usize]) -> String {
+    if id.is_empty() {
+        String::new()
+    } else {
+        let mut res = id[0].to_string();
+
+        for i in &id[1..] {
+            res.push_str(&format!("-{i}"));
+        }
+
+        res.push('@');
+        res
+    }
 }
 
 impl From<Observatory> for WeakObservatory {
@@ -107,6 +147,7 @@ impl From<Observatory> for WeakObservatory {
                 radius: 1.0,
             },
             body_id: value.body.read().unwrap().get_id(),
+            name: None,
         }
     }
 }
@@ -143,7 +184,7 @@ mod tests {
     #[test]
     fn simple_rotation_test() {
         let root = get_toy_example_body();
-        let observatory = Observatory::new(Spherical::RIGHT, root);
+        let observatory = Observatory::new(Spherical::RIGHT, root, Err(vec![]));
 
         for (time, polar_angle) in [
             (0_u8, 0.0),
