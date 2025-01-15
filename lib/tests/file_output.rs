@@ -29,7 +29,13 @@ fn file_output() -> Result<(), ProgramBuilderError> {
         Spherical::BACK,
     ]
     .into_iter()
-    .map(|dir| Observatory::new(dir, observing_body.clone()))
+    .map(|dir| {
+        Observatory::new(
+            dir,
+            observing_body.clone(),
+            Err(observing_body.read().unwrap().get_id()),
+        )
+    })
     .collect();
 
     let program = ProgramBuilder::default()
@@ -42,10 +48,10 @@ fn file_output() -> Result<(), ProgramBuilderError> {
     program.make_observations(0, 100, Some(1));
 
     for time in 0..100 {
-        for _observatory in &observatories {
+        for observatory in &observatories {
             let path = root_path.join(std::path::Path::new(&format!(
                 "{}/{time:010}.svg",
-                "TODO OBSERVATORY NAME"
+                observatory.get_name(),
             )));
 
             assert!(

@@ -50,7 +50,7 @@ impl Program {
                 let path = self
                     .output_file_root
                     // TODO real names
-                    .join(format!("TODO OBSERVATORY NAME/{time:010}"));
+                    .join(format!("{}/{time:010}", observatory.get_name()));
                 let observations = observatory.observe(time as Float);
                 for output in &self.outputs {
                     // Write the observations to file, recovering on errors
