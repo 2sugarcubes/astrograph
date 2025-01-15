@@ -82,20 +82,36 @@ impl<T: Projection> Svg<T> {
             );
         }
 
-        for projected_location in observations
+        for (body, projected_location, distance) in observations
             .iter()
             // Map from world space to "screen space" (we still require some uniform
             // transformations to map to a true screen space)
-            .filter_map(|(_, loc)| self.0.project_with_state(loc))
+            .filter_map(|(body, loc)| {
+                self.0
+                    .project_with_state(loc)
+                    .map(|projection| (body, projection, loc.radius))
+            })
         {
             let circle = Circle::new()
                 // Set radius to a small but still visible value
                 // TODO set radius based on angular diameter
-                .set("r", "0.02")
+                .set(
+                    "r",
+                    body.read()
+                        .map(|b| (b.get_angular_radius(distance) * float::FRAC_1_PI).max(0.005))
+                        .unwrap_or(0.001),
+                )
+                .set("distance", distance)
                 .set("cx", projected_location.x)
                 .set("cy", projected_location.y)
                 // TODO set color based on body type? (Will likely require user defined settings)
-                .set("fill", "#FFF");
+                .set("fill", "#FFF")
+                .set(
+                    "class",
+                    body.read()
+                        .map(|b| b.get_name())
+                        .unwrap_or_else(|b| b.into_inner().get_name()),
+                );
 
             result.append(circle);
         }
