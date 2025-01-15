@@ -112,7 +112,7 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
     )
 }
 
-fn to_name(id: &[usize]) -> String {
+pub(super) fn to_name(id: &[usize]) -> String {
     if id.is_empty() {
         String::new()
     } else {
