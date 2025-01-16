@@ -67,10 +67,13 @@ impl Rotating {
 
 #[cfg(test)]
 mod test {
+    use std::u8;
+
     use coordinates::{
         prelude::{Spherical, ThreeDimensionalConsts, Vector3},
-        traits::Magnitude,
+        traits::{Magnitude, Positional},
     };
+    use rand_distr::num_traits::float as _;
 
     use crate::{consts::float, Float};
 
@@ -111,7 +114,7 @@ mod test {
     }
 
     #[test]
-    fn correct_quaternion() {
+    fn correct_quaternion_with_axis_up() {
         let rotations = Rotating::new(float::TAU, Spherical::UP);
         let fixed_point = Vector3::RIGHT;
 
@@ -131,6 +134,77 @@ mod test {
             assert_float_absolute_eq!(real_y, expected_y);
 
             println!("Passed ✅");
+        }
+    }
+
+    #[test]
+    fn correct_quaternion_with_axis_right() {
+        let rotations = Rotating::new(float::TAU, Spherical::RIGHT);
+        let fixed_point = Vector3::FORWARD;
+
+        for i in 0..u8::MAX {
+            let angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
+
+            let (expected_z, expected_y) = (-angle).sin_cos();
+
+            let [_, real_y, real_z] =
+                quaternion::rotate_vector(rotations.get_rotation(angle), fixed_point.into());
+
+            print!("Testing angle: {angle:.2}\t");
+
+            assert_float_absolute_eq!(real_y, expected_y);
+            assert_float_absolute_eq!(real_z, expected_z);
+
+            println!("Passed ✅");
+        }
+    }
+
+    #[test]
+    fn correct_quaternion_with_axis_forward() {
+        let rotations = Rotating::new(float::TAU, Spherical::FORWARD);
+        let fixed_point = Vector3::UP;
+        for i in 0..u8::MAX {
+            let angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
+
+            let (expected_x, expected_z) = (-angle).sin_cos();
+
+            let [real_x, _, real_z] =
+                quaternion::rotate_vector(rotations.get_rotation(angle), fixed_point.into());
+
+            print!("Testing angle: {angle:.2}\t");
+
+            assert_float_absolute_eq!(real_x, expected_x);
+            assert_float_absolute_eq!(real_z, expected_z);
+
+            println!("Passed ✅");
+        }
+    }
+
+    #[test]
+    fn correct_quaternion_with_axis_not_on_great_circle() {
+        let rotations = Rotating::new(float::TAU, Spherical::UP);
+
+        for polar_angle in (0..u8::MAX).map(|x| Float::from(x) / Float::from(u8::MAX) * float::PI) {
+            let fixed_point: Vector3<_> = Spherical::new(1.0, polar_angle, 0.0).into();
+            for i in 0..u8::MAX {
+                let angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
+
+                let [real_x, real_y, real_z] =
+                    quaternion::rotate_vector(rotations.get_rotation(angle), fixed_point.into());
+
+                let (mut expected_y, mut expected_x) = (-angle).sin_cos();
+                let expected_z = fixed_point.z;
+                expected_x *= (1.0 - expected_z.powi(2)).sqrt();
+                expected_y *= (1.0 - expected_z.powi(2)).sqrt();
+
+                print!("Testing angle: {angle:.2}, at polar angle: {polar_angle:.2}");
+
+                assert_float_absolute_eq!(real_z, expected_z);
+                assert_float_absolute_eq!(real_y, expected_y);
+                assert_float_absolute_eq!(real_x, expected_x);
+
+                println!("Passed ✅");
+            }
         }
     }
 }
