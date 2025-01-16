@@ -71,9 +71,8 @@ mod test {
 
     use coordinates::{
         prelude::{Spherical, ThreeDimensionalConsts, Vector3},
-        traits::{Magnitude, Positional},
+        traits::Magnitude,
     };
-    use rand_distr::num_traits::float as _;
 
     use crate::{consts::float, Float};
 
