@@ -169,7 +169,7 @@ impl Body {
                 parent
                     .read()
                     .unwrap()
-                    .traverse_up(time, Vector3::ORIGIN)
+                    .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
                     .into_iter()
                     // Remove current body from the results
                     .filter(|(b, _)| b.read().unwrap().get_name() != self.get_name()),
@@ -212,28 +212,26 @@ impl Body {
         current_position: Vector3<Float>,
     ) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = Vec::with_capacity(self.children.len() + 2);
-
-        // Calculate the parent's location by getting our offset
-        let location = current_position - self.dynamic.get_offset(time);
         for c in &self.children {
             // Add parents and cousins
-            let location = location + c.read().unwrap().dynamic.get_offset(time);
-            results.push((c.clone(), location));
+            let child_location = current_position + c.read().unwrap().dynamic.get_offset(time);
+            results.push((c.clone(), child_location));
         }
 
         // If the parent still exists
         if let Some(p) = &self.parent.clone().and_then(|weak| weak.upgrade()) {
+            // Calculate the parent's location by getting our offset
+            let parent_location = current_position - self.dynamic.get_offset(time);
+
             //TODO resolve poisoned locks
             let parent = p.read().unwrap();
-            // Add the grandparent, great-grandparent, etc.
-            results.append(&mut parent.traverse_up(time, location));
 
-            // If the parent is the root
+            // Add the grandparent, great-grandparent, etc.
+            results.append(&mut parent.traverse_up(time, parent_location));
+
+            // If the parent is the root add this body since it can't be added by a grandparent
             if parent.parent.is_none() {
-                results.push((
-                    p.clone(),
-                    location - p.read().unwrap().dynamic.get_offset(time),
-                ));
+                results.push((p.clone(), parent_location));
             }
         }
 
@@ -311,7 +309,9 @@ mod tests {
             .into_iter()
             .map(|(b, loc)| {
                 (
-                    b.read().map_or(String::from("Poisoned"), |b| b.get_name()),
+                    b.read().map_or(String::from("Poisoned"), |b| {
+                        format!("{:?}", b.get_dynamic())
+                    }),
                     loc,
                 )
             })
