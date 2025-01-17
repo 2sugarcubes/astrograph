@@ -1,8 +1,10 @@
-use coordinates::prelude::{Spherical, Vector3};
+use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 use quaternion::Quaternion;
 use serde::{Deserialize, Serialize};
 
 use crate::{consts::float, Float};
+
+use super::Arc;
 
 /// A struct that defines the rotation of a body.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -53,15 +55,35 @@ impl Rotating {
         }
     }
 
-    /// Returns a rotation for a given time.
+    /// Returns a rotation for a given time, should just adjust the longitude the observed body is
+    /// over not the latitude.
     #[must_use]
-    pub fn get_rotation(&self, time: Float) -> Quaternion<Float> {
+    fn get_rotation(&self, time: Float) -> Quaternion<Float> {
         quaternion::axis_angle(self.axis.into(), -self.get_mean_angle(time))
     }
 
     /// Gets angle relative to the reference direction since last complete revolution
     fn get_mean_angle(&self, time: Float) -> Float {
         time % self.sidereal_period / self.sidereal_period * float::TAU
+    }
+
+    pub fn rotate_observed_bodies_equatorial_coordinates(
+        &self,
+        time: Float,
+        observations: &mut [(Arc, Vector3<Float>)],
+    ) {
+        let obliquity_rotation = quaternion::rotation_from_to(self.axis.into(), Vector3::UP.into());
+        let around_axis_rotation = self.get_rotation(time);
+
+        // Convert locations to equitorial coordinates. Though the prime meridian is used instead
+        // of the march equinox to mark zero longitude
+        for (_, loc) in observations.iter_mut() {
+            // Get the axis in the corrext spot (the z axis)
+            let vector =
+                quaternion::rotate_vector(around_axis_rotation, [loc.x, loc.y, loc.z]).into();
+            // Get the prime meridian in the right spot along the positive y axis
+            *loc = quaternion::rotate_vector(obliquity_rotation, vector).into();
+        }
     }
 }
 
