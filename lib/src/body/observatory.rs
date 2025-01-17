@@ -40,21 +40,17 @@ impl Observatory {
     /// [poisoned](https://doc.rust-lang.org/std/sync/struct.RwLock.html#poisoning).
     #[must_use]
     pub fn observe(&self, time: Float) -> Vec<(Arc, Spherical<Float>)> {
-        let body = self.body.read().unwrap();
-        let raw_observations = body.get_observations_from_here(time);
+        let raw_observations = self.body.read().unwrap().get_observations_from_here(time);
 
-        let rotation = if let Some(rotation) = &body.rotation {
-            quaternion::mul(self.location, rotation.get_rotation(time))
-        } else {
-            self.location
-        };
-
-        // Rotate observations to put them in the local coordinate space
+        // Rotate observations to put them in the local coordinate space from equitorial coordinate
+        // space
         raw_observations
             .iter()
             .filter_map(|(body, pos)| {
                 let local_coordinates =
-                    Vector3::from(quaternion::rotate_vector(rotation, (*pos).into()));
+                    Vector3::from(quaternion::rotate_vector(self.location, (*pos).into()));
+                //TODO adjust z based on the body's radius since we aren't observing from the
+                //centre of the body
 
                 // Filter out bodies below the horizon
                 if local_coordinates.z >= 0.0 {
