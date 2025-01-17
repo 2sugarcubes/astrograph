@@ -175,7 +175,10 @@ impl Body {
                     .filter(|(b, _)| b.read().unwrap().get_name() != self.get_name()),
             );
         }
-
+        if let Some(rot) = &self.rotation {
+            // Rotate observations according to axial tilt and time of day
+            rot.rotate_observed_bodies_equatorial_coordinates(time, &mut results);
+        }
         results
     }
 
@@ -228,11 +231,21 @@ impl Body {
 
             // Add the grandparent, great-grandparent, etc.
             results.append(&mut parent.traverse_up(time, parent_location));
+        } else {
+            // This body is the root. We need to add it manually since it can't be added by a parent
 
-            // If the parent is the root add this body since it can't be added by a grandparent
-            if parent.parent.is_none() {
-                results.push((p.clone(), parent_location));
-            }
+            // TODO find a cleaner way of getting an arc<rwlock> if this body.
+            // results.push((Arc::new(RwLock::new(self.clone())), current_position)); (Could be
+            // expensive, could leak memory, could result in desyncing between this self and the
+            // new self)
+            results.push((
+                self.children[0]
+                    .read()
+                    .ok()
+                    .and_then(|c| c.parent.clone().and_then(|x| x.upgrade()))
+                    .unwrap(),
+                current_position,
+            ));
         }
 
         results
