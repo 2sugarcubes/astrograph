@@ -1,0 +1,54 @@
+{
+  "name": "Sol",
+  "radius": 0.5,
+  "dynamic": {
+    "Fixed": { "x": 0, "y": 0, "z": 0 }
+  },
+  "children": [
+    {
+      "name": "Summer",
+      "rotation": {
+        "siderealPeriod": 24,
+        "axis": {
+          "r": 1,
+          "theta": 0.78539,
+          "phi": 0
+        }
+      },
+      "dynamic": {
+        "Fixed": { "x": -1, "y": 0, "z": 0 }
+      },
+      "children": []
+    },
+    {
+      "name": "Autumn",
+      "rotation": {
+        "siderealPeriod": 24,
+        "axis": {
+          "r": 1,
+          "theta": 0.78539,
+          "phi": 0
+        }
+      },
+      "dynamic": {
+        "Fixed": { "x": 0, "y": -1, "z": 0 }
+      },
+      "children": []
+    },
+    {
+      "name": "Winter",
+      "rotation": {
+        "siderealPeriod": 24,
+        "axis": {
+          "r": 1,
+          "theta": 0.78539,
+          "phi": 0
+        }
+      },
+      "dynamic": {
+        "Fixed": { "x": 1, "y": 0, "z": 0 }
+      },
+      "children": []
+    }
+  ]
+}
