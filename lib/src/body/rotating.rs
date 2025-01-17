@@ -79,8 +79,7 @@ impl Rotating {
         // of the march equinox to mark zero longitude
         for (_, loc) in observations.iter_mut() {
             // Get the axis in the corrext spot (the z axis)
-            let vector =
-                quaternion::rotate_vector(around_axis_rotation, [loc.x, loc.y, loc.z]).into();
+            let vector = quaternion::rotate_vector(around_axis_rotation, [loc.x, loc.y, loc.z]);
             // Get the prime meridian in the right spot along the positive y axis
             *loc = quaternion::rotate_vector(obliquity_rotation, vector).into();
         }
@@ -89,8 +88,6 @@ impl Rotating {
 
 #[cfg(test)]
 mod test {
-    use std::u8;
-
     use coordinates::{
         prelude::{Spherical, ThreeDimensionalConsts, Vector3},
         traits::Magnitude,
