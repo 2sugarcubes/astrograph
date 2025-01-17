@@ -1,8 +1,12 @@
 {
   "rootBody": {
+    "name": "Sol",
+    "radius": 2.321,
     "children": [
       {
         "children": [],
+        "radius": 5E-19,
+        "name": "Mercury",
         "dynamic": {
           "Keplerian": {
             "e": 0.20563069,
@@ -17,6 +21,8 @@
       },
       {
         "children": [],
+        "radius": 0.0202,
+        "name": "Venus",
         "dynamic": {
           "Keplerian": {
             "e": 0.00677323,
@@ -30,8 +36,12 @@
         }
       },
       {
+        "radius": 0.021251398,
+        "name": "Earth",
         "children": [
           {
+            "name": "Luna",
+            "radius": 0.0057953,
             "children": [],
             "dynamic": {
               "Keplerian": {
@@ -67,6 +77,8 @@
         }
       },
       {
+        "name": "Mars",
+        "radius": 0.01131,
         "children": [],
         "dynamic": {
           "Keplerian": {
@@ -89,6 +101,8 @@
         }
       },
       {
+        "name": "Jupiter",
+        "radius": 0.2333,
         "children": [],
         "dynamic": {
           "Keplerian": {
@@ -103,6 +117,8 @@
         }
       },
       {
+        "name": "Saturn",
+        "radius": 0.1945,
         "children": [],
         "dynamic": {
           "Keplerian": {
@@ -117,6 +133,8 @@
         }
       },
       {
+        "name": "Uranus",
+        "radius": 0.0846,
         "children": [],
         "dynamic": {
           "Keplerian": {
@@ -131,6 +149,8 @@
         }
       },
       {
+        "name": "Neptune",
+        "radius": 0.0821,
         "children": [],
         "dynamic": {
           "Keplerian": {

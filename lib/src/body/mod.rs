@@ -35,8 +35,10 @@ pub struct Body {
     // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
-    //radius: Float,
+    /// Radius of the body in light seconds
+    radius: Option<Float>,
     //color: [u8,h8,u8],
+    name: Option<String>,
 }
 
 impl PartialEq for Body {
@@ -63,6 +65,8 @@ impl Body {
             children: Vec::new(),
             dynamic: Box::new(dynamic),
             rotation: None,
+            radius: None,
+            name: None,
         }));
         if let Some(p) = parent {
             //TODO resolve poisoned lock
@@ -130,6 +134,19 @@ impl Body {
         }
     }
 
+    /// Get the angular radius (`angular diameter / 2`) in radians
+    #[must_use]
+    pub fn get_angular_radius(&self, distance: Float) -> Float {
+        self.radius.map_or(0.01, |r| (r / distance).asin())
+    }
+
+    #[must_use]
+    pub fn get_name(&self) -> String {
+        self.name
+            .clone()
+            .unwrap_or_else(|| observatory::to_name(&self.get_id()))
+    }
+
     #[must_use]
     pub fn get_children(&self) -> &Vec<Arc> {
         &self.children
@@ -148,9 +165,20 @@ impl Body {
     pub fn get_observations_from_here(&self, time: Float) -> Vec<(Arc, Vector3<Float>)> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
-            results.extend(parent.read().unwrap().traverse_up(time, Vector3::ORIGIN));
+            results.extend(
+                parent
+                    .read()
+                    .unwrap()
+                    .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
+                    .into_iter()
+                    // Remove current body from the results
+                    .filter(|(b, _)| b.read().unwrap().get_name() != self.get_name()),
+            );
         }
-
+        if let Some(rot) = &self.rotation {
+            // Rotate observations according to axial tilt and time of day
+            rot.rotate_observed_bodies_equatorial_coordinates(time, &mut results);
+        }
         results
     }
 
@@ -169,11 +197,11 @@ impl Body {
             let child = c.read().unwrap();
             // Get the child position relative to here
             let location = child.dynamic.get_offset(time) + current_position;
-            // Add that child
-            results.push((c.clone(), location));
-
             // Add grandchildren, great-grandchildren, etc.
             results.extend(child.traverse_down(time, location));
+
+            // Add that child
+            results.push((c.clone(), location));
         }
 
         results
@@ -186,22 +214,38 @@ impl Body {
         time: Float,
         current_position: Vector3<Float>,
     ) -> Vec<(Arc, Vector3<Float>)> {
-        let mut results = Vec::new();
-
+        let mut results = Vec::with_capacity(self.children.len() + 2);
         for c in &self.children {
             // Add parents and cousins
-            let location = current_position - c.read().unwrap().dynamic.get_offset(time);
-            results.push((c.clone(), location));
+            let child_location = current_position + c.read().unwrap().dynamic.get_offset(time);
+            results.push((c.clone(), child_location));
         }
 
         // If the parent still exists
         if let Some(p) = &self.parent.clone().and_then(|weak| weak.upgrade()) {
             // Calculate the parent's location by getting our offset
-            let location = current_position - self.dynamic.get_offset(time);
+            let parent_location = current_position - self.dynamic.get_offset(time);
+
             //TODO resolve poisoned locks
             let parent = p.read().unwrap();
+
             // Add the grandparent, great-grandparent, etc.
-            results.append(&mut parent.traverse_up(time, location));
+            results.append(&mut parent.traverse_up(time, parent_location));
+        } else {
+            // This body is the root. We need to add it manually since it can't be added by a parent
+
+            // TODO find a cleaner way of getting an arc<rwlock> if this body.
+            // results.push((Arc::new(RwLock::new(self.clone())), current_position)); (Could be
+            // expensive, could leak memory, could result in desyncing between this self and the
+            // new self)
+            results.push((
+                self.children[0]
+                    .read()
+                    .ok()
+                    .and_then(|c| c.parent.clone().and_then(|x| x.upgrade()))
+                    .unwrap(),
+                current_position,
+            ));
         }
 
         results
@@ -271,14 +315,24 @@ mod tests {
         const EXPECTED_COUNT: usize = 9;
         let (_root_body, observing_body) = get_toy_example();
 
-        let observations = observing_body
+        let observations: Vec<_> = observing_body
             .read()
             .unwrap()
-            .get_observations_from_here(0.0);
+            .get_observations_from_here(0.0)
+            .into_iter()
+            .map(|(b, loc)| {
+                (
+                    b.read().map_or(String::from("Poisoned"), |b| {
+                        format!("{:?}", b.get_dynamic())
+                    }),
+                    loc,
+                )
+            })
+            .collect();
         let sanitized_observations: Vec<&Vector3<Float>> =
             observations.iter().map(|(_, loc)| loc).collect();
 
-        println!("{sanitized_observations:?}");
+        println!("{observations:#?}");
         let count = sanitized_observations.len();
         assert!(
             count <= EXPECTED_COUNT,
@@ -289,11 +343,11 @@ mod tests {
             "Not observing enough bodies (left: {count}, right: {EXPECTED_COUNT})",
         );
 
-        let mut expected_x = 0.0;
+        let mut expected_x = 5.0 * DOWNWARDS_STEP;
 
         // Check children
         for observation in &sanitized_observations[0..4] {
-            expected_x += DOWNWARDS_STEP;
+            expected_x -= DOWNWARDS_STEP;
             assert!(
                 (observation.x - expected_x).abs() < Float::EPSILON,
                 "Observation ({:.1}) is too far from expected ({:.1})",

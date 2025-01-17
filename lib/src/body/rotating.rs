@@ -1,8 +1,10 @@
-use coordinates::prelude::{Spherical, Vector3};
+use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 use quaternion::Quaternion;
 use serde::{Deserialize, Serialize};
 
 use crate::{consts::float, Float};
+
+use super::Arc;
 
 /// A struct that defines the rotation of a body.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -53,15 +55,34 @@ impl Rotating {
         }
     }
 
-    /// Returns a rotation for a given time.
+    /// Returns a rotation for a given time, should just adjust the longitude the observed body is
+    /// over not the latitude.
     #[must_use]
-    pub fn get_rotation(&self, time: Float) -> Quaternion<Float> {
+    fn get_rotation(&self, time: Float) -> Quaternion<Float> {
         quaternion::axis_angle(self.axis.into(), -self.get_mean_angle(time))
     }
 
     /// Gets angle relative to the reference direction since last complete revolution
     fn get_mean_angle(&self, time: Float) -> Float {
         time % self.sidereal_period / self.sidereal_period * float::TAU
+    }
+
+    pub fn rotate_observed_bodies_equatorial_coordinates(
+        &self,
+        time: Float,
+        observations: &mut [(Arc, Vector3<Float>)],
+    ) {
+        let obliquity_rotation = quaternion::rotation_from_to(self.axis.into(), Vector3::UP.into());
+        let around_axis_rotation = self.get_rotation(time);
+
+        // Convert locations to equitorial coordinates. Though the prime meridian is used instead
+        // of the march equinox to mark zero longitude
+        for (_, loc) in observations.iter_mut() {
+            // Get the axis in the corrext spot (the z axis)
+            let vector = quaternion::rotate_vector(around_axis_rotation, [loc.x, loc.y, loc.z]);
+            // Get the prime meridian in the right spot along the positive y axis
+            *loc = quaternion::rotate_vector(obliquity_rotation, vector).into();
+        }
     }
 }
 
@@ -111,7 +132,7 @@ mod test {
     }
 
     #[test]
-    fn correct_quaternion() {
+    fn correct_quaternion_with_axis_up() {
         let rotations = Rotating::new(float::TAU, Spherical::UP);
         let fixed_point = Vector3::RIGHT;
 
@@ -131,6 +152,77 @@ mod test {
             assert_float_absolute_eq!(real_y, expected_y);
 
             println!("Passed ✅");
+        }
+    }
+
+    #[test]
+    fn correct_quaternion_with_axis_right() {
+        let rotations = Rotating::new(float::TAU, Spherical::RIGHT);
+        let fixed_point = Vector3::FORWARD;
+
+        for i in 0..u8::MAX {
+            let angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
+
+            let (expected_z, expected_y) = (-angle).sin_cos();
+
+            let [_, real_y, real_z] =
+                quaternion::rotate_vector(rotations.get_rotation(angle), fixed_point.into());
+
+            print!("Testing angle: {angle:.2}\t");
+
+            assert_float_absolute_eq!(real_y, expected_y);
+            assert_float_absolute_eq!(real_z, expected_z);
+
+            println!("Passed ✅");
+        }
+    }
+
+    #[test]
+    fn correct_quaternion_with_axis_forward() {
+        let rotations = Rotating::new(float::TAU, Spherical::FORWARD);
+        let fixed_point = Vector3::UP;
+        for i in 0..u8::MAX {
+            let angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
+
+            let (expected_x, expected_z) = (-angle).sin_cos();
+
+            let [real_x, _, real_z] =
+                quaternion::rotate_vector(rotations.get_rotation(angle), fixed_point.into());
+
+            print!("Testing angle: {angle:.2}\t");
+
+            assert_float_absolute_eq!(real_x, expected_x);
+            assert_float_absolute_eq!(real_z, expected_z);
+
+            println!("Passed ✅");
+        }
+    }
+
+    #[test]
+    fn correct_quaternion_with_axis_not_on_great_circle() {
+        let rotations = Rotating::new(float::TAU, Spherical::UP);
+
+        for polar_angle in (0..u8::MAX).map(|x| Float::from(x) / Float::from(u8::MAX) * float::PI) {
+            let fixed_point: Vector3<_> = Spherical::new(1.0, polar_angle, 0.0).into();
+            for i in 0..u8::MAX {
+                let angle = Float::from(i) / Float::from(u8::MAX) * float::TAU;
+
+                let [real_x, real_y, real_z] =
+                    quaternion::rotate_vector(rotations.get_rotation(angle), fixed_point.into());
+
+                let (mut expected_y, mut expected_x) = (-angle).sin_cos();
+                let expected_z = fixed_point.z;
+                expected_x *= (1.0 - expected_z.powi(2)).sqrt();
+                expected_y *= (1.0 - expected_z.powi(2)).sqrt();
+
+                print!("Testing angle: {angle:.2}, at polar angle: {polar_angle:.2}");
+
+                assert_float_absolute_eq!(real_z, expected_z);
+                assert_float_absolute_eq!(real_y, expected_y);
+                assert_float_absolute_eq!(real_x, expected_x);
+
+                println!("Passed ✅");
+            }
         }
     }
 }
