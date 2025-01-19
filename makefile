@@ -12,7 +12,6 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 		cd assets && \
 		./packSolarSystem.sh && \
 		cd - && \
-		make wasm && \
 		cargo clippy --all-targets --all-features -- -Dclippy::pedantic -Dwarnings && \
 		cargo clippy --all-targets --no-default-features -- -Dclippy::pedantic -Dwarnings && \
 		echo "\tf64 tests" && cargo test --all-features && \
@@ -21,10 +20,11 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 		rm universe.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
+		wasm-pack build --target web -d ../web/pkg lib && \
 		echo '✅ Good to push 👍'
 
 serve: ## Build and serve wasm on a testing server
-	make wasm && cd ./web/ && python -m http.server; cd ..
+	@make wasm && cd ./web/ && python -m http.server; cd ..
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
