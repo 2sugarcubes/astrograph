@@ -1,12 +1,14 @@
-wasm: 
+.PHONY: help
+
+wasm: ## Build wasm target
 	# Massively reduce bundle size
-	wasm-pack build --target web --release -d ../web/pkg lib
+	@wasm-pack build --target web --release -d ../web/pkg lib
 
-test:
-	cargo test
+test: ## Run cargo tests
+	@cargo test
 
-pre-push:
-	cargo fmt && \
+pre-push: ## Run all the CI tests (With the exception of tests that run on a different OS, i.e. windows and/or ubuntu).
+	@cargo fmt && \
 		cd assets && \
 		./packSolarSystem.sh && \
 		cd - && \
@@ -20,5 +22,8 @@ pre-push:
 		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
 		echo '✅ Good to push 👍'
 
-serve:
+serve: ## Build and serve wasm on a testing server
 	make wasm && cd ./web/ && python -m http.server; cd ..
+
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
