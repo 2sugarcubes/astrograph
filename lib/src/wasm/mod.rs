@@ -85,8 +85,9 @@ struct Body {
     // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
-    //radius: Float,
+    radius: Option<crate::Float>,
     //color: [u8,h8,u8],
+    name: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -106,6 +107,8 @@ fn upgrade_body(body: &self::Body, parent: Option<&Arc<RwLock<body::Body>>>) -> 
         dynamic,
         rotation: body.rotation.clone(),
         children: Vec::with_capacity(body.children.len()),
+        radius: body.radius,
+        name: body.name.clone(),
     }));
 
     if let Ok(mut lock) = result.write() {

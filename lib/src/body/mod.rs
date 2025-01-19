@@ -36,9 +36,9 @@ pub struct Body {
     // /// Mass of the body in jupiter masses
     //mass: Float,
     /// Radius of the body in light seconds
-    radius: Option<Float>,
+    pub(crate) radius: Option<Float>,
     //color: [u8,h8,u8],
-    name: Option<String>,
+    pub(crate) name: Option<String>,
 }
 
 impl PartialEq for Body {
