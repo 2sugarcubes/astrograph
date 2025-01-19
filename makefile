@@ -12,6 +12,7 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 		cd assets && \
 		./packSolarSystem.sh && \
 		cd - && \
+		make wasm && \
 		cargo clippy --all-targets --all-features -- -Dclippy::pedantic -Dwarnings && \
 		cargo clippy --all-targets --no-default-features -- -Dclippy::pedantic -Dwarnings && \
 		echo "\tf64 tests" && cargo test --all-features && \
