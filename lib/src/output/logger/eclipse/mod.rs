@@ -20,10 +20,10 @@ impl Output for Eclipse {
             .and_then(|x| x.to_str())
             .unwrap_or("Could not parse time");
 
+        // Create an object to speed up searches similar to a hashgrid or oct-tree
         let grid = CollisionGrid::new(observations);
-        let points = observations;
 
-        for p in points {
+        for p in observations {
             let name =
                 p.0.read()
                     .map(|p| p.get_name())
