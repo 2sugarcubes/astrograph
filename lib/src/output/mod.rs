@@ -11,6 +11,8 @@ use crate::{body::Arc, Float};
 /// An output for SVG files
 pub mod svg;
 
+pub mod logger;
+
 /// An output for the website
 #[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
 pub mod web;
