@@ -1,4 +1,4 @@
-// TODO break functionality into different modules e.g. star, planet, moon
+// TODO: break functionality into different modules e.g. star, planet, moon
 
 use std::ops::Range;
 
@@ -66,7 +66,7 @@ impl Generator for Artifexian {
                             planets.push(Planet::new_terrestial(rng, distance));
                         }
 
-                        // TODO break when distance between bodies is less than 0.15
+                        // PERF: break when distance between bodies is less than 0.15
                         distance /= rng.gen_range(1.4..2.0);
                     }
                 } else {
@@ -74,7 +74,7 @@ impl Generator for Artifexian {
                     while star.planetary_zone.contains(&distance) {
                         planets.push(Planet::new_terrestial(rng, distance));
 
-                        // TODO break when distance between bodies is less than 0.15
+                        // PERF: break when distance between bodies is less than 0.15
                         distance /= rng.gen_range(1.4..2.0);
                     }
                 }
@@ -725,8 +725,8 @@ mod test {
     //#[ignore = "long running"]
     #[test]
     fn flame_test() {
-        //TODO there seems to be a problem with distributions when inc contains more than 7
-        //consecuive zeros
+        // FIXME: there seems to be a problem with distributions when inc contains more than 7
+        // consecuive zeros
         const INC: u64 = 0x0101_0101_0101_0101;
 
         //let mut rng = rand::rngs::mock::StepRng::new(0, 1);

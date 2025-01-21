@@ -27,7 +27,8 @@ impl<T: Projection> Svg<T> {
         time: &str,
         observations: &[(Arc, Spherical<crate::Float>)],
     ) -> svg::Document {
-        // TODO remove some magic values (like "1010", "505", etc.)
+        // TODO: remove some magic values (like "0.005", "-0.95", etc.)
+
         // Create lines of longitude through the circle to more easily read it.
         const NUMBER_OF_BISECTIONS: u8 = 4;
 
@@ -93,17 +94,17 @@ impl<T: Projection> Svg<T> {
             })
         {
             let circle = Circle::new()
-                // Set radius to a small but still visible value
-                // TODO set radius based on angular diameter
                 .set(
                     "r",
                     body.read()
+                        // Set radius to a small but still visible value if angular diameter is too small
                         .map(|b| (b.get_angular_radius(distance) * float::FRAC_1_PI).max(0.005))
-                        .unwrap_or(0.001),
+                        // or we don't have the information for it
+                        .unwrap_or(0.005),
                 )
                 .set("cx", projected_location.x)
                 .set("cy", projected_location.y)
-                // TODO set color based on body type? (Will likely require user defined settings)
+                // TODO: set color based on body type or name? (Will likely require user defined settings)
                 .set("fill", "#FFF")
                 .set(
                     "class",

@@ -18,7 +18,7 @@ use crate::{
 pub struct Program {
     /// The root of the tree, we need to reference it here to prevent the reference counter from
     /// reaching zero prematurely.
-    // TODO #[builder(setter(name = root_body))]
+    // TODO: #[builder(setter(name = root_body))]
     _root_body: Arc,
     /// List of observatories that we need to observe from to.
     #[builder(setter(each(name = "add_observatory")))]
@@ -49,11 +49,11 @@ impl Program {
             for observatory in &self.observatories {
                 let path = self
                     .output_file_root
-                    // TODO real names
                     .join(format!("{}/{time:010}", observatory.get_name()));
                 let observations = observatory.observe(time as Float);
                 for output in &self.outputs {
                     // Write the observations to file, recovering on errors
+                    // HACK: Should remove this match statement and return an error on writing
                     match output.write_observations_to_file(&observations, &path) {
                         Ok(()) => println!(
                             "File {} was written successfully",
@@ -68,7 +68,7 @@ impl Program {
                                 // Panic can only occur in internal testing mode when panics are expected
                                 panic!("{message}");
                             } else {
-                                //TODO implement log or something similar
+                                // TODO: implement log or something similar
                                 eprintln!("{message}");
                             }
                         }

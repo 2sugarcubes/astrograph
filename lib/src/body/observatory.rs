@@ -49,8 +49,8 @@ impl Observatory {
             .filter_map(|(body, pos)| {
                 let local_coordinates =
                     Vector3::from(quaternion::rotate_vector(self.location, (*pos).into()));
-                //TODO adjust z based on the body's radius since we aren't observing from the
-                //centre of the body
+                // FIXME: adjust z based on the body's radius since we aren't observing from the
+                // centre of the body
 
                 // Filter out bodies below the horizon
                 if local_coordinates.z >= 0.0 {
@@ -150,8 +150,6 @@ impl From<Observatory> for WeakObservatory {
 
 #[cfg(test)]
 mod tests {
-    //FIXME write some tests later, my head hurts
-
     use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 
     use crate::{
@@ -179,6 +177,8 @@ mod tests {
 
     #[test]
     fn simple_rotation_test() {
+        // FIXME: Fails on windows, make the test more leniant, perhaps by checking which body is
+        // closest to overhead?
         let root = get_toy_example_body();
         let observatory = Observatory::new(Spherical::RIGHT, root, Err(vec![]));
 
