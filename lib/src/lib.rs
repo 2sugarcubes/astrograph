@@ -35,9 +35,6 @@ pub type Float = f64;
 
 pub type LocalObservation = (body::Arc, coordinates::prelude::Spherical<Float>);
 pub type EllipticObservation = (body::Arc, coordinates::prelude::Vector3<Float>);
-#[cfg(any(target_arch = "wasm32", target_arch = "wasm64"))]
-/// WebAssembly bindings
-pub mod wasm;
 
 /// Useful functions to use while testing to cut down on code repetition.
 pub mod testing {
