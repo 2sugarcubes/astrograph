@@ -12,7 +12,7 @@ use crate::{output::Output, Float};
 mod collision_check;
 
 #[derive(Clone, Debug, Default)]
-pub struct EclipseLogger {
+pub struct Logger {
     eclipse_log: Arc<RwLock<HashMap<Arc<std::path::Path>, Vec<String>>>>,
 }
 
@@ -40,14 +40,14 @@ fn get_eclipses_on_frame(
                 .map(|b| b.get_name())
                 .unwrap_or(String::from("Poisoned Body"));
 
-            results.push(format!("Time={time}, There was an eclipse between {name} and {other_name} with magnitude {magnitude:.2}"))
+            results.push(format!("Time={time}, There was an eclipse between {name} and {other_name} with magnitude {magnitude:.2}"));
         }
     }
 
     results
 }
 
-impl Output for EclipseLogger {
+impl Output for Logger {
     fn write_observations(
         &self,
         observations: &[(crate::body::Arc, Spherical<Float>)],
@@ -63,7 +63,7 @@ impl Output for EclipseLogger {
             "-eclipses.txt",
         );
         if let Ok(mut hash_map) = self.eclipse_log.write() {
-            if let Some(values) = hash_map.get_mut(path.as_path().into()) {
+            if let Some(values) = hash_map.get_mut(path.as_path()) {
                 values.extend(log);
             } else {
                 hash_map.insert(path.into(), log);
@@ -82,11 +82,7 @@ impl Output for EclipseLogger {
                 }
 
                 // Create the file and write any eclipse data
-                let mut file = OpenOptions::new()
-                    .create(true)
-                    .write(true)
-                    .append(true)
-                    .open(path)?;
+                let mut file = OpenOptions::new().create(true).append(true).open(path)?;
                 // Fill the file with the eclipses
                 file.write_all(data.join("\n").as_bytes())?;
             }
@@ -130,6 +126,6 @@ mod tests {
                 "Time={time}, There was an eclipse between {} and {} with magnitude {:.2}",
                 "0-0", "", 1.0
             )
-        )
+        );
     }
 }
