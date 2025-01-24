@@ -16,21 +16,13 @@ extern "C" {
 }
 
 impl Output for Web {
-    fn write_observations_to_file(
+    fn write_observations(
         &self,
-        observations: &[(
-            crate::body::Arc,
-            coordinates::prelude::Spherical<crate::Float>,
-        )],
-        path: &std::path::Path,
+        observations: &[(Arc, Spherical<Float>)],
+        observatory_name: &str,
+        time: i128,
+        output_path_root: &Path,
     ) -> Result<(), std::io::Error> {
-        let time: u64 = path
-            .file_name()
-            .and_then(|x| x.to_str())
-            .unwrap()
-            .parse()
-            .unwrap();
-
         let observations = self
             .svg
             .consume_observation(&format!("{time}"), observations);

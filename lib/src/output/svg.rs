@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, path::Path};
 
 use crate::{body::Arc, consts::float, projection::Projection, Float};
 
@@ -125,23 +125,21 @@ where
     T: Debug,
 {
     /// Outputs [`Self::consume_observation`] to a given file.
-    fn write_observations_to_file(
+    fn write_observations(
         &self,
-        observations: &[(Arc, Spherical<crate::Float>)],
-        path: &std::path::Path,
+        observations: &[(Arc, Spherical<Float>)],
+        observatory_name: &str,
+        time: i128,
+        output_path_root: &Path,
     ) -> Result<(), std::io::Error> {
-        let path = super::set_extension(path, "svg");
-        let time = path
-            .file_name()
-            .and_then(|x| x.to_str())
-            .and_then(|x| x.strip_suffix(".svg"))
-            .unwrap_or("Could not find Time")
-            .to_string();
-
+        let path = super::to_default_path(output_path_root, observatory_name, time, ".svg");
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
 
-        svg::save(path, &self.consume_observation(&time, observations))
+        svg::save(
+            path,
+            &self.consume_observation(&format!("{time:010}"), observations),
+        )
     }
 }

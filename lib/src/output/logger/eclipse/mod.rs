@@ -1,5 +1,7 @@
 use std::{
     collections::HashMap,
+    fs::OpenOptions,
+    io::Write,
     sync::{Arc, RwLock},
 };
 
@@ -46,22 +48,22 @@ fn get_eclipses_on_frame(
 }
 
 impl Output for EclipseLogger {
-    fn write_observations_to_file(
+    fn write_observations(
         &self,
-        observations: &[(
-            crate::body::Arc,
-            coordinates::prelude::Spherical<crate::Float>,
-        )],
-        path: &std::path::Path,
+        observations: &[(crate::body::Arc, Spherical<Float>)],
+        observatory_name: &str,
+        time: i128,
+        output_path_root: &std::path::Path,
     ) -> Result<(), std::io::Error> {
-        let time = path
-            .file_name()
-            .and_then(|x| x.to_str())
-            .unwrap_or("Could not parse time");
-        let log = get_eclipses_on_frame(observations, time);
-
+        let log = get_eclipses_on_frame(observations, &time.to_string());
+        let path = super::super::to_default_path(
+            output_path_root,
+            observatory_name,
+            time,
+            "-eclipses.txt",
+        );
         if let Ok(mut hash_map) = self.eclipse_log.write() {
-            if let Some(values) = hash_map.get_mut(path.into()) {
+            if let Some(values) = hash_map.get_mut(path.as_path().into()) {
                 values.extend(log);
             } else {
                 hash_map.insert(path.into(), log);
@@ -70,14 +72,35 @@ impl Output for EclipseLogger {
 
         Ok(())
     }
+
+    fn flush(&self) -> Result<(), std::io::Error> {
+        if let Ok(hash_map) = self.eclipse_log.read() {
+            for (path, data) in hash_map.iter() {
+                // Create path to file
+                if let Some(parent) = path.parent() {
+                    std::fs::create_dir_all(parent)?;
+                }
+
+                // Create the file and write any eclipse data
+                let mut file = OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .append(true)
+                    .open(path)?;
+                // Fill the file with the eclipses
+                file.write_all(data.join("\n").as_bytes())?;
+            }
+        }
+        Ok(())
+    }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
     use coordinates::prelude::Spherical;
 
     use crate::{body::Body, dynamic::fixed::Fixed};
-
-    use super::get_eclipses_on_frame;
 
     #[test]
     fn eclipse_is_logged_in_correct_format() {
