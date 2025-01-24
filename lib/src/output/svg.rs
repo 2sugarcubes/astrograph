@@ -1,9 +1,9 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, path::Path};
 
-use crate::{body::Arc, consts::float, projection::Projection, Float};
+use crate::{consts::float, projection::Projection, Float, LocalObservation};
 
 use super::Output;
-use coordinates::prelude::{Polar, Spherical, Vector2};
+use coordinates::prelude::{Polar, Vector2};
 use svg::{
     self,
     node::element::{Circle, Line, Rectangle, Style, Text},
@@ -25,7 +25,7 @@ impl<T: Projection> Svg<T> {
     pub(super) fn consume_observation(
         &self,
         time: &str,
-        observations: &[(Arc, Spherical<crate::Float>)],
+        observations: &[LocalObservation],
     ) -> svg::Document {
         // TODO remove some magic values (like "1010", "505", etc.)
         // Create lines of longitude through the circle to more easily read it.
@@ -125,23 +125,21 @@ where
     T: Debug,
 {
     /// Outputs [`Self::consume_observation`] to a given file.
-    fn write_observations_to_file(
+    fn write_observations(
         &self,
-        observations: &[(Arc, Spherical<crate::Float>)],
-        path: &std::path::Path,
+        observations: &[LocalObservation],
+        observatory_name: &str,
+        time: i128,
+        output_path_root: &Path,
     ) -> Result<(), std::io::Error> {
-        let path = super::set_extension(path, "svg");
-        let time = path
-            .file_name()
-            .and_then(|x| x.to_str())
-            .and_then(|x| x.strip_suffix(".svg"))
-            .unwrap_or("Could not find Time")
-            .to_string();
-
+        let path = super::to_default_path(output_path_root, observatory_name, time, ".svg");
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
 
-        svg::save(path, &self.consume_observation(&time, observations))
+        svg::save(
+            path,
+            &self.consume_observation(&format!("{time:010}"), observations),
+        )
     }
 }

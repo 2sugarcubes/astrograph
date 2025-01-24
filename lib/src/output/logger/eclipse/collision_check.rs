@@ -2,27 +2,25 @@ use std::ops::Div;
 
 use coordinates::{prelude::Spherical, traits::Positional};
 
-use crate::{body::Arc, consts::float, Float};
+use crate::{body::Arc, consts::float, Float, LocalObservation};
 
 pub struct CollisionGrid {
-    body_grid: [std::sync::Arc<[(Arc, Spherical<Float>)]>; Self::NUMBER_OF_CELLS],
+    body_grid: [std::sync::Arc<[LocalObservation]>; Self::NUMBER_OF_CELLS],
 }
 
 impl CollisionGrid {
     const CELLS_PER_ROW: usize = 16;
     const ROWS_PER_SPHERE: usize = 8;
     const NUMBER_OF_CELLS: usize = Self::CELLS_PER_ROW * Self::ROWS_PER_SPHERE;
-    pub(super) fn new(observed_bodies: &[(Arc, Spherical<Float>)]) -> Self {
-        let mut body_grid: [Vec<_>; Self::NUMBER_OF_CELLS] =
-            match vec![
-                Vec::with_capacity(observed_bodies.len() / Self::NUMBER_OF_CELLS);
-                Self::NUMBER_OF_CELLS
-            ]
+    pub(super) fn new(observed_bodies: &[LocalObservation]) -> Self {
+        let mut body_grid: [Vec<_>; Self::NUMBER_OF_CELLS] = match (0..Self::NUMBER_OF_CELLS)
+            .map(|_| Vec::with_capacity(observed_bodies.len() / Self::NUMBER_OF_CELLS))
+            .collect::<Vec<_>>()
             .try_into()
-            {
-                Ok(v) => v,
-                Err(_) => unreachable!(),
-            };
+        {
+            Ok(v) => v,
+            Err(_) => unreachable!(),
+        };
 
         for (b, loc) in observed_bodies {
             body_grid[Self::get_face_id(loc)].push((b.clone(), *loc));
@@ -30,7 +28,7 @@ impl CollisionGrid {
 
         let body_grid: [std::sync::Arc<_>; Self::NUMBER_OF_CELLS] = match body_grid
             .into_iter()
-            .map(|x| std::sync::Arc::from(x))
+            .map(std::sync::Arc::from)
             .collect::<Vec<_>>()
             .try_into()
         {
@@ -42,7 +40,7 @@ impl CollisionGrid {
     }
 
     /// Returns the magnitude of any eclipses if there is any
-    pub fn collisions(&self, near_point: &(Arc, Spherical<Float>)) -> Vec<(Arc, Float)> {
+    pub fn collisions(&self, near_point: &LocalObservation) -> Vec<(Arc, Float)> {
         // 7 or 18 faces that are adjacent to the face this point is on
         // len = 18 when the face is on the north or south pole region and many edges join on the z
         // axis
@@ -53,8 +51,7 @@ impl CollisionGrid {
         // point and are in a neighboring cell
         let points: Vec<(Float, &Spherical<Float>, &Arc)> = faces
             .into_iter()
-            .map(|face_id| self.body_grid[face_id].iter())
-            .flatten()
+            .flat_map(|face_id| self.body_grid[face_id].iter())
             .filter_map(|(b, loc)| {
                 if loc.radius > near_point.1.radius {
                     Some((b.read().ok()?.get_angular_radius(loc.radius), loc, b))
@@ -65,11 +62,10 @@ impl CollisionGrid {
             .collect();
 
         // Get the diameter of the near point
-        if let Some(near_point_diameter) = near_point
+        if let Ok(near_point_diameter) = near_point
             .0
             .read()
             .map(|b| (b.get_angular_radius(near_point.1.radius), near_point.1))
-            .ok()
         {
             // List of points that this point has eclipsed
             points
@@ -108,6 +104,8 @@ impl CollisionGrid {
         }
     }
 
+    #[allow(clippy::cast_sign_loss)] // abs is called before conversion
+    #[allow(clippy::cast_possible_truncation)] // floor is called before conversion
     fn get_face_id(loc: &Spherical<Float>) -> usize {
         let layer_count = (loc.polar_angle / float::FRAC_PI_8).floor() as usize;
         let x_count = ((loc.azimuthal_angle
@@ -131,13 +129,12 @@ impl CollisionGrid {
             // North pole adjacency rules
 
             // This row
-            (0 as usize..16)
-                .into_iter()
+            (0_usize..16)
                 // Next row
-                .chain(if id != Self::CELLS_PER_ROW - 1 {
-                    [id + Self::CELLS_PER_ROW, id + Self::CELLS_PER_ROW + 1]
-                } else {
+                .chain(if id == Self::CELLS_PER_ROW - 1 {
                     [id + 1, id + Self::CELLS_PER_ROW]
+                } else {
+                    [id + Self::CELLS_PER_ROW, id + Self::CELLS_PER_ROW + 1]
                 })
                 .collect()
         } else if row_number == Self::ROWS_PER_SPHERE - 1 {
@@ -212,7 +209,6 @@ impl CollisionGrid {
                     id + Self::CELLS_PER_ROW,
                     id + Self::CELLS_PER_ROW + 1,
                 ]
-                .into()
             } else if id % Self::CELLS_PER_ROW == Self::CELLS_PER_ROW - 1 {
                 vec![
                     // Previous row
@@ -303,7 +299,11 @@ mod test {
                 let neighbors = CollisionGrid::get_adjacent_faces(neighbor);
                 println!(
                     "neighbors {neighbors:03?} of {neighbor} does {} contain the item {id}",
-                    neighbors.contains(&id).then(|| "   ").unwrap_or("not")
+                    if neighbors.contains(&id) {
+                        "   "
+                    } else {
+                        "not"
+                    }
                 );
                 assert!(CollisionGrid::get_adjacent_faces(neighbor).contains(&id));
 

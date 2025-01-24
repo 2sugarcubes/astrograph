@@ -54,7 +54,12 @@ impl Program {
                 let observations = observatory.observe(time as Float);
                 for output in &self.outputs {
                     // Write the observations to file, recovering on errors
-                    match output.write_observations_to_file(&observations, &path) {
+                    match output.write_observations(
+                        &observations,
+                        &observatory.get_name(),
+                        time,
+                        &self.output_file_root,
+                    ) {
                         Ok(()) => println!(
                             "File {} was written successfully",
                             &path.to_str().unwrap_or("[could not display path]")
@@ -75,6 +80,13 @@ impl Program {
                     }
                 }
             }
+        }
+
+        for output in &self.outputs {
+            match output.flush() {
+                Ok(()) => (),
+                Err(e) => eprintln!("{e}"),
+            };
         }
     }
 
