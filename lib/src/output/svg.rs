@@ -1,9 +1,9 @@
 use std::{fmt::Debug, path::Path};
 
-use crate::{body::Arc, consts::float, projection::Projection, Float, LocalObservation};
+use crate::{consts::float, projection::Projection, Float, LocalObservation};
 
 use super::Output;
-use coordinates::prelude::{Polar, Spherical, Vector2};
+use coordinates::prelude::{Polar, Vector2};
 use svg::{
     self,
     node::element::{Circle, Line, Rectangle, Style, Text},

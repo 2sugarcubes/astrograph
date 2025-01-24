@@ -4,8 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{consts::float, EllipticObservation, Float};
 
-use super::Arc;
-
 /// A struct that defines the rotation of a body.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(from = "SerializableRotating", into = "SerializableRotating")]

@@ -3,10 +3,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use coordinates::prelude::Spherical;
 use dyn_clone::DynClone;
 
-use crate::{body::Arc, Float, LocalObservation};
+use crate::LocalObservation;
 
 /// An output for SVG files
 pub mod svg;

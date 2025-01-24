@@ -162,7 +162,7 @@ impl Body {
     /// Will panic if any descendants or sill existing ancestry have been poisoned by panicking
     /// while in write mode
     #[must_use]
-    pub fn get_observations_from_here(&self, time: Float) -> Vec<(EllipticObservation)> {
+    pub fn get_observations_from_here(&self, time: Float) -> Vec<EllipticObservation> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             results.extend(
@@ -213,7 +213,7 @@ impl Body {
         &self,
         time: Float,
         current_position: Vector3<Float>,
-    ) -> Vec<(EllipticObservation)> {
+    ) -> Vec<EllipticObservation> {
         let mut results = Vec::with_capacity(self.children.len() + 2);
         for c in &self.children {
             // Add parents and cousins
