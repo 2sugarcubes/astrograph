@@ -12,16 +12,16 @@ pub struct Web {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen]
-    fn draw_observation(time: u64, observations: String);
+    fn draw_observation(time: i128, observations: String);
 }
 
 impl Output for Web {
     fn write_observations(
         &self,
-        observations: &[crate::Observation],
+        observations: &[crate::LocalObservation],
         observatory_name: &str,
         time: i128,
-        output_path_root: &Path,
+        output_path_root: &std::path::Path,
     ) -> Result<(), std::io::Error> {
         let observations = self
             .svg
