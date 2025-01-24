@@ -8,7 +8,7 @@ use crate::{
     },
     dynamic::{fixed::Fixed, keplerian::Keplerian},
     generator::{artifexian::Artifexian, Generator},
-    output::web::Web,
+    output::Web,
     program::ProgramBuilder,
 };
 use gloo_utils::format::JsValueSerdeExt;
@@ -16,6 +16,8 @@ use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
 use serde::Deserialize;
 use wasm_bindgen::prelude::*;
+
+mod output;
 
 /// # Errors
 /// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
