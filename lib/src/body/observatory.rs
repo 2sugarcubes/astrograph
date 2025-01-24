@@ -70,7 +70,7 @@ impl Observatory {
         )));
         self.name.clone().unwrap_or_else(|id| {
             format!(
-                "{}{:.2}N{:.2}E",
+                "{}@{:.2}N{:.2}E",
                 to_name(&id),
                 lat_long.polar_angle.to_degrees() - 90.0,
                 lat_long.azimuthal_angle.to_degrees() - 180.0
@@ -118,7 +118,6 @@ pub(super) fn to_name(id: &[usize]) -> String {
             res.push_str(&format!("-{i}"));
         }
 
-        res.push('@');
         res
     }
 }
