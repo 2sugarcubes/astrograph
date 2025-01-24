@@ -18,7 +18,7 @@ extern "C" {
 impl Output for Web {
     fn write_observations(
         &self,
-        observations: &[(Arc, Spherical<Float>)],
+        observations: &[crate::Observation],
         observatory_name: &str,
         time: i128,
         output_path_root: &Path,

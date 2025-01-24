@@ -10,7 +10,7 @@ use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
 use rotating::Rotating;
 use serde::{Deserialize, Serialize};
 
-use crate::{dynamic::Dynamic, Float};
+use crate::{dynamic::Dynamic, EllipticObservation, Float};
 
 /// A convenience wrapper for [`std::sync::Arc`]`<`[`std::sync::RwLock`]`<`[`self::Body`]`>>`
 pub type Arc = StdArc<RwLock<Body>>;
@@ -162,7 +162,7 @@ impl Body {
     /// Will panic if any descendants or sill existing ancestry have been poisoned by panicking
     /// while in write mode
     #[must_use]
-    pub fn get_observations_from_here(&self, time: Float) -> Vec<(Arc, Vector3<Float>)> {
+    pub fn get_observations_from_here(&self, time: Float) -> Vec<(EllipticObservation)> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             results.extend(
@@ -188,7 +188,7 @@ impl Body {
         &self,
         time: Float,
         current_position: Vector3<Float>,
-    ) -> Vec<(Arc, Vector3<Float>)> {
+    ) -> Vec<EllipticObservation> {
         let mut results = Vec::with_capacity(self.children.len());
 
         // For each child
@@ -213,7 +213,7 @@ impl Body {
         &self,
         time: Float,
         current_position: Vector3<Float>,
-    ) -> Vec<(Arc, Vector3<Float>)> {
+    ) -> Vec<(EllipticObservation)> {
         let mut results = Vec::with_capacity(self.children.len() + 2);
         for c in &self.children {
             // Add parents and cousins

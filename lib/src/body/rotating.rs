@@ -2,7 +2,7 @@ use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
 use quaternion::Quaternion;
 use serde::{Deserialize, Serialize};
 
-use crate::{consts::float, Float};
+use crate::{consts::float, EllipticObservation, Float};
 
 use super::Arc;
 
@@ -70,7 +70,7 @@ impl Rotating {
     pub fn rotate_observed_bodies_equatorial_coordinates(
         &self,
         time: Float,
-        observations: &mut [(Arc, Vector3<Float>)],
+        observations: &mut [EllipticObservation],
     ) {
         let obliquity_rotation = quaternion::rotation_from_to(self.axis.into(), Vector3::UP.into());
         let around_axis_rotation = self.get_rotation(time);

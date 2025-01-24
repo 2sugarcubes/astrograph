@@ -1,6 +1,6 @@
 use std::{fmt::Debug, path::Path};
 
-use crate::{body::Arc, consts::float, projection::Projection, Float};
+use crate::{body::Arc, consts::float, projection::Projection, Float, LocalObservation};
 
 use super::Output;
 use coordinates::prelude::{Polar, Spherical, Vector2};
@@ -25,7 +25,7 @@ impl<T: Projection> Svg<T> {
     pub(super) fn consume_observation(
         &self,
         time: &str,
-        observations: &[(Arc, Spherical<crate::Float>)],
+        observations: &[LocalObservation],
     ) -> svg::Document {
         // TODO remove some magic values (like "1010", "505", etc.)
         // Create lines of longitude through the circle to more easily read it.
@@ -127,7 +127,7 @@ where
     /// Outputs [`Self::consume_observation`] to a given file.
     fn write_observations(
         &self,
-        observations: &[(Arc, Spherical<Float>)],
+        observations: &[LocalObservation],
         observatory_name: &str,
         time: i128,
         output_path_root: &Path,

@@ -6,7 +6,7 @@ use std::{
 use coordinates::prelude::Spherical;
 use dyn_clone::DynClone;
 
-use crate::{body::Arc, Float};
+use crate::{body::Arc, Float, LocalObservation};
 
 /// An output for SVG files
 pub mod svg;
@@ -26,18 +26,22 @@ pub trait Output: DynClone + Debug {
     /// that have already been created
     fn write_observations(
         &self,
-        observations: &[(Arc, Spherical<Float>)],
+        observations: &[LocalObservation],
         observatory_name: &str,
         time: i128,
         output_path_root: &Path,
     ) -> Result<(), std::io::Error>;
 
+    /// # Errors
+    /// implementations may panif if there is an error in the filesystem e.g. the user is missing
+    /// permissions, a directory in the path is a file.
     fn flush(&self) -> Result<(), std::io::Error> {
         Ok(())
     }
 }
 dyn_clone::clone_trait_object!(Output);
 
+#[must_use]
 pub fn to_default_path(
     output_path_root: &Path,
     observatory_name: &str,
