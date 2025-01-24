@@ -10,9 +10,6 @@ keywords.workspace = true
 categories.workspace = true
 authors.workspace = true
 
-[lib]
-crate-type = ["cdylib", "rlib"]
-
 [features]
 default = ["f64"]
 f64 = []
