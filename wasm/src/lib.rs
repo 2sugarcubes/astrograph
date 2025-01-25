@@ -7,7 +7,7 @@ use astrolabe::{
         rotating::Rotating,
     },
     dynamic::{self, fixed::Fixed, keplerian::Keplerian},
-    generator::{artifexian::Artifexian, Generator},
+    generator::{artifexian::ArtifexianBuilder, Generator},
     program::ProgramBuilder,
     Float,
 };
@@ -23,7 +23,7 @@ mod output;
 /// # Errors
 /// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
 /// required fields
-#[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
+#[wasm_bindgen]
 pub fn generate_observations_from_json(
     root: &str,
     observatories: &str,
@@ -62,14 +62,28 @@ pub fn generate_observations_from_json(
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
 pub fn generate_universe_from_seed(seed: u64) -> JsValue {
-    JsValue::from_serde(&Artifexian::generate(&mut XorShiftRng::seed_from_u64(seed))).unwrap()
+    JsValue::from_serde(
+        &ArtifexianBuilder::default()
+            .star_count(1_000_000)
+            .build()
+            .unwrap()
+            .generate(&mut XorShiftRng::seed_from_u64(seed)),
+    )
+    .unwrap()
 }
 
 #[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
 pub fn generate_universe() -> JsValue {
-    JsValue::from_serde(&Artifexian::generate(&mut XorShiftRng::from_entropy())).unwrap()
+    JsValue::from_serde(
+        &ArtifexianBuilder::default()
+            .star_count(1_000_000)
+            .build()
+            .unwrap()
+            .generate(&mut XorShiftRng::from_entropy()),
+    )
+    .unwrap()
 }
 
 /// A kind of hacky solution to the problem of serde json not recognising typetaged dynamics when

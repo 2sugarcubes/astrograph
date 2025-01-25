@@ -1,13 +1,17 @@
 use astrolabe::{
     dynamic::keplerian::Keplerian,
-    generator::{artifexian::Artifexian, Generator},
+    generator::{artifexian::ArtifexianBuilder, Generator},
     Float,
 };
 
 #[test]
 fn inclinations() {
     let mut rng = rand::thread_rng();
-    let root = Artifexian::generate(&mut rng);
+    let root = ArtifexianBuilder::default()
+        .star_count(500_000)
+        .build()
+        .unwrap()
+        .generate(&mut rng);
 
     for star in root.read().unwrap().get_children() {
         let star = star.read().unwrap();
