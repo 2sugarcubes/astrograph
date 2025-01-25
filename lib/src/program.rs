@@ -129,6 +129,8 @@ impl From<DeserializedProgram> for Program {
 
 #[cfg(test)]
 mod tests {
+    use crate::{output::svg::Svg, projection};
+
     use super::*;
 
     #[test]
@@ -157,5 +159,29 @@ mod tests {
         let program: Program = serde_json::from_str(program).unwrap();
 
         assert_eq!(6, program.observatories.len());
+    }
+
+    #[test]
+    #[should_panic(expected = "file name contained an unexpected NUL byte")]
+    fn write_to_forbidden_path() {
+        let program = include_str!("../../assets/solar-system.program.json");
+        let mut program: Program = serde_json::from_str(program).unwrap();
+        program.add_output(Box::new(Svg::new(projection::StatelessOrthographic())));
+
+        // Set output path to an invalid path on windows AND linux
+        let mut path = PathBuf::new();
+        if cfg!(windows) {
+            path.push("I:\\\\//");
+        } else {
+            path.push("/test\0");
+        }
+
+        path.push("\0");
+        path.push(">.<");
+
+        println!("{path:?}");
+        program.set_output_path(path);
+
+        program.make_observations(0, 1, Some(1));
     }
 }
