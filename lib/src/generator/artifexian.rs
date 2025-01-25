@@ -3,6 +3,7 @@
 use std::ops::Range;
 
 use coordinates::prelude::{Cylindrical, Spherical, ThreeDimensionalConsts, Vector3};
+use derive_builder::Builder;
 
 use crate::{
     body::{self, rotating::Rotating, Arc, Body},
@@ -13,15 +14,16 @@ use crate::{
 
 use super::Generator;
 
-pub struct Artifexian {}
+#[derive(Clone, Copy, Debug, Builder, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Artifexian {
+    star_count: usize,
+}
 
 impl Generator for Artifexian {
-    fn generate<G: rand::Rng>(rng: &mut G) -> crate::body::Arc {
+    fn generate<G: rand::Rng>(&self, rng: &mut G) -> crate::body::Arc {
         let root = Body::new(None, Fixed::new(Vector3::ORIGIN));
 
-        let i_max = if cfg!(test) { 1_000 } else { 1_000_000 };
-
-        for i in 0..i_max {
+        for i in 0..self.star_count {
             // At least 1% of stars are habitable
             let star = if i % 100 != 0 {
                 // Skip planet gen to save memory
@@ -731,7 +733,11 @@ mod test {
 
         //let mut rng = rand::rngs::mock::StepRng::new(0, 1);
         let mut rng = rand_xorshift::XorShiftRng::seed_from_u64(42_123);
-        let root = Artifexian::generate(&mut rng);
+        let generator = ArtifexianBuilder::default()
+            .star_count(1_000)
+            .build()
+            .unwrap();
+        let root = generator.generate(&mut rng);
 
         println!("x\ty\tz");
         for p in &root.read().unwrap().children {
@@ -741,6 +747,6 @@ mod test {
 
         drop(root);
         let mut rng = rand::rngs::mock::StepRng::new(INC + (INC >> 8) + (INC >> 16), INC);
-        let _ = Artifexian::generate(&mut rng);
+        let _ = generator.generate(&mut rng);
     }
 }

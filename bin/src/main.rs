@@ -9,7 +9,7 @@ use std::{
 
 use astrolabe::{
     body::{observatory::WeakObservatory, Body},
-    generator::{artifexian::Artifexian, Generator},
+    generator::{artifexian::ArtifexianBuilder, Generator},
     output::svg::Svg,
     program::{Program, ProgramBuilder},
     projection::StatelessOrthographic,
@@ -46,7 +46,7 @@ enum Commands {
     Build {
         /// Number of stars to generate in the resulting universe
         #[arg(short = 'c', long, default_value_t = 1_000_000)]
-        star_count: u64,
+        star_count: usize,
 
         /// Seed for the random number generator, leave blank for a random seed, supports
         #[arg(short, long)]
@@ -107,7 +107,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn build(seed: Option<&String>, _star_count: u64, output: &Path) -> Result<(), Box<dyn Error>> {
+fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), Box<dyn Error>> {
     let seed_num = seed
         .map_or_else(
             || rand::thread_rng().clone().gen(),
@@ -118,7 +118,11 @@ fn build(seed: Option<&String>, _star_count: u64, output: &Path) -> Result<(), B
     eprintln!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
 
     let mut rng = XorShiftRng::from_seed(seed_num);
-    let tree = Artifexian::generate(&mut rng);
+    let tree = ArtifexianBuilder::default()
+        .star_count(star_count)
+        .build()
+        .unwrap()
+        .generate(&mut rng);
 
     let json = serde_json::to_string(&tree)?;
 
