@@ -6,3 +6,4 @@
 **/*.csv
 web/pkg/
 .cargo/config.toml
+tarpaulin-report.html

@@ -14,13 +14,14 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 		cd - && \
 		cargo clippy --all-targets --all-features -- -Dclippy::pedantic -Dwarnings && \
 		cargo clippy --all-targets --no-default-features -- -Dclippy::pedantic -Dwarnings && \
-		echo "\tf64 tests" && cargo test --all-features && \
-		echo "\tf32 tests" && cargo test --no-default-features && \
+		echo -e "\tf64 tests" && cargo test --all-features && \
+		echo -e "\tf32 tests" && cargo test --no-default-features && \
 		wasm-pack build --target web -d ../web/pkg wasm && \
 		cargo run -- build -c 100 -s 0x100000000000000000000 && \
 		rm universe.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
+		cargo tarpaulin --skip-clean --fail-under 50 --exclude-files */main.rs --frozen --offline --out html | tail -n 1 && \
 		echo '✅ Good to push 👍'
 
 serve: ## Build and serve wasm on a testing server
