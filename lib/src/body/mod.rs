@@ -69,7 +69,7 @@ impl Body {
             name: None,
         }));
         if let Some(p) = parent {
-            //TODO resolve poisoned lock
+            // HACK: resolve poisoned lock
             let mut lock = p.write().unwrap();
             lock.children.push(b.clone());
         }
@@ -193,7 +193,7 @@ impl Body {
 
         // For each child
         for c in &self.children {
-            //TODO resolve poisoned locks
+            // HACK: resolve poisoned locks
             let child = c.read().unwrap();
             // Get the child position relative to here
             let location = child.dynamic.get_offset(time) + current_position;
@@ -226,7 +226,7 @@ impl Body {
             // Calculate the parent's location by getting our offset
             let parent_location = current_position - self.dynamic.get_offset(time);
 
-            //TODO resolve poisoned locks
+            // HACK: resolve poisoned locks
             let parent = p.read().unwrap();
 
             // Add the grandparent, great-grandparent, etc.
@@ -234,7 +234,7 @@ impl Body {
         } else {
             // This body is the root. We need to add it manually since it can't be added by a parent
 
-            // TODO find a cleaner way of getting an arc<rwlock> if this body.
+            // TODO: find a cleaner way of getting an arc<rwlock> if this body.
             // results.push((Arc::new(RwLock::new(self.clone())), current_position)); (Could be
             // expensive, could leak memory, could result in desyncing between this self and the
             // new self)
@@ -519,7 +519,7 @@ mod tests {
             num_children!(mercury, 0);
             num_children!(venus, 0);
             num_children!(earth, 1);
-            //TODO find data for moons of MARS, JUPITER, SATURN, URANUS, and NEPTUNE.
+            // HACK: find data for moons of MARS, JUPITER, SATURN, URANUS, and NEPTUNE.
             num_children!(mars, 0);
             // We are just going to count the galilean moons
             num_children!(jupiter, 0);

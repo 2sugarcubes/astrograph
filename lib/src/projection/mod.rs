@@ -77,7 +77,7 @@ impl Projection for Orthographic {
     }
 }
 
-// TODO make macro for this (will speed up inplementing projections)
+// TODO: make macro for this (will speed up inplementing projections)
 #[cfg(test)]
 mod test {
     mod stateless {
