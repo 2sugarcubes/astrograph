@@ -23,11 +23,11 @@ type Weak = StdWeak<RwLock<Body>>;
 pub struct Body {
     /// The body that this body is orbiting around
     #[serde(skip)]
-    pub(crate) parent: Option<Weak>,
+    pub parent: Option<Weak>,
     /// Bodies that orbit around this body
-    pub(crate) children: Vec<Arc>,
+    pub children: Vec<Arc>,
     /// The way this body moves around the parent
-    pub(crate) dynamic: Box<dyn Dynamic>,
+    pub dynamic: Box<dyn Dynamic>,
     /// If the body has any o1fservatories it is highly recommended to initialize this.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -36,9 +36,9 @@ pub struct Body {
     // /// Mass of the body in jupiter masses
     //mass: Float,
     /// Radius of the body in light seconds
-    pub(crate) radius: Option<Float>,
+    pub radius: Option<Float>,
     //color: [u8,h8,u8],
-    pub(crate) name: Option<String>,
+    pub name: Option<String>,
 }
 
 impl PartialEq for Body {

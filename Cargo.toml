@@ -1,5 +1,5 @@
 [workspace]
-members = ["lib", "bin"]
+members = ["lib", "bin", "wasm"]
 resolver = "2"
 
 [workspace.package]

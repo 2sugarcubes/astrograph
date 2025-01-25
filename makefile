@@ -2,7 +2,7 @@
 
 wasm: ## Build wasm target
 	# Massively reduce bundle size
-	@wasm-pack build --target web --release -d ../web/pkg lib
+	@wasm-pack build --target web --release -d ../web/pkg wasm
 
 test: ## Run cargo tests
 	@cargo test
@@ -16,11 +16,11 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 		cargo clippy --all-targets --no-default-features -- -Dclippy::pedantic -Dwarnings && \
 		echo "\tf64 tests" && cargo test --all-features && \
 		echo "\tf32 tests" && cargo test --no-default-features && \
+		wasm-pack build --target web -d ../web/pkg wasm && \
 		cargo run -- build -c 100 -s 0x100000000000000000000 && \
 		rm universe.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
-		wasm-pack build --target web -d ../web/pkg lib && \
 		echo '✅ Good to push 👍'
 
 serve: ## Build and serve wasm on a testing server

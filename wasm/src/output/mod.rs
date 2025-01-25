@@ -1,6 +1,6 @@
-use crate::projection;
+use astrolabe::projection;
 
-use super::{svg::Svg, Output};
+use astrolabe::output::{svg::Svg, Output};
 
 use wasm_bindgen::prelude::*;
 
@@ -18,10 +18,10 @@ extern "C" {
 impl Output for Web {
     fn write_observations(
         &self,
-        observations: &[crate::LocalObservation],
-        observatory_name: &str,
+        observations: &[astrolabe::LocalObservation],
+        _observatory_name: &str,
         time: i128,
-        output_path_root: &std::path::Path,
+        _output_path_root: &std::path::Path,
     ) -> Result<(), std::io::Error> {
         let observations = self
             .svg

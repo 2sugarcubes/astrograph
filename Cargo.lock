@@ -67,8 +67,6 @@ dependencies = [
  "derive_builder",
  "dyn-clone",
  "dyn_partial_eq",
- "getrandom",
- "gloo-utils",
  "quaternion",
  "rand",
  "rand_distr",
@@ -77,7 +75,6 @@ dependencies = [
  "serde_json",
  "svg",
  "typetag",
- "wasm-bindgen",
  "wasm-bindgen-test",
 ]
 
@@ -91,6 +88,20 @@ dependencies = [
  "rand",
  "rand_xorshift",
  "serde_json",
+]
+
+[[package]]
+name = "astrolabe-wasm"
+version = "0.1.0"
+dependencies = [
+ "astrolabe",
+ "getrandom",
+ "gloo-utils",
+ "rand",
+ "rand_xorshift",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
 ]
 
 [[package]]

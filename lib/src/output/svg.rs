@@ -22,7 +22,7 @@ impl<T: Projection> Svg<T> {
     }
 
     /// Converts observations to a SVG document
-    pub(super) fn consume_observation(
+    pub fn consume_observation(
         &self,
         time: &str,
         observations: &[LocalObservation],

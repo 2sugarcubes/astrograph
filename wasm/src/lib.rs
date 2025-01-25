@@ -1,21 +1,24 @@
 use std::sync::{Arc, RwLock};
 
-use crate::{
+use astrolabe::{
     body::{
         self,
         observatory::{self, Observatory, WeakObservatory},
         rotating::Rotating,
     },
-    dynamic::{fixed::Fixed, keplerian::Keplerian},
+    dynamic::{self, fixed::Fixed, keplerian::Keplerian},
     generator::{artifexian::Artifexian, Generator},
-    output::web::Web,
     program::ProgramBuilder,
+    Float,
 };
 use gloo_utils::format::JsValueSerdeExt;
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
 use serde::Deserialize;
 use wasm_bindgen::prelude::*;
+
+use output::Web;
+mod output;
 
 /// # Errors
 /// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
