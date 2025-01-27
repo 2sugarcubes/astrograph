@@ -55,57 +55,57 @@ jobs:
               **/out/astrolabe.fish
               **/out/astrolabe.1
 
-          - os-name: Linux-aarch64
-            runs-on: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-            extra-files: |
-              **/out/_astrolabe
-              **/out/astrolabe.bash
-              **/out/astrolabe.elv
-              **/out/astrolabe.fish
-              **/out/astrolabe.1
-
-          - os-name: Windows-x86_64
-            runs-on: windows-latest
-            target: x86_64-pc-windows-msvc
-            extra-files: |
-              **/out/_astrolabe.ps1
-
-          - os-name: Windows-aarch64
-            runs-on: windows-latest
-            target: aarch64-pc-windows-msvc
-            extra-files: |
-              **/out/_astrolabe.ps1
-
-          - os-name: Windows-i686
-            runs-on: windows-latest
-            target: i686-pc-windows-msvc
-            extra-files: |
-              **/out/_astrolabe
-              **/out/astrolabe.bash
-              **/out/astrolabe.elv
-              **/out/astrolabe.fish
-              **/out/astrolabe.1
-
-          - os-name: macOS-x86_64
-            runs-on: macos-latest
-            target: x86_64-apple-darwin
-            extra-files: |
-              **/out/_astrolabe
-              **/out/astrolabe.bash
-              **/out/astrolabe.elv
-              **/out/astrolabe.fish
-              **/out/astrolabe.1
-
-          - os-name: macOS-aarch64
-            runs-on: macos-latest
-            target: aarch64-apple-darwin
-            extra-files: |
-              **/out/_astrolabe
-              **/out/astrolabe.bash
-              **/out/astrolabe.elv
-              **/out/astrolabe.fish
-              **/out/astrolabe.1
+    #      - os-name: Linux-aarch64
+    #        runs-on: ubuntu-latest
+    #        target: aarch64-unknown-linux-musl
+    #        extra-files: |
+    #          **/out/_astrolabe
+    #          **/out/astrolabe.bash
+    #          **/out/astrolabe.elv
+    #          **/out/astrolabe.fish
+    #          **/out/astrolabe.1
+    #
+    #      - os-name: Windows-x86_64
+    #        runs-on: windows-latest
+    #        target: x86_64-pc-windows-msvc
+    #        extra-files: |
+    #          **/out/_astrolabe.ps1
+    #
+    #      - os-name: Windows-aarch64
+    #        runs-on: windows-latest
+    #        target: aarch64-pc-windows-msvc
+    #        extra-files: |
+    #          **/out/_astrolabe.ps1
+    #
+    #      - os-name: Windows-i686
+    #        runs-on: windows-latest
+    #        target: i686-pc-windows-msvc
+    #        extra-files: |
+    #          **/out/_astrolabe
+    #          **/out/astrolabe.bash
+    #          **/out/astrolabe.elv
+    #          **/out/astrolabe.fish
+    #          **/out/astrolabe.1
+    #
+    #      - os-name: macOS-x86_64
+    #        runs-on: macos-latest
+    #        target: x86_64-apple-darwin
+    #        extra-files: |
+    #          **/out/_astrolabe
+    #          **/out/astrolabe.bash
+    #          **/out/astrolabe.elv
+    #          **/out/astrolabe.fish
+    #          **/out/astrolabe.1
+    #
+    #      - os-name: macOS-aarch64
+    #        runs-on: macos-latest
+    #        target: aarch64-apple-darwin
+    #        extra-files: |
+    #          **/out/_astrolabe
+    #          **/out/astrolabe.bash
+    #          **/out/astrolabe.elv
+    #          **/out/astrolabe.fish
+    #          **/out/astrolabe.1
 
     runs-on: ${{ matrix.platform.runs-on }}
     needs: [wasm-and-completions]
@@ -116,13 +116,13 @@ jobs:
         uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: "--bin astrolabe --release"
+          args: "--bin astrolabe --release --locked"
           strip: true
       - name: Publish artifacts and release
-        uses: houseabsolute/actions-rust-release@v0
+        uses: houseabsolute/actions-rust-release@v0.0.4
         with:
           executable-name: astrolabe
           target: ${{ matrix.platform.target }}
           # Changelog and readme provided by wasm-and-completions
-          changes-file: ""
+          changes-file: null
           extra-files: ${{ matrix.platform.extra-files }}
