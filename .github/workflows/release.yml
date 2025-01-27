@@ -42,15 +42,15 @@ jobs:
       matrix:
         platform:
           - os-name: Linux-x86_64
-            runs-on: ubuntu-20.04
+            runs-on: ubuntu-latest
             target: x86_64-unknown-linux-musl
 
           - os-name: Linux-i686
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-latest
             target: i686-unknown-linux-musl
 
           - os-name: Linux-aarch64
-            runs-on: ubuntu-20.04
+            runs-on: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
 
           - os-name: Windows-x86_64
@@ -66,11 +66,11 @@ jobs:
             target: i686-pc-windows-msvc
 
           - os_name: macOS-x86_64
-            os: macOS-latest
+            runs-on: macos-latest
             target: x86_64-apple-darwin
 
           - os-name: macOS-aarch64
-            runs-on: macOS-latest
+            runs-on: macos-latest
             target: aarch64-apple-darwin
 
     runs-on: ${{ matrix.platform.runs-on }}
