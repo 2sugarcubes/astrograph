@@ -12,29 +12,6 @@ env:
   CROSS_CONTAINER_IN_CONTAINER: true
 
 jobs:
-  wasm-and-completions:
-    name: Build additional artifacts
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - uses: jetli/wasm-pack-action@v0.4.0
-      - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
-      - run: cargo build --bin astrolabe
-      - name: Add to release
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          body_path: CHANGELOG.md
-          files: |
-            **/out/_astrolabe
-            **/out/_astrolabe.ps1
-            **/out/astrolabe.bash
-            **/out/astrolabe.elv
-            **/out/astrolabe.fish
-            **/out/astrolabe.1
-            wasm.tar.gz
-
   build-binaries:
     name: Build Release Binaries - ${{ matrix.platform.os-name }}
     strategy:
@@ -90,3 +67,27 @@ jobs:
           target: ${{ matrix.platform.target }}
           # Changelog provided by wasm-and-completions
           changes-file: ""
+
+  wasm-and-completions:
+    needs: [build-binaries]
+    name: Build additional artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
+      - run: cargo build --bin astrolabe
+      - name: Add to release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          body_path: CHANGELOG.md
+          files: |
+            **/out/_astrolabe
+            **/out/_astrolabe.ps1
+            **/out/astrolabe.bash
+            **/out/astrolabe.elv
+            **/out/astrolabe.fish
+            **/out/astrolabe.1
+            wasm.tar.gz
