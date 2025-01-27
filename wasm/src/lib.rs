@@ -49,7 +49,7 @@ pub fn generate_observations_from_json(
 
     // Create program that outputs to the page
     let program = ProgramBuilder::default()
-        ._root_body(root)
+        .root_body(root)
         .outputs(vec![Box::new(Web::default())])
         .observatories(observatories)
         .build()?;
