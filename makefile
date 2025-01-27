@@ -1,7 +1,6 @@
 .PHONY: help
 
 wasm: ## Build wasm target
-	# Massively reduce bundle size
 	@wasm-pack build --target web --release -d ../web/pkg wasm
 
 test: ## Run cargo tests
@@ -16,16 +15,19 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 		cargo clippy --all-targets --no-default-features -- -Dclippy::pedantic -Dwarnings && \
 		echo -e "\tf64 tests" && cargo test --all-features && \
 		echo -e "\tf32 tests" && cargo test --no-default-features && \
-		wasm-pack build --target web -d ../web/pkg wasm && \
+		wasm-pack build --target web --no-opt -d ../web/pkg wasm && \
 		cargo run -- build -c 100 -s 0x100000000000000000000 && \
 		rm universe.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json && \
 		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
-		cargo tarpaulin --skip-clean --fail-under 50 --exclude-files */main.rs --frozen --offline --out html | tail -n 1 && \
+		cargo tarpaulin --skip-clean --count --fail-under 50 --exclude-files */main.rs --frozen --offline --out html | tail -n 1 && \
 		echo '✅ Good to push 👍'
 
 serve: ## Build and serve wasm on a testing server
 	@make wasm && cd ./web/ && python -m http.server; cd ..
+
+portable-build: ## Build targets for a release tag
+	@tools/build-targets.sh
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
