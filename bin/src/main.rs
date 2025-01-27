@@ -115,7 +115,7 @@ fn simulate(
             program_builder.add_observatory(astrolabe::body::observatory::to_observatory(o, &root));
         }
 
-        program_builder._root_body(root).build().unwrap()
+        program_builder.root_body(root).build().unwrap()
     } else if let Some(mut program) = fs::read_to_string(program)
         .ok()
         .and_then(|json| serde_json::from_str::<Program>(&json).ok())
