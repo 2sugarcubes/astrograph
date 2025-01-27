@@ -28,7 +28,7 @@ fn observations(c: &mut Criterion) {
 
     // Bench observations
     c.bench_function("observe 1,000", |b| {
-        b.iter(|| program.make_observations(black_box(0), 1_000, None))
+        b.iter(|| program.make_observations(black_box(0), 1_000, None));
     });
 }
 
@@ -39,7 +39,7 @@ fn generation(c: &mut Criterion) {
         .build()
         .unwrap();
     c.bench_function("gen 100,000", |b| {
-        b.iter(|| generator.generate(&mut thread_rng()))
+        b.iter(|| generator.generate(&mut thread_rng()));
     });
 }
 
