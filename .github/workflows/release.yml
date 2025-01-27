@@ -10,6 +10,25 @@ permissions:
   contents: write
 
 jobs:
+  wasm-and-completions:
+    name: Build additional artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
+      - run: cargo build --bin astrolabe
+      - name: Add to release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          body_path: CHANGELOG.md
+          # Add completion files, wasm tar, and the README
+          files: |
+            wasm.tar.gz
+            README.md
+
   build-binaries:
     name: Build Release Binaries - ${{ matrix.platform.os-name }}
     strategy:
@@ -19,36 +38,77 @@ jobs:
           - os-name: Linux-x86_64
             runs-on: ubuntu-latest
             target: x86_64-unknown-linux-musl
+            extra-files: |
+              **/out/_astrolabe
+              **/out/astrolabe.bash
+              **/out/astrolabe.elv
+              **/out/astrolabe.fish
+              **/out/astrolabe.1
 
           - os-name: Linux-i686
             runs-on: ubuntu-latest
             target: i686-unknown-linux-musl
+            extra-files: |
+              **/out/_astrolabe
+              **/out/astrolabe.bash
+              **/out/astrolabe.elv
+              **/out/astrolabe.fish
+              **/out/astrolabe.1
 
           - os-name: Linux-aarch64
             runs-on: ubuntu-latest
             target: aarch64-unknown-linux-musl
+            extra-files: |
+              **/out/_astrolabe
+              **/out/astrolabe.bash
+              **/out/astrolabe.elv
+              **/out/astrolabe.fish
+              **/out/astrolabe.1
 
           - os-name: Windows-x86_64
             runs-on: windows-latest
             target: x86_64-pc-windows-msvc
+            extra-files: |
+              **/out/_astrolabe.ps1
 
           - os-name: Windows-aarch64
             runs-on: windows-latest
             target: aarch64-pc-windows-msvc
+            extra-files: |
+              **/out/_astrolabe.ps1
 
           - os-name: Windows-i686
             runs-on: windows-latest
             target: i686-pc-windows-msvc
+            extra-files: |
+              **/out/_astrolabe
+              **/out/astrolabe.bash
+              **/out/astrolabe.elv
+              **/out/astrolabe.fish
+              **/out/astrolabe.1
 
           - os-name: macOS-x86_64
             runs-on: macos-latest
             target: x86_64-apple-darwin
+            extra-files: |
+              **/out/_astrolabe
+              **/out/astrolabe.bash
+              **/out/astrolabe.elv
+              **/out/astrolabe.fish
+              **/out/astrolabe.1
 
           - os-name: macOS-aarch64
             runs-on: macos-latest
             target: aarch64-apple-darwin
+            extra-files: |
+              **/out/_astrolabe
+              **/out/astrolabe.bash
+              **/out/astrolabe.elv
+              **/out/astrolabe.fish
+              **/out/astrolabe.1
 
     runs-on: ${{ matrix.platform.runs-on }}
+    needs: [wasm-and-completions]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,29 +123,6 @@ jobs:
         with:
           executable-name: astrolabe
           target: ${{ matrix.platform.target }}
-          # Changelog provided by wasm-and-completions
+          # Changelog and readme provided by wasm-and-completions
           changes-file: ""
-
-  wasm-and-completions:
-    needs: [build-binaries]
-    name: Build additional artifacts
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - uses: jetli/wasm-pack-action@v0.4.0
-      - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
-      - run: cargo build --bin astrolabe
-      - name: Add to release
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          body_path: CHANGELOG.md
-          files: |
-            **/out/_astrolabe
-            **/out/_astrolabe.ps1
-            **/out/astrolabe.bash
-            **/out/astrolabe.elv
-            **/out/astrolabe.fish
-            **/out/astrolabe.1
-            wasm.tar.gz
+          extra-files: ${{ matrix.platform.extra-files }}
