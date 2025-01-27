@@ -23,9 +23,9 @@ jobs:
           draft: true
           body_path: CHANGELOG.md
           files: |
-            **/out/_astrolabe{,.ps1}
-            **/out/astrolabe.{bash,elv,fish}
-            **/out/astrolabe.1
+            '**/out/_astrolabe{,.ps1}'
+            '**/out/astrolabe.{bash,elv,fish}'
+            '**/out/astrolabe.1'
 
   build-binaries:
     name: Compile for ${{ matrix.platform.platform_name }}
