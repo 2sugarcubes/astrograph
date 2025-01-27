@@ -13,7 +13,7 @@ fn main() -> std::io::Result<()> {
 
     // Generate Man Page
     let man = clap_mangen::Man::new(cmd.clone());
-    let mut buffer: Vec<u8> = Default::default();
+    let mut buffer: Vec<u8> = Vec::default();
     man.render(&mut buffer)?;
 
     std::fs::write(out_dir.join("astrolabe.1"), buffer)?;
