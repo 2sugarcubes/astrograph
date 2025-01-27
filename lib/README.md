@@ -4,11 +4,11 @@
 
 [![codecov](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests)](https://github.com/2sugarcubes/astrolabe/actions)
-[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]
+![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe/dev)
 
 [![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/issues)
 
-A library for predicting the locations of astronomical bodies that are both deterministinc and non-chaotic.
+A library for predicting the locations of astronomical bodies that are both deterministic and non-chaotic.
 
 ## What this package aims to do
 
@@ -36,7 +36,7 @@ Predict bodies in a n-body problem, a situation where each body influences the m
   - [x] Arbitrary elliptic planes around planets
 - [x] WASM target
 - [x] binary target
-- [ ] Eclipses
+- [x] Eclipses
 - [ ] web page
 - [ ] Summary output format (Similar to an [almanac](https://en.wikipedia.org/wiki/Almanac) e.g. [Astronomical Almanac, 2016, by The Stationery Office, U.S. Nautical Almanac Office, and Defense Department](https://openlibrary.org/books/OL50688251M/Astronomical_Almanac))
 - [ ] Constellations
