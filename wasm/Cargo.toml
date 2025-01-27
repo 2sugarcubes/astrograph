@@ -13,6 +13,7 @@ readme = "README.md"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+bench = false
 
 [features]
 default = ["f64"]
