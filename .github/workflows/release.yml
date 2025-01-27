@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  wasm-and-completions:
+  wasm:
     name: Build additional artifacts
     runs-on: ubuntu-latest
     steps:
@@ -108,7 +108,7 @@ jobs:
               completions/astrolabe.1
 
     runs-on: ${{ matrix.platform.runs-on }}
-    needs: [wasm-and-completions]
+    needs: [wasm]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
