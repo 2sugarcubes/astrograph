@@ -4,12 +4,10 @@ on:
   push:
     tags:
       - "v*.*.*"
+      - "v*.*.*-*"
 
 permissions:
   contents: write
-
-env:
-  CROSS_CONTAINER_IN_CONTAINER: true
 
 jobs:
   build-binaries:
