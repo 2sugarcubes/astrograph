@@ -9,7 +9,25 @@ env:
   CROSS_CONTAINER_IN_CONTAINER: true
 
 jobs:
-  build:
+  wasm-and-completions:
+    name: Build additional artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: cargo install wasm-pack && make wasm && tar -cvzf wasm.tar.gz web/pkg
+      - run: cargo build --bin astrolabe
+      - name: Add to release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          body_path: CHANGELOG.md
+          files: |
+            **/out/_astrolabe{,.ps1}
+            **/out/astrolabe.{bash,elv,fish}
+            **/out/astrolabe.1
+
+  build-binaries:
     name: Compile for ${{ matrix.platform.platform_name }}
     strategy:
       fail-fast: false
@@ -62,7 +80,3 @@ jobs:
         with:
           executable-name: astrolabe
           target: ${{ matrix.platform.target }}
-          extra-files: |
-            **/out/_astrolabe{,.ps1}
-            **/out/astrolabe.{bash,elv,fish}
-            **/out/astrolabe.1
