@@ -13,6 +13,7 @@ authors.workspace = true
 [[bin]]
 name = "astrolabe"
 path = "src/main.rs"
+bench = false
 
 [features]
 
