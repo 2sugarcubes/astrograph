@@ -33,6 +33,7 @@ jobs:
             **/out/astrolabe.elv
             **/out/astrolabe.fish
             **/out/astrolabe.1
+            wasm.tar.gz
 
   build-binaries:
     name: Compile for ${{ matrix.platform.platform_name }}
