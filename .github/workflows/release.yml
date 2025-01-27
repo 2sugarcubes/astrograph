@@ -39,21 +39,21 @@ jobs:
             runs-on: ubuntu-20.04
             target: x86_64-unknown-linux-musl
             extra-files: |
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/_astrolabe
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.bash
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.elv
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.fish
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.1
+              target/**/out/_astrolabe
+              target/**/out/astrolabe.bash
+              target/**/out/astrolabe.elv
+              target/**/out/astrolabe.fish
+              target/**/out/astrolabe.1
 
           - os-name: Linux-i686
             runs-on: ubuntu-20.04
             target: i686-unknown-linux-musl
             extra-files: |
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/_astrolabe
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.bash
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.elv
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.fish
-              ../../../../../target/*/release/build/astrolabe-bin-*/out/astrolabe.1
+              target/**/out/_astrolabe
+              target/**/out/astrolabe.bash
+              target/**/out/astrolabe.elv
+              target/**/out/astrolabe.fish
+              target/**/out/astrolabe.1
 
     #      - os-name: Linux-aarch64
     #        runs-on: ubuntu-latest
@@ -118,6 +118,7 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: "--bin astrolabe --release --locked"
           strip: true
+      - run: ls target/
       - name: Publish artifacts and release
         uses: houseabsolute/actions-rust-release@v0.0.4
         with:
