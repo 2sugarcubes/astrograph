@@ -39,21 +39,21 @@ jobs:
             runs-on: ubuntu-20.04
             target: x86_64-unknown-linux-musl
             extra-files: |
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/_astrolabe
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.bash
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.elv
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.fish
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.1
+              target/x86_64-unknown-linux-musl/release/build/astrolabe-bin-*/out/_astrolabe
+              target/x86_64-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.bash
+              target/x86_64-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.elv
+              target/x86_64-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.fish
+              target/x86_64-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.1
 
           - os-name: Linux-i686
             runs-on: ubuntu-20.04
             target: i686-unknown-linux-musl
             extra-files: |
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/_astrolabe
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.bash
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.elv
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.fish
-              target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/astrolabe.1
+              target/i686-unknown-linux-musl/release/build/astrolabe-bin-*/out/_astrolabe
+              target/i686-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.bash
+              target/i686-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.elv
+              target/i686-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.fish
+              target/i686-unknown-linux-musl/release/build/astrolabe-bin-*/out/astrolabe.1
 
     #      - os-name: Linux-aarch64
     #        runs-on: ubuntu-latest
