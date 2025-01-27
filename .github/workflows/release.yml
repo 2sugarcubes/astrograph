@@ -129,5 +129,5 @@ jobs:
           target: ${{ matrix.platform.target }}
           archive-name: ${{ matrix.platform.os-name }}
           # Changelog and readme provided by wasm-and-completions
-          changes-file: null
+          changes-file: CHANGELOG.md
           extra-files: ${{ matrix.platform.extra-files }}
