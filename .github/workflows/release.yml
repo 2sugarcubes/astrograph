@@ -36,7 +36,7 @@ jobs:
             wasm.tar.gz
 
   build-binaries:
-    name: Compile for ${{ matrix.platform.platform_name }}
+    name: Build Release Binaries - ${{ matrix.platform.os-name }}
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +50,7 @@ jobs:
             target: i686-unknown-linux-musl
 
           - os-name: Linux-aarch64
-            runs-on: ubuntu-24.04-arm
+            runs-on: ubuntu-latest
             target: aarch64-unknown-linux-musl
 
           - os-name: Windows-x86_64
@@ -77,7 +77,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build binary
+      - name: Build binary for ${{ matrix.platform.os-name }}
         uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platform.target }}
@@ -88,3 +88,5 @@ jobs:
         with:
           executable-name: astrolabe
           target: ${{ matrix.platform.target }}
+          # Changelog provided by wasm-and-completions
+          changes-file: ""
