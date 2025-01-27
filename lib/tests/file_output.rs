@@ -39,7 +39,7 @@ fn file_output() -> Result<(), ProgramBuilderError> {
     .collect();
 
     let program = ProgramBuilder::default()
-        ._root_body(root_body)
+        .root_body(root_body)
         .add_output(Box::new(output))
         .output_file_root(root_path.clone())
         .observatories(observatories.clone())
