@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use derive_builder::Builder;
+use log::{info, warn};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -18,7 +19,7 @@ use crate::{
 pub struct Program {
     /// The root of the tree, we need to reference it here to prevent the reference counter from
     /// reaching zero prematurely.
-    // TODO: #[builder(setter(name = root_body))]
+    #[builder(setter(name = root_body))]
     _root_body: Arc,
     /// List of observatories that we need to observe from to.
     #[builder(setter(each(name = "add_observatory")))]
@@ -60,7 +61,7 @@ impl Program {
                         time,
                         &self.output_file_root,
                     ) {
-                        Ok(()) => println!(
+                        Ok(()) => info!(
                             "File {} was written successfully",
                             &path.to_str().unwrap_or("[could not display path]")
                         ),
@@ -73,8 +74,7 @@ impl Program {
                                 // Panic can only occur in internal testing mode when panics are expected
                                 panic!("{message}");
                             } else {
-                                // TODO: implement log or something similar
-                                eprintln!("{message}");
+                                warn!("{message}");
                             }
                         }
                     }
@@ -85,7 +85,7 @@ impl Program {
         for output in &self.outputs {
             match output.flush() {
                 Ok(()) => (),
-                Err(e) => eprintln!("{e}"),
+                Err(e) => warn!("{e}"),
             };
         }
     }

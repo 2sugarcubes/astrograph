@@ -30,6 +30,7 @@ typetag = "0.2.18"
 rand = "0.8.5"
 rand_distr = "0.4.3"
 rand_xorshift = "0.3.0"
+log = "0.4.25"
 
 [dev-dependencies]
 assert_float_eq = "1.1.3"
