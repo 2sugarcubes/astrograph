@@ -65,7 +65,7 @@ jobs:
             runs-on: windows-latest
             target: i686-pc-windows-msvc
 
-          - os_name: macOS-x86_64
+          - os-name: macOS-x86_64
             runs-on: macos-latest
             target: x86_64-apple-darwin
 
@@ -81,7 +81,7 @@ jobs:
         uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: "--bin astrolabe --locked --release"
+          args: "--bin astrolabe --release"
           strip: true
       - name: Publish artifacts and release
         uses: houseabsolute/actions-rust-release@v0
