@@ -162,7 +162,14 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "file name contained an unexpected NUL byte")]
+    #[cfg_attr(
+        unix,
+        should_panic(expected = "file name contained an unexpected NUL byte")
+    )]
+    #[cfg_attr(
+        windows,
+        should_panic(expected = "message: strings passed to WinAPI cannot contain NULs")
+    )]
     fn write_to_forbidden_path() {
         let program = include_str!("../../assets/solar-system.program.json");
         let mut program: Program = serde_json::from_str(program).unwrap();
