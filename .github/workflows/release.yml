@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+  contents: write
+
 env:
   CROSS_CONTAINER_IN_CONTAINER: true
 
@@ -15,7 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - run: cargo install wasm-pack && wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
       - run: cargo build --bin astrolabe
       - name: Add to release
         uses: softprops/action-gh-release@v2
