@@ -36,66 +36,66 @@ jobs:
       matrix:
         platform:
           - os-name: Linux-x86_64
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-20.04
             target: x86_64-unknown-linux-musl
             extra-files: |
-              **/out/_astrolabe
-              **/out/astrolabe.bash
-              **/out/astrolabe.elv
-              **/out/astrolabe.fish
-              **/out/astrolabe.1
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/_astrolabe
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.bash
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.elv
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.fish
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.1
 
           - os-name: Linux-i686
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-20.04
             target: i686-unknown-linux-musl
             extra-files: |
-              **/out/_astrolabe
-              **/out/astrolabe.bash
-              **/out/astrolabe.elv
-              **/out/astrolabe.fish
-              **/out/astrolabe.1
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/_astrolabe
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.bash
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.elv
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.fish
+              /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-*/out/astrolabe.1
 
     #      - os-name: Linux-aarch64
     #        runs-on: ubuntu-latest
     #        target: aarch64-unknown-linux-musl
     #        extra-files: |
-    #          **/out/_astrolabe
-    #          **/out/astrolabe.bash
-    #          **/out/astrolabe.elv
-    #          **/out/astrolabe.fish
-    #          **/out/astrolabe.1
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/_astrolabe
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.bash
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.elv
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.fish
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.1
     #
     #      - os-name: Windows-x86_64
     #        runs-on: windows-latest
     #        target: x86_64-pc-windows-msvc
     #        extra-files: |
-    #          **/out/_astrolabe.ps1
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/_astrolabe.ps1
     #
     #      - os-name: Windows-aarch64
     #        runs-on: windows-latest
     #        target: aarch64-pc-windows-msvc
     #        extra-files: |
-    #          **/out/_astrolabe.ps1
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/_astrolabe.ps1
     #
     #      - os-name: Windows-i686
     #        runs-on: windows-latest
     #        target: i686-pc-windows-msvc
     #        extra-files: |
-    #          **/out/_astrolabe
-    #          **/out/astrolabe.bash
-    #          **/out/astrolabe.elv
-    #          **/out/astrolabe.fish
-    #          **/out/astrolabe.1
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/_astrolabe
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.bash
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.elv
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.fish
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.1
     #
     #      - os-name: macOS-x86_64
     #        runs-on: macos-latest
     #        target: x86_64-apple-darwin
     #        extra-files: |
-    #          **/out/_astrolabe
-    #          **/out/astrolabe.bash
-    #          **/out/astrolabe.elv
-    #          **/out/astrolabe.fish
-    #          **/out/astrolabe.1
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/_astrolabe
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.bash
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.elv
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.fish
+    #          /target/x86_64-pc-windows-gnu/release/build/astrolabe-bin-**/out/astrolabe.1
     #
     #      - os-name: macOS-aarch64
     #        runs-on: macos-latest
