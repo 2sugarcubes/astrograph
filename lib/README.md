@@ -1,9 +1,9 @@
 # Astrolabe
 
 [![License](https://img.shields.io/github/license/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/LICENSE.txt)
-[![codecov](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
+[![Code Coverage](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
 [![GitHub Release Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/release.yml)](https://github.com/2sugarcubes/astrolabe/releases)
-[![GitHub Test Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests.yml)](https://github.com/2sugarcubes/astrolabe/actions/workflows/tests.yml)
+[![GitHub Test Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests.yml)](https://github.com/2sugarcubes/astrolabe/actions/workflows/tests.yml?label=tests)
 ![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe/dev)
 [![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/issues)
 
