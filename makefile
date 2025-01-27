@@ -1,7 +1,6 @@
 .PHONY: help
 
 wasm: ## Build wasm target
-	# Massively reduce bundle size
 	@wasm-pack build --target web --release -d ../web/pkg wasm
 
 test: ## Run cargo tests
@@ -26,6 +25,9 @@ pre-push: ## Run all the CI tests (With the exception of tests that run on a dif
 
 serve: ## Build and serve wasm on a testing server
 	@make wasm && cd ./web/ && python -m http.server; cd ..
+
+portable-build: ## Build targets for a release tag
+	@tools/build-targets.sh
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
