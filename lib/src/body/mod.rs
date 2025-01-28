@@ -69,9 +69,9 @@ impl Body {
             name: None,
         }));
         if let Some(p) = parent {
-            // HACK: resolve poisoned lock
-            let mut lock = p.write().unwrap();
-            lock.children.push(b.clone());
+            if let Ok(mut lock) = p.write() {
+                lock.children.push(b.clone());
+            }
         }
 
         b
@@ -86,13 +86,17 @@ impl Body {
     /// while writing to it)
     pub fn hydrate_all(this: &Arc, parent: &Option<Weak>) {
         if parent.is_some() {
-            this.write().unwrap().parent.clone_from(parent);
+            if let Ok(mut this) = this.write() {
+                this.parent.clone_from(parent);
+            }
         }
 
         // A weak pointer to this body.
         let weak = StdArc::downgrade(this);
-        for child in &this.read().unwrap().children {
-            Self::hydrate_all(child, &Some(weak.clone()));
+        if let Ok(this) = this.read() {
+            for child in &this.children {
+                Self::hydrate_all(child, &Some(weak.clone()));
+            }
         }
     }
 
@@ -118,17 +122,20 @@ impl Body {
     #[must_use]
     pub fn get_id(&self) -> Vec<usize> {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
-            let parent = parent.read().unwrap();
-            let mut id = parent.get_id();
-            id.push(
-                parent
-                    .clone()
-                    .children
-                    .into_iter()
-                    .position(|c| c.read().unwrap().eq(self))
-                    .unwrap(),
-            );
-            id
+            if let Ok(parent) = parent.read() {
+                let mut id = parent.get_id();
+                id.push(
+                    parent
+                        .clone()
+                        .children
+                        .into_iter()
+                        .position(|c| c.read().map_or(false, |c| c.eq(self)))
+                        .unwrap_or(usize::MAX),
+                );
+                id
+            } else {
+                vec![]
+            }
         } else {
             vec![]
         }
@@ -165,15 +172,17 @@ impl Body {
     pub fn get_observations_from_here(&self, time: Float) -> Vec<EllipticObservation> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
-            results.extend(
-                parent
-                    .read()
-                    .unwrap()
-                    .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
-                    .into_iter()
-                    // Remove current body from the results
-                    .filter(|(b, _)| b.read().unwrap().get_name() != self.get_name()),
-            );
+            if let Ok(parent) = parent.read() {
+                results.extend(
+                    parent
+                        .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
+                        .into_iter()
+                        // Remove current body from the results
+                        .filter(|(b, _)| {
+                            b.read().map_or(true, |b| b.get_name() != self.get_name())
+                        }),
+                );
+            }
         }
         if let Some(rot) = &self.rotation {
             // Rotate observations according to axial tilt and time of day
@@ -193,15 +202,15 @@ impl Body {
 
         // For each child
         for c in &self.children {
-            // HACK: resolve poisoned locks
-            let child = c.read().unwrap();
-            // Get the child position relative to here
-            let location = child.dynamic.get_offset(time) + current_position;
-            // Add grandchildren, great-grandchildren, etc.
-            results.extend(child.traverse_down(time, location));
+            if let Ok(child) = c.read() {
+                // Get the child position relative to here
+                let location = child.dynamic.get_offset(time) + current_position;
+                // Add grandchildren, great-grandchildren, etc.
+                results.extend(child.traverse_down(time, location));
 
-            // Add that child
-            results.push((c.clone(), location));
+                // Add that child
+                results.push((c.clone(), location));
+            }
         }
 
         results
@@ -217,8 +226,10 @@ impl Body {
         let mut results = Vec::with_capacity(self.children.len() + 2);
         for c in &self.children {
             // Add parents and cousins
-            let child_location = current_position + c.read().unwrap().dynamic.get_offset(time);
-            results.push((c.clone(), child_location));
+            if let Ok(child) = c.read() {
+                let child_location = current_position + child.dynamic.get_offset(time);
+                results.push((c.clone(), child_location));
+            }
         }
 
         // If the parent still exists
@@ -226,11 +237,10 @@ impl Body {
             // Calculate the parent's location by getting our offset
             let parent_location = current_position - self.dynamic.get_offset(time);
 
-            // HACK: resolve poisoned locks
-            let parent = p.read().unwrap();
-
-            // Add the grandparent, great-grandparent, etc.
-            results.append(&mut parent.traverse_up(time, parent_location));
+            if let Ok(parent) = p.read() {
+                // Add the grandparent, great-grandparent, etc.
+                results.append(&mut parent.traverse_up(time, parent_location));
+            }
         } else {
             // This body is the root. We need to add it manually since it can't be added by a parent
 
