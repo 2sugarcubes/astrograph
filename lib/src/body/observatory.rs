@@ -1,4 +1,5 @@
 use coordinates::prelude::{Spherical, ThreeDimensionalConsts, Vector3};
+use log::warn;
 use quaternion::Quaternion;
 use serde::{Deserialize, Serialize};
 
@@ -33,33 +34,33 @@ impl Observatory {
 
     /// Takes bodies from a universal coordinate space and converts them to local coordinates
     /// relative to the observatory
-    ///
-    /// # Panics
-    ///
-    /// If it cannot get a clean read lock on the body this observatory is on. i.e. the [`std::sync::RwLock`] is
-    /// [poisoned](https://doc.rust-lang.org/std/sync/struct.RwLock.html#poisoning).
     #[must_use]
     pub fn observe(&self, time: Float) -> Vec<LocalObservation> {
-        let raw_observations = self.body.read().unwrap().get_observations_from_here(time);
+        if let Ok(body) = self.body.read() {
+            let raw_observations = body.get_observations_from_here(time);
 
-        // Rotate observations to put them in the local coordinate space from equitorial coordinate
-        // space
-        raw_observations
-            .iter()
-            .filter_map(|(body, pos)| {
-                let local_coordinates =
-                    Vector3::from(quaternion::rotate_vector(self.location, (*pos).into()));
-                // FIXME: adjust z based on the body's radius since we aren't observing from the
-                // centre of the body
+            // Rotate observations to put them in the local coordinate space from equitorial coordinate
+            // space
+            raw_observations
+                .iter()
+                .filter_map(|(body, pos)| {
+                    let local_coordinates =
+                        Vector3::from(quaternion::rotate_vector(self.location, (*pos).into()));
+                    // FIXME: adjust z based on the body's radius since we aren't observing from the
+                    // centre of the body
 
-                // Filter out bodies below the horizon
-                if local_coordinates.z >= 0.0 {
-                    Some((body.clone(), local_coordinates.into()))
-                } else {
-                    None
-                }
-            })
-            .collect()
+                    // Filter out bodies below the horizon
+                    if local_coordinates.z >= 0.0 {
+                        Some((body.clone(), local_coordinates.into()))
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        } else {
+            warn!("The body was poisoned, could not make observations from it");
+            vec![]
+        }
     }
 
     #[must_use]
@@ -97,6 +98,7 @@ pub struct WeakObservatory {
 pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observatory {
     let mut body = root.clone();
     for child_id in &weak_observatory.body_id {
+        // HACK: remove unwrap here, probably by returning an Option<Observatory>
         let b = body.read().unwrap().children[*child_id].clone();
         body = b;
     }
@@ -135,13 +137,18 @@ impl From<Observatory> for WeakObservatory {
         let azimuthal_angle =
             (2.0 * qy * qw - 2.0 * qx * qz).atan2(1.0 - 2.0 * qy * qy - 2.0 * qz * qz);
 
+        let body_id = value
+            .body
+            .read()
+            .map(|body| body.get_id())
+            .unwrap_or_default();
         WeakObservatory {
             location: Spherical {
                 polar_angle,
                 azimuthal_angle,
                 radius: 1.0,
             },
-            body_id: value.body.read().unwrap().get_id(),
+            body_id,
             name: None,
         }
     }

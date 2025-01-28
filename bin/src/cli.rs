@@ -6,14 +6,15 @@ use clap::Parser;
 #[command(version, about)]
 #[command(propagate_version = true)]
 pub(super) struct Arguments {
-    /// Output additional data to standard error, one occurance outputs logs, two info, three
-    /// debug, etc.
+    /// Output additional data to the console, one occurance outputs info logs, two debug, three
+    /// trace.
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub(super) verbose: u8,
 
-    /// Do not output any information to standard error, takes precidence over `verbose`
-    #[arg(short, long)]
-    pub(super) quiet: bool,
+    /// Output less/no information to the console, for no information to the console use this
+    /// option twice e.g. `-qq`
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    pub(super) quiet: u8,
 
     /// Output directory for observations or universe generation, output structure will be like
     /// `/output_path/observatory_id/time.ext`
