@@ -7,21 +7,7 @@ test: ## Run cargo tests
 	@cargo test
 
 pre-push: ## Run all the CI tests (With the exception of tests that run on a different OS, i.e. windows and/or ubuntu).
-	@cargo fmt && \
-		cd assets && \
-		./packSolarSystem.sh && \
-		cd - && \
-		cargo clippy --all-targets --all-features -- -Dclippy::pedantic -Dwarnings && \
-		cargo clippy --all-targets --no-default-features -- -Dclippy::pedantic -Dwarnings && \
-		echo -e "\tf64 tests" && cargo test --all-features && \
-		echo -e "\tf32 tests" && cargo test --no-default-features && \
-		wasm-pack build --target web --no-opt -d ../web/pkg wasm && \
-		cargo run -- build -c 100 -s 0x100000000000000000000 && \
-		rm universe.json && \
-		cargo run -- -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json && \
-		cargo run -- -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json && \
-		cargo tarpaulin --skip-clean --count --fail-under 50 --exclude-files */main.rs --frozen --offline --out html | tail -n 1 && \
-		echo '✅ Good to push 👍'
+	@./tools/push-check.sh
 
 serve: ## Build and serve wasm on a testing server
 	@make wasm && cd ./web/ && python -m http.server; cd ..
