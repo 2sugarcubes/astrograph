@@ -141,7 +141,7 @@ impl From<Observatory> for WeakObservatory {
             .body
             .read()
             .map(|body| body.get_id())
-            .unwrap_or(vec![]);
+            .unwrap_or_default();
         WeakObservatory {
             location: Spherical {
                 polar_angle,

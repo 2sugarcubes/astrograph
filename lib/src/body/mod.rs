@@ -117,7 +117,7 @@ impl Body {
                         .clone()
                         .children
                         .into_iter()
-                        .position(|c| c.read().map_or(false, |c| c.eq(self)))
+                        .position(|c| c.read().is_ok_and(|c| c.eq(self)))
                         .unwrap_or(usize::MAX),
                 );
                 id
@@ -164,9 +164,7 @@ impl Body {
                         .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
                         .into_iter()
                         // Remove current body from the results
-                        .filter(|(b, _)| {
-                            b.read().map_or(true, |b| b.get_name() != self.get_name())
-                        }),
+                        .filter(|(b, _)| b.read().is_ok_and(|b| b.get_name() != self.get_name())),
                 );
             }
         }
