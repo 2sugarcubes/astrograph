@@ -15,12 +15,15 @@ use astrolabe::{
     projection::StatelessOrthographic,
 };
 use clap::Parser;
+use log::{debug, error, info, warn};
 use rand::{Rng, SeedableRng};
 use rand_xorshift::XorShiftRng;
 mod cli;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = cli::Arguments::parse();
+
+    setup_log(args.quiet, args.verbose);
 
     match args.sub_command {
         cli::Commands::Build { star_count, seed } => build(seed.as_ref(), star_count, &args.output),
@@ -43,15 +46,36 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 }
 
+fn setup_log(quiet: u8, verbosity: u8) {
+    let mut builder = pretty_env_logger::env_logger::Builder::from_default_env();
+
+    if quiet != 0 || verbosity != 0 {
+        let log_level = match verbosity as i16 - quiet as i16 {
+            ..=-2 => log::LevelFilter::Off,
+            -1 => log::LevelFilter::Error,
+            0 => log::LevelFilter::Warn,
+            1 => log::LevelFilter::Info,
+            2 => log::LevelFilter::Debug,
+            3.. => log::LevelFilter::Trace,
+        };
+        builder.filter_level(log_level);
+    }
+
+    builder.init();
+}
+
 fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), Box<dyn Error>> {
     let seed_num = seed
         .map_or_else(
             || rand::thread_rng().clone().gen(),
-            |s| parse_int::parse::<i128>(s).unwrap(),
+            |s| parse_int::parse::<u128>(s).unwrap_or_else(|_| {
+                warn!("Seed did not appear to be a valid natural number (maybe it was too large or negative). Generating a random number");
+                rand::thread_rng().clone().gen()
+            }),
         )
         .to_be_bytes();
 
-    eprintln!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
+    debug!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
 
     let mut rng = XorShiftRng::from_seed(seed_num);
     let tree = ArtifexianBuilder::default()
@@ -66,7 +90,7 @@ fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), 
     if output_file.is_dir() {
         output_file.push(PathBuf::from_str("universe.json").unwrap());
     }
-    eprintln!(
+    info!(
         "Writing universe to file {}",
         output_file.to_str().unwrap_or("UNPRINTABLE PATH")
     );
@@ -106,7 +130,7 @@ fn simulate(
         program_builder
             .add_output(Box::new(Svg::new(StatelessOrthographic())))
             .output_file_root(output.to_owned());
-        eprintln!(
+        debug!(
             "Created a program from parts with {} observatories",
             observatories.len()
         );
@@ -127,12 +151,12 @@ fn simulate(
         universe.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
         observatories.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
     ) {
-        println!("Cannot parse observatories at: {universe}, or universe at: {observatories}");
+        error!("Cannot parse observatories at: {universe}, or universe at: {observatories}");
         return Err(Box::new(crate::ReadError {
             file_path: format!("universe: {universe}, observatories: {observatories}"),
         }));
     } else {
-        println!("Cannot parse program at: {program}");
+        error!("Cannot parse program at: {program}");
         return Err(Box::new(crate::ReadError {
             file_path: program.to_string(),
         }));
