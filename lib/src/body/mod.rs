@@ -51,9 +51,6 @@ impl PartialEq for Body {
 
 impl Body {
     /// Generates a new body, adding it to the children of the parent if one is given.
-    ///
-    /// # Panics
-    /// Will panic if `parent` is poisoned
     pub fn new<D>(parent: Option<Arc>, dynamic: D) -> Arc
     where
         D: Dynamic + Send + Sync + 'static,
@@ -79,11 +76,6 @@ impl Body {
 
     /// Adds missing references to parent bodies after deserialisation, if this is not called
     /// observations can only be made of descendant nodes, i.e. no parent or ancestor nodes.
-    ///
-    /// # Panics
-    ///
-    /// Will panic if any descendants have a poisoned write lock (i.e. another thread panicked
-    /// while writing to it)
     pub fn hydrate_all(this: &Arc, parent: &Option<Weak>) {
         if parent.is_some() {
             if let Ok(mut this) = this.write() {
@@ -115,10 +107,6 @@ impl Body {
     ///
     /// assert_eq!(id, Vec::<usize>::new());
     /// ```
-    ///
-    /// # Panics
-    ///
-    /// Will panic if any ancestor bodies are poisioned
     #[must_use]
     pub fn get_id(&self) -> Vec<usize> {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
@@ -165,9 +153,7 @@ impl Body {
         // of the *
         &*self.dynamic
     }
-    /// # Panics
-    /// Will panic if any descendants or sill existing ancestry have been poisoned by panicking
-    /// while in write mode
+
     #[must_use]
     pub fn get_observations_from_here(&self, time: Float) -> Vec<EllipticObservation> {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
