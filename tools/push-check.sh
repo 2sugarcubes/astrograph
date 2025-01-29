@@ -23,5 +23,5 @@ echo -e " ✒️ running rust format" &&
   echo -e "\n 💫 Test run with partial program" &&
   cargo run -- -vv -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json &&
   echo -e "\n ☂️ Running code coverage" &&
-  cargo tarpaulin --skip-clean --fail-under 50 --exclude-files */main.rs --frozen --out html | tail -n 1 &&
+  cargo tarpaulin --skip-clean --fail-under 50 --exclude-files '**/main.rs' --frozen --out html | tail -n 1 &&
   echo '✅ Good to push 👍'
