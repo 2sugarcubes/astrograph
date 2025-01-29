@@ -50,7 +50,7 @@ fn setup_log(quiet: u8, verbosity: u8) {
     let mut builder = pretty_env_logger::env_logger::Builder::from_default_env();
 
     if quiet != 0 || verbosity != 0 {
-        let log_level = match verbosity as i16 - quiet as i16 {
+        let log_level = match i16::from(verbosity) - i16::from(quiet) {
             ..=-2 => log::LevelFilter::Off,
             -1 => log::LevelFilter::Error,
             0 => log::LevelFilter::Warn,
