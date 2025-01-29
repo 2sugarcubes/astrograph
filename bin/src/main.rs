@@ -15,7 +15,7 @@ use astrolabe::{
     projection::StatelessOrthographic,
 };
 use clap::Parser;
-use log::{debug, error, info, warn};
+use log::{debug, error, info, trace, warn};
 use rand::{Rng, SeedableRng};
 use rand_xorshift::XorShiftRng;
 mod cli;
@@ -107,25 +107,28 @@ fn simulate(
     program: &str,
     output: &Path,
 ) -> Result<(), Box<dyn Error>> {
+    trace!("Entered Simulation function in binary");
     let program: Program = if let (Some(universe), Some(observatories)) = (
         universe
-            .as_ref()
             .and_then(|path| fs::read_to_string(path).ok())
             .and_then(|json| {
                 let res: Result<Body, _> = serde_json::from_str(&json);
                 res.ok()
             }),
         observatories
-            .as_ref()
             .and_then(|path| fs::read_to_string(path).ok())
             .and_then(|json| {
                 let res: Result<Vec<WeakObservatory>, _> = serde_json::from_str(&json);
                 res.ok()
             }),
     ) {
+        trace!("Reading from parts");
         let root: astrolabe::body::Arc = Arc::new(RwLock::new(universe));
 
+        trace!("Hydrating all bodies");
         astrolabe::body::Body::hydrate_all(&root, &None);
+
+        trace!("Building the program around these observatories and bodies");
         let mut program_builder = ProgramBuilder::default();
         program_builder
             .add_output(Box::new(Svg::new(StatelessOrthographic())))
@@ -144,6 +147,7 @@ fn simulate(
         .ok()
         .and_then(|json| serde_json::from_str::<Program>(&json).ok())
     {
+        trace!("Reading from program file");
         program.add_output(Box::new(Svg::new(StatelessOrthographic())));
         program.set_output_path(output);
         program
@@ -162,6 +166,7 @@ fn simulate(
         }));
     };
 
+    trace!("Making observations");
     program.make_observations(
         start_time,
         end_time,
@@ -171,6 +176,7 @@ fn simulate(
             Some(step_size)
         },
     );
+    trace!("Finished Observations");
     Ok(())
 }
 
