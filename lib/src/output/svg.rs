@@ -109,7 +109,8 @@ impl<T: Projection> Svg<T> {
                 .set(
                     "class",
                     body.read()
-                        .map_or_else(|b| b.into_inner().get_name(), |b| b.get_name()),
+                        .map_or_else(|b| b.into_inner().get_name(), |b| b.get_name())
+                        .to_string(),
                 );
 
             result.append(circle);

@@ -31,14 +31,14 @@ fn get_eclipses_on_frame(
         let name =
             p.0.read()
                 .map(|p| p.get_name())
-                .unwrap_or(String::from("Poisoned Body"));
+                .unwrap_or("Poisoned Body".into());
 
         for (other, magnitude) in grid.collisions(p) {
             // For each body this body has eclipsed, get the name of the far body
             let other_name = other
                 .read()
                 .map(|b| b.get_name())
-                .unwrap_or(String::from("Poisoned Body"));
+                .unwrap_or("Poisoned Body".into());
 
             results.push(format!("Time={time}, There was an eclipse between {name} and {other_name} with magnitude {magnitude:.2}"));
         }
