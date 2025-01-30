@@ -1,12 +1,9 @@
-use std::sync::{Arc, RwLock};
-
 use astrolabe::{
     body::{
-        self,
         observatory::{self, Observatory, WeakObservatory},
         rotating::Rotating,
     },
-    dynamic::{self, fixed::Fixed, keplerian::Keplerian},
+    dynamic::{fixed::Fixed, keplerian::Keplerian},
     generator::{artifexian::ArtifexianBuilder, Generator},
     program::ProgramBuilder,
     Float,
@@ -33,7 +30,9 @@ pub fn generate_observations_from_json(
 ) -> Result<(), JsError> {
     // Create root body (and whole body tree)
     let fake_root: self::Body = serde_json::from_str(root)?;
-    let root = upgrade_body(&fake_root, None);
+    let root = astrolabe::body::Body::try_from(fake_root).unwrap().into();
+
+    astrolabe::body::Body::hydrate_all(&root, &None);
 
     // Create weak observatories to avoid memory duplication
     let observatories: Vec<WeakObservatory> = serde_json::from_str(observatories)?;
@@ -107,42 +106,33 @@ struct Body {
     name: Option<String>,
 }
 
+impl TryFrom<Body> for astrolabe::body::Body {
+    type Error = astrolabe::body::BodyBuilderError;
+    fn try_from(value: Body) -> Result<Self, Self::Error> {
+        astrolabe::body::BodyBuilder::default()
+            .parent(None)
+            .name(value.name.map_or(astrolabe::body::Name::Unknown, |n| {
+                astrolabe::body::Name::Named(n.into())
+            }))
+            .children(
+                value
+                    .children
+                    .into_iter()
+                    .filter_map(|c| astrolabe::body::Body::try_from(c).ok().map(|b| b.into()))
+                    .collect(),
+            )
+            .radius(value.radius)
+            .rotation(value.rotation)
+            .dynamic(match value.dynamic {
+                Dynamic::Fixed(f) => Box::new(f),
+                Dynamic::Keplerian(f) => Box::new(f),
+            })
+            .build()
+    }
+}
+
 #[derive(Clone, Debug, Deserialize)]
 enum Dynamic {
     Fixed(Fixed),
     Keplerian(Keplerian),
-}
-
-fn upgrade_body(body: &self::Body, parent: Option<&Arc<RwLock<body::Body>>>) -> body::Arc {
-    let dynamic: Box<dyn crate::dynamic::Dynamic> = match body.dynamic {
-        Dynamic::Fixed(f) => Box::new(f),
-        Dynamic::Keplerian(k) => Box::new(k),
-    };
-
-    let mut result = body::Body {
-        parent: parent.as_ref().map(|p| Arc::downgrade(p)),
-        dynamic,
-        rotation: body.rotation.clone(),
-        children: Vec::with_capacity(body.children.len()),
-        radius: body.radius,
-        name: body
-            .name
-            .as_ref()
-            .map_or(astrolabe::body::Name::Unknown, |n| {
-                astrolabe::body::Name::Named(n.clone().into())
-            }),
-    };
-
-    result.name = astrolabe::body::Name::from_id(&result.get_id());
-
-    let result = Arc::new(RwLock::new(result));
-    if let Ok(mut lock) = result.write() {
-        for c in &body.children {
-            let child = upgrade_body(c, Some(&result.clone()));
-            assert!(child.read().unwrap().parent.is_some());
-            lock.children.push(child);
-        }
-    }
-
-    result
 }
