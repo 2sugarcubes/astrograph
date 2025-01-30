@@ -7,6 +7,7 @@ pub mod rotating;
 use std::sync::{Arc as StdArc, RwLock, Weak as StdWeak};
 
 use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
+use derive_builder::Builder;
 use log::{trace, warn};
 use rotating::Rotating;
 use serde::{Deserialize, Serialize};
@@ -19,29 +20,36 @@ pub type Arc = StdArc<RwLock<Body>>;
 type Weak = StdWeak<RwLock<Body>>;
 
 /// A representation of a body in the simulation, such as a star, planet, center of mass, or moon.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, Builder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct Body {
     /// The body that this body is orbiting around
     #[serde(skip)]
-    pub parent: Option<Weak>,
+    pub(crate) parent: Option<Weak>,
     /// Bodies that orbit around this body
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub children: Vec<Arc>,
+    pub(crate) children: Vec<Arc>,
     /// The way this body moves around the parent
-    pub dynamic: Box<dyn Dynamic>,
+    pub(crate) dynamic: Box<dyn Dynamic>,
     /// If the body has any o1fservatories it is highly recommended to initialize this.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rotation: Option<Rotating>,
+    pub(crate) rotation: Option<Rotating>,
     // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
     /// Radius of the body in light seconds
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub radius: Option<Float>,
+    pub(crate) radius: Option<Float>,
     //color: [u8,h8,u8],
     #[serde(skip_serializing_if = "Name::is_calculated", default)]
-    pub name: Name,
+    pub(crate) name: Name,
+}
+
+impl From<Body> for Arc {
+    fn from(value: Body) -> Self {
+        Arc::new(RwLock::new(value))
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
