@@ -232,6 +232,7 @@ impl Body {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             if let Ok(parent) = parent.read() {
+                // PERF: return an iterator instead of copying all elements into a single vector
                 results.extend(
                     parent
                         .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
