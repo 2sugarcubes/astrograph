@@ -1,0 +1,44 @@
+[
+  {
+    "location": { "r": 1.0, "theta": 0, "phi": 0 },
+    "body_id": [0, 0],
+    "name": "North Pole (Summer)"
+  },
+  {
+    "location": {
+      "r": 1.0,
+      "theta": 1.57079632679489,
+      "phi": 0.0
+    },
+    "body_id": [0, 1],
+    "name": "Equator (Summer)"
+  },
+  {
+    "location": { "r": 1.0, "theta": 0, "phi": 0 },
+    "body_id": [0, 2],
+    "name": "North Pole (Autumn)"
+  },
+  {
+    "location": {
+      "r": 1.0,
+      "theta": 1.57079632679489,
+      "phi": 0.0
+    },
+    "body_id": [0, 4],
+    "name": "Equator (Autumn)"
+  },
+  {
+    "location": { "r": 1.0, "theta": 0, "phi": 0 },
+    "body_id": [0, 8],
+    "name": "North Pole (Winter)"
+  },
+  {
+    "location": {
+      "r": 1.0,
+      "theta": 1.57079632679489,
+      "phi": 0.0
+    },
+    "body_id": [0, 3],
+    "name": "Equator (Winter)"
+  }
+]

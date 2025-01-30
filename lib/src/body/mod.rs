@@ -7,6 +7,7 @@ pub mod rotating;
 use std::sync::{Arc as StdArc, RwLock, Weak as StdWeak};
 
 use coordinates::prelude::{ThreeDimensionalConsts, Vector3};
+use log::{trace, warn};
 use rotating::Rotating;
 use serde::{Deserialize, Serialize};
 
@@ -25,27 +26,76 @@ pub struct Body {
     #[serde(skip)]
     pub parent: Option<Weak>,
     /// Bodies that orbit around this body
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub children: Vec<Arc>,
     /// The way this body moves around the parent
     pub dynamic: Box<dyn Dynamic>,
     /// If the body has any o1fservatories it is highly recommended to initialize this.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
     pub rotation: Option<Rotating>,
     // Getting some parameters ready for a next version
     // /// Mass of the body in jupiter masses
     //mass: Float,
     /// Radius of the body in light seconds
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub radius: Option<Float>,
     //color: [u8,h8,u8],
-    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Name::is_calculated", default)]
+    pub name: Name,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", untagged)]
+pub enum Name {
+    Named(StdArc<str>),
+    #[serde(skip)]
+    Id(StdArc<str>),
+    #[serde(skip)]
+    Unknown,
+}
+
+impl Name {
+    fn is_calculated(this: &Self) -> bool {
+        match this {
+            Self::Id(_) | Self::Unknown => true,
+            Self::Named(_) => false,
+        }
+    }
+
+    #[must_use]
+    pub fn from_id(id: &[usize]) -> Self {
+        Self::Id(observatory::to_name(id).into())
+    }
+}
+
+impl Default for Name {
+    fn default() -> Self {
+        Self::Unknown
+    }
+}
+
+impl<T: From<StdArc<str>>> From<Name> for Option<T> {
+    fn from(value: Name) -> Self {
+        match value {
+            Name::Id(_) | Name::Unknown => None,
+            Name::Named(s) => Some(s.into()),
+        }
+    }
+}
+
+impl<T: Into<StdArc<str>>> From<Option<T>> for Name {
+    fn from(value: Option<T>) -> Self {
+        match value {
+            Some(s) => Name::Named(s.into()),
+            None => Name::Unknown,
+        }
+    }
 }
 
 impl PartialEq for Body {
     fn eq(&self, other: &Self) -> bool {
-        self.dynamic == other.dynamic
-            && self.rotation == other.rotation
-            && self.parent.is_some() == other.parent.is_some()
+        self.dynamic == other.dynamic && self.rotation == other.rotation
+        //&& self.parent.is_some() == other.parent.is_some()
     }
 }
 
@@ -63,7 +113,7 @@ impl Body {
             dynamic: Box::new(dynamic),
             rotation: None,
             radius: None,
-            name: None,
+            name: Name::Unknown,
         }));
         if let Some(p) = parent {
             if let Ok(mut lock) = p.write() {
@@ -77,9 +127,21 @@ impl Body {
     /// Adds missing references to parent bodies after deserialisation, if this is not called
     /// observations can only be made of descendant nodes, i.e. no parent or ancestor nodes.
     pub fn hydrate_all(this: &Arc, parent: &Option<Weak>) {
-        if parent.is_some() {
-            if let Ok(mut this) = this.write() {
-                this.parent.clone_from(parent);
+        let id = if let Ok(this) = this.read() {
+            this.get_id()
+        } else {
+            vec![]
+        };
+
+        if let Ok(mut child) = this.write() {
+            trace!("Hydrating {:?}", child.dynamic);
+            if parent.is_some() {
+                child.parent.clone_from(parent);
+            }
+
+            trace!("Renaming {:?}", child.dynamic);
+            if let Name::Unknown = child.name {
+                child.name = Name::Id(observatory::to_name(&id).into());
             }
         }
 
@@ -87,7 +149,7 @@ impl Body {
         let weak = StdArc::downgrade(this);
         if let Ok(this) = this.read() {
             for child in &this.children {
-                Self::hydrate_all(child, &Some(weak.clone()));
+                Self::hydrate_all(&child, &Some(weak.clone()));
             }
         }
     }
@@ -109,17 +171,19 @@ impl Body {
     /// ```
     #[must_use]
     pub fn get_id(&self) -> Vec<usize> {
-        if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
-            if let Ok(parent) = parent.read() {
+        if let Some(parent) = self.parent.as_ref().and_then(std::sync::Weak::upgrade) {
+            if let Ok(parent) = &parent.read() {
+                trace!("Getting id of parent");
                 let mut id = parent.get_id();
+                trace!("Adding id of this to returned id {id:?}");
                 id.push(
                     parent
-                        .clone()
                         .children
-                        .into_iter()
+                        .iter()
                         .position(|c| c.read().is_ok_and(|c| c.eq(self)))
                         .unwrap_or(usize::MAX),
                 );
+                trace!("Returning id {id:?}");
                 id
             } else {
                 vec![]
@@ -135,11 +199,20 @@ impl Body {
         self.radius.map_or(0.01, |r| (r / distance).asin())
     }
 
+    /// # Panics
+    ///
+    /// Panics if name is [`Name::Unknown`], this occurs if the serialized body doesn't have a name
+    /// field and [`Self::hydrate_all`] is not called before starting to simulate
     #[must_use]
-    pub fn get_name(&self) -> String {
-        self.name
-            .clone()
-            .unwrap_or_else(|| observatory::to_name(&self.get_id()))
+    pub fn get_name(&self) -> StdArc<str> {
+        match &self.name {
+            Name::Named(name) | Name::Id(name) => name.clone(),
+            Name::Unknown => {
+                warn!("Generating id is expensive in the hot loop, remember to call hydrate_all after building the body tree");
+                //observatory::to_name(&self.get_id()).into()
+                unreachable!("Getting ID in the hot loop is too expensive");
+            }
+        }
     }
 
     #[must_use]
@@ -159,6 +232,7 @@ impl Body {
         let mut results = self.traverse_down(time, Vector3::ORIGIN);
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             if let Ok(parent) = parent.read() {
+                // PERF: return an iterator instead of copying all elements into a single vector
                 results.extend(
                     parent
                         .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
@@ -248,9 +322,6 @@ impl Body {
 
 #[cfg(test)]
 mod tests {
-
-    use serde_json::Result;
-
     use crate::dynamic::{fixed::Fixed, keplerian::Keplerian};
 
     use super::*;
@@ -487,10 +558,10 @@ mod tests {
     }
 
     #[test]
-    fn deserialise_from_json_string() -> Result<()> {
+    fn deserialise_from_json_string() {
         let json = include_str!("../../../assets/solar-system.json");
 
-        let sun: Arc = StdArc::new(RwLock::new(serde_json::from_str(json)?));
+        let sun: Arc = StdArc::new(RwLock::new(serde_json::from_str(json).unwrap()));
         Body::hydrate_all(&sun, &None);
 
         macro_rules! num_children {
@@ -525,8 +596,15 @@ mod tests {
             num_children!(neptune, 0);
         } else {
             unreachable!();
-        }
+        };
+    }
 
-        Ok(())
+    #[test]
+    fn deserialize_from_generated_json() {
+        let json = include_str!("../../../assets/test/generated/universe.json");
+        match serde_json::from_str::<Body>(json) {
+            Ok(_) => (),
+            Err(e) => panic!("Error while serializing: {e}"),
+        }
     }
 }

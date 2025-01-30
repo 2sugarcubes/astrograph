@@ -119,15 +119,23 @@ fn upgrade_body(body: &self::Body, parent: Option<&Arc<RwLock<body::Body>>>) -> 
         Dynamic::Keplerian(k) => Box::new(k),
     };
 
-    let result = Arc::new(RwLock::new(body::Body {
+    let mut result = body::Body {
         parent: parent.as_ref().map(|p| Arc::downgrade(p)),
         dynamic,
         rotation: body.rotation.clone(),
         children: Vec::with_capacity(body.children.len()),
         radius: body.radius,
-        name: body.name.clone(),
-    }));
+        name: body
+            .name
+            .as_ref()
+            .map_or(astrolabe::body::Name::Unknown, |n| {
+                astrolabe::body::Name::Named(n.clone().into())
+            }),
+    };
 
+    result.name = astrolabe::body::Name::from_id(&result.get_id());
+
+    let result = Arc::new(RwLock::new(result));
     if let Ok(mut lock) = result.write() {
         for c in &body.children {
             let child = upgrade_body(c, Some(&result.clone()));
