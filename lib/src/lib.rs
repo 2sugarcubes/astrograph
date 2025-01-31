@@ -1,5 +1,8 @@
+//! Simulates the motion of celestial bodies.
+
 // Style guide suggests using return for any function over 5 lines to improve readability
 #![allow(clippy::needless_return)]
+#![warn(clippy::missing_docs_in_private_items)]
 
 /// Structures that model discrete objects in the simulation, e.g. planets, stars, and
 /// observatories.

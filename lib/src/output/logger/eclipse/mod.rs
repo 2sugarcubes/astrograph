@@ -9,13 +9,17 @@ use collision_check::CollisionGrid;
 use coordinates::prelude::Spherical;
 
 use crate::{output::Output, Float};
+
+/// Provides a struct that speeds up eclipse checks
 mod collision_check;
 
 #[derive(Clone, Debug, Default)]
 pub struct Logger {
+    /// List of eclipses that have been observed
     eclipse_log: Arc<RwLock<HashMap<Arc<std::path::Path>, Vec<String>>>>,
 }
 
+/// Gets a list of eclipses that have been observed at this time
 fn get_eclipses_on_frame(
     observations: &[(crate::body::Arc, Spherical<Float>)],
     time: &str,

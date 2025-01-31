@@ -40,6 +40,7 @@ pub struct Keplerian {
     /// infinitely distant point and the parent body are equal again i.e. the [sidereal period](https://en.wikipedia.org/wiki/Orbital_period#Related_periods) as opposed to [tropical period](https://en.wikipedia.org/wiki/Solar_year), or [synodic period](https://en.wikipedia.org/wiki/Orbital_period#Synodic_period))
     orbital_period: Float,
 
+    /// Fields that are calculated away when Deserializing but needed for Serializeing
     calculated_fields: CalculatedFields,
 }
 
@@ -53,10 +54,21 @@ impl PartialEq for Keplerian {
     }
 }
 
+/// Fields that are calculated away when Deserializing
 #[derive(Debug, Clone, Copy)]
 struct CalculatedFields {
+    /// Unit: radians
+    ///
+    /// The angle from the universal reference direction to the ascending node (location where the orbit passes through
+    /// the universal reference plane with positive z veleocity)
     longitude_of_ascending_node: Float,
+    /// Unit: radians
+    ///
+    /// The angle from the universal reference direction to the periapsis
     argument_of_periapsis: Float,
+    /// Unit: radians
+    ///
+    /// The angle made between this orbit and the universal reference plane
     inclination: Float,
 }
 

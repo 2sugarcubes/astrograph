@@ -3,26 +3,36 @@ use super::{
     Float, Planet, Range, Spherical,
 };
 
+/// A star that can have bodies that orbit it
 #[derive(Debug, Clone)]
 pub(super) struct MainSequenceStar {
+    /// Mass of the star in jupiter masses
     pub(super) mass: Float,
     //luminosity: Float,
     //diameter: Float,
     //surface_temp: Float,
+    /// Area where habitable planets can exist in ls (light seconds)
     pub(super) habitable_zone: Range<Float>,
+    /// Area where planets can exist
     pub(super) planetary_zone: Range<Float>,
+    /// Line where all planets become gas giants or pluto like
     pub(super) frost_line: Float,
+    /// If this star can support water based life in it's lifetime
     pub(super) is_habitable: bool,
+    /// The location of true north above this star, defining the eliptical plane
     pub(super) north_pole: Spherical<Float>,
+    /// List of planets that orbit this star
     pub(super) planets: Vec<Planet>,
 }
 
 impl MainSequenceStar {
+    /// Generate a star that may or may not be habitable
     pub(super) fn new<G: rand::Rng>(rng: &mut G) -> Self {
         let mass: Float = rng.gen_range(0.02..16.0);
         Self::new_from_mass(rng, mass)
     }
 
+    /// Generate a habitable star
     pub(super) fn new_habitable<G: rand::Rng>(rng: &mut G) -> Self {
         let mass: Float = rng.gen_range(0.6..1.4);
         Self::new_from_mass(rng, mass)
@@ -47,6 +57,7 @@ impl MainSequenceStar {
         }
     }
 
+    /// Gets the allowed deviation above or below the universal referance plane
     #[allow(clippy::excessive_precision)] // Needs to work for f32 and f64 versions
     fn allowed_height(radius: Float) -> Float {
         const SIGMA: Float = 40_963.217_496_445_2;
@@ -57,6 +68,7 @@ impl MainSequenceStar {
         maximum * 1.029e8
     }
 
+    /// Convert this star to a body to add to the body tree
     pub(super) fn to_body<G: rand::Rng>(&self, rng: &mut G, root: &Arc) -> Arc {
         const WIDTH_OF_MILKY_WAY: Float = 3e12;
 

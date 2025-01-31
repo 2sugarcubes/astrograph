@@ -100,11 +100,15 @@ impl Program {
     }
 }
 
+/// Intermediate type to allow deserializing programs and maintaining validity of the data
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct DeserializedProgram {
+    /// The root body, that hasn't been hydrated yet
     root_body: Arc,
+    /// The observatories that haven't been linked to their bodies yet
     observatories: Vec<WeakObservatory>,
+    /// The output path
     output_file_root: PathBuf,
 }
 

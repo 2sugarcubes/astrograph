@@ -4,30 +4,41 @@ use super::{
     Vector3,
 };
 
+/// A planet that orbits a star
 #[derive(Debug, Clone)]
 pub(super) struct Planet {
+    /// Semi-major axis of this body's orbit in ls
     pub(super) semi_major_axis: Float,
+    /// mass of this planet in jupiter masses
     pub(super) mass: Float,
+    /// Radius of this body in ls
     pub(super) radius: Float,
+    /// Type of this body, e.g. Habitable, Terestrial, or Gas Giant.
     pub(super) kind: PlanetType,
+    /// The location of true-north so we can generate a rotation for this body
     pub(super) north_pole: Spherical<Float>,
 }
 
+/// Planet types
 #[derive(Debug, Clone)]
 pub(super) enum PlanetType {
+    /// A terrestial planet e.g. Mars
     Terestrial,
+    /// A gas giant, e.g. Jupiter
     GasGiant,
+    /// A Habitable planet, e.g. Earth
     Habitable,
 }
 
 impl Planet {
+    /// Generate a gas giant based on the frost line of the star
     pub(super) fn new_from_frost_line<G: rand::Rng>(
         rng: &mut G,
         parent_star: &MainSequenceStar,
     ) -> Self {
         let semi_major_axis = parent_star.frost_line + au_to_ls(rng.gen_range(1.0..1.2));
 
-        let (mass, radius) = Self::generate_gas_giant_perameters(rng);
+        let (mass, radius) = Self::generate_gas_giant_parameters(rng);
 
         Self {
             semi_major_axis,
@@ -38,6 +49,7 @@ impl Planet {
         }
     }
 
+    /// Generate a habitable planet from the habitable zone of a star
     pub(super) fn new_habitable<G: rand::Rng>(
         rng: &mut G,
         parent_star: &MainSequenceStar,
@@ -74,6 +86,7 @@ impl Planet {
         }
     }
 
+    /// Generate a Terestrial planet based on the given semi-major axis
     pub(super) fn new_terrestial<G: rand::Rng>(rng: &mut G, semi_major_axis: Float) -> Self {
         let (mass, radius) = Self::generate_terestial_parameters(rng);
 
@@ -86,8 +99,9 @@ impl Planet {
         }
     }
 
+    /// Generate a gas giant based on the given semi-major axis
     pub(super) fn new_gas_giant<G: rand::Rng>(rng: &mut G, semi_major_axis: Float) -> Self {
-        let (mass, radius) = Self::generate_gas_giant_perameters(rng);
+        let (mass, radius) = Self::generate_gas_giant_parameters(rng);
 
         Self {
             semi_major_axis,
@@ -98,6 +112,7 @@ impl Planet {
         }
     }
 
+    /// Calculate how many major and minor moons a Terestrial planet should have
     #[allow(
         clippy::cast_precision_loss,
         clippy::cast_sign_loss,
@@ -121,7 +136,8 @@ impl Planet {
         (major_moons, minor_moons)
     }
 
-    fn generate_gas_giant_perameters<G: rand::Rng>(rng: &mut G) -> (Float, Float) {
+    /// Generates the mass and radius of a gas giant
+    fn generate_gas_giant_parameters<G: rand::Rng>(rng: &mut G) -> (Float, Float) {
         let mass = rng.gen_range(earth_masses_to_jupiter_masses(10.0)..13.0);
         let radius = 0.2333
             * if mass >= 2.0 {
@@ -133,6 +149,7 @@ impl Planet {
         (mass, radius)
     }
 
+    /// Generates the mass and radius of a terrestial planet
     fn generate_terestial_parameters<G: rand::Rng>(rng: &mut G) -> (Float, Float) {
         // Terestrial
         let mass: Float = rng.gen_range(0.18..3.5);
@@ -146,6 +163,7 @@ impl Planet {
         )
     }
 
+    /// Converts a planet to a body that can be added to the tree
     pub(super) fn to_body<G: rand::Rng>(
         &self,
         rng: &mut G,
@@ -232,6 +250,8 @@ impl Planet {
         }
         b
     }
+
+    /// Generates the moons around this planet
     fn generate_moons<G: rand::Rng>(
         &self,
         rng: &mut G,
