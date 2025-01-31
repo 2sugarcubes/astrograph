@@ -8,7 +8,7 @@ pub trait Projection {
     /// Projects from 3D to 2D while taking into account any state the projector has.
     //#[inline(always)]
     fn project_with_state(&self, location: &Spherical<Float>) -> Option<Vector2<Float>> {
-        // default behaviour when there is no state
+        // default behavior when there is no state
         Self::project(location)
     }
     /// Projects from 3D to 2D without taking into account any state the projector has, generally
@@ -77,7 +77,7 @@ impl Projection for Orthographic {
     }
 }
 
-// TODO: make macro for this (will speed up inplementing projections)
+// TODO: make macro for this (will speed up implementing projections)
 #[cfg(test)]
 mod test {
     mod stateless {

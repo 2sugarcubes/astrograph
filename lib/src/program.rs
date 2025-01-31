@@ -85,7 +85,7 @@ impl Program {
 
     /// Makes a single observation to help with parallel computation
     fn make_observation(&self, time: i128) {
-        info!("Calulating observations for t={time}");
+        info!("Calculating observations for t={time}");
         for observatory in &self.observatories {
             let path = self
                 .output_file_root

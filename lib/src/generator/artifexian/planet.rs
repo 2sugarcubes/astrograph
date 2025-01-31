@@ -22,7 +22,7 @@ pub(super) struct Planet {
 /// Planet types
 #[derive(Debug, Clone)]
 pub(super) enum PlanetType {
-    /// A terrestial planet e.g. Mars
+    /// A terrestrial planet e.g. Mars
     Terestrial,
     /// A gas giant, e.g. Jupiter
     GasGiant,
@@ -87,7 +87,7 @@ impl Planet {
     }
 
     /// Generate a Terestrial planet based on the given semi-major axis
-    pub(super) fn new_terrestial<G: rand::Rng>(rng: &mut G, semi_major_axis: Float) -> Self {
+    pub(super) fn new_terrestrial<G: rand::Rng>(rng: &mut G, semi_major_axis: Float) -> Self {
         let (mass, radius) = Self::generate_terestial_parameters(rng);
 
         Self {
@@ -149,7 +149,7 @@ impl Planet {
         (mass, radius)
     }
 
-    /// Generates the mass and radius of a terrestial planet
+    /// Generates the mass and radius of a terrestrial planet
     fn generate_terestial_parameters<G: rand::Rng>(rng: &mut G) -> (Float, Float) {
         // Terestrial
         let mass: Float = rng.gen_range(0.18..3.5);

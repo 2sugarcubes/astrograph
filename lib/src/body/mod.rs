@@ -236,7 +236,7 @@ impl Body {
 
     #[must_use]
     pub fn get_dynamic(&self) -> &dyn Dynamic {
-        // Deref the box, yeilding `dyn Dynamic`, then add a thin reference by putting & in front
+        // Deref the box, yielding `dyn Dynamic`, then add a thin reference by putting & in front
         // of the *
         &*self.dynamic
     }

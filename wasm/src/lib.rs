@@ -24,7 +24,7 @@ mod output;
 //pub use wasm_bindgen_rayon::init_thread_pool;
 
 /// # Errors
-/// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
+/// Returns an error if root or observatories are not valid representations of their values i.e. missing
 /// required fields
 #[wasm_bindgen]
 pub fn generate_observations_from_json(
@@ -102,7 +102,7 @@ pub fn generate_universe() -> JsValue {
     .unwrap()
 }
 
-/// A kind of hacky solution to the problem of serde json not recognising typetaged dynamics when
+/// A kind of hacky solution to the problem of serde json not recognizing typetaged dynamics when
 /// targeting a wasm arch
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]

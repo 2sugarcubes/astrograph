@@ -107,7 +107,7 @@ impl CollisionGrid {
                 Some((radius_sum - angle_to).div(2.0).clamp(0.0, near_point.0) / far_point.0)
             }
         } else {
-            // No eclipse has occured
+            // No eclipse has occurred
             None
         }
     }

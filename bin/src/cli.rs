@@ -7,7 +7,7 @@ use clap::Parser;
 #[command(version, about)]
 #[command(propagate_version = true)]
 pub(super) struct Arguments {
-    /// Output additional data to the console, one occurance outputs info logs, two debug, three
+    /// Output additional data to the console, one occurrence outputs info logs, two debug, three
     /// trace.
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub(super) verbose: u8,
@@ -55,12 +55,12 @@ pub(super) enum Commands {
         step_size: usize,
 
         /// Path to a JSON file that represents the bodies in the universe, if present with
-        /// [`Self::observatories`] this takes precidence over [`Self::program`]
+        /// [`Self::observatories`] this takes precedence over [`Self::program`]
         #[arg(short, long)]
         universe: Option<PathBuf>,
 
         /// Path to a JSON file that represents the observatories, if present with
-        /// [`Self::universe`] this takes precidence over [`Self::program`]
+        /// [`Self::universe`] this takes precedence over [`Self::program`]
         #[arg(short, long)]
         observatories: Option<PathBuf>,
 

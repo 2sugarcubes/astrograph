@@ -19,7 +19,7 @@ pub(super) struct MainSequenceStar {
     pub(super) frost_line: Float,
     /// If this star can support water based life in it's lifetime
     pub(super) is_habitable: bool,
-    /// The location of true north above this star, defining the eliptical plane
+    /// The location of true north above this star, defining the elliptical plane
     pub(super) north_pole: Spherical<Float>,
     /// List of planets that orbit this star
     pub(super) planets: Vec<Planet>,
@@ -57,7 +57,7 @@ impl MainSequenceStar {
         }
     }
 
-    /// Gets the allowed deviation above or below the universal referance plane
+    /// Gets the allowed deviation above or below the universal reference plane
     #[allow(clippy::excessive_precision)] // Needs to work for f32 and f64 versions
     fn allowed_height(radius: Float) -> Float {
         const SIGMA: Float = 40_963.217_496_445_2;
@@ -85,7 +85,7 @@ impl MainSequenceStar {
                 // Make a second arm, half a turn from the primary
                 rng.sample(d) * 0.25 + 0.5
             } + 1.0 + radius * 1.352 / (WIDTH_OF_MILKY_WAY)) // Make theta map out one and a half turns on
-                                                             // the way from the centre to the outer rim
+                                                             // the way from the center to the outer rim
         } else {
             random_angle(rng)
         };

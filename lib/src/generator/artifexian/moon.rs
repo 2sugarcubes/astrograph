@@ -49,7 +49,7 @@ impl Moon {
         let (hill_limit, radius, kind) = if is_major {
             let radius = rng.gen_range(0.001_001..parent.radius * 0.75);
 
-            // If this moon is orbiting a terrestial planet then divide the maximum semi-major axis
+            // If this moon is orbiting a terrestrial planet then divide the maximum semi-major axis
             // by two
             match parent.kind {
                 PlanetType::GasGiant => (
@@ -185,7 +185,7 @@ impl Moon {
                 rng.gen_range(0.0..0.08),
             ),
             MoonType::MajorIcy | MoonType::MajorRocky => {
-                // Clamp bounds to sensable values
+                // Clamp bounds to sensible values
 
                 let eccentricity_range = match parent.kind {
                     PlanetType::GasGiant => 0.001..0.5,
