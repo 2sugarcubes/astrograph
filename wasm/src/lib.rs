@@ -19,7 +19,10 @@ use wasm_bindgen::prelude::*;
 use output::Web;
 mod output;
 
-pub use wasm_bindgen_rayon::init_thread_pool;
+// TODO: add support for web workers
+
+//pub use wasm_bindgen_rayon::init_thread_pool;
+
 /// # Errors
 /// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
 /// required fields
@@ -31,6 +34,9 @@ pub fn generate_observations_from_json(
     end_time: i128,
     step_size: Option<usize>,
 ) -> Result<(), JsError> {
+    #[cfg(debug_assertions)]
+    wasm_log::init(wasm_log::Config::default());
+
     // Create root body (and whole body tree)
     let fake_root: self::Body = serde_json::from_str(root)?;
     let root = astrolabe::body::Body::from(fake_root).into();
@@ -65,6 +71,9 @@ pub fn generate_observations_from_json(
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
 pub fn generate_universe_from_seed(seed: u64) -> JsValue {
+    #[cfg(debug_assertions)]
+    wasm_log::init(wasm_log::Config::default());
+
     JsValue::from_serde(
         &ArtifexianBuilder::default()
             .star_count(1_000_000)
@@ -80,6 +89,9 @@ pub fn generate_universe_from_seed(seed: u64) -> JsValue {
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
 pub fn generate_universe() -> JsValue {
+    #[cfg(debug_assertions)]
+    wasm_log::init(wasm_log::Config::default());
+
     JsValue::from_serde(
         &ArtifexianBuilder::default()
             .star_count(1_000_000)

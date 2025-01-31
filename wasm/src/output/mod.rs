@@ -2,8 +2,6 @@ use astrolabe::projection;
 
 use astrolabe::output::{svg::Svg, Output};
 
-use itertools::Itertools;
-
 use rayon::prelude::*;
 use wasm_bindgen::prelude::*;
 

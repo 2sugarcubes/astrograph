@@ -1,0 +1,6 @@
+# TODO: add support for web-workers
+#
+#[toolchain]
+#channel = "nightly-2024-08-02"
+#components = ["rust-src"]
+#targets = ["wasm32-unknown-unknown"]
