@@ -88,6 +88,7 @@ dependencies = [
  "rand",
  "rand_distr",
  "rand_xorshift",
+ "rayon",
  "serde",
  "serde_json",
  "svg",
@@ -120,9 +121,12 @@ dependencies = [
  "gloo-utils",
  "rand",
  "rand_xorshift",
+ "rayon",
  "serde",
  "serde_json",
+ "svg",
  "wasm-bindgen",
+ "wasm-log",
 ]
 
 [[package]]
@@ -1113,6 +1117,17 @@ checksum = "0789dac148a8840bbcf9efe13905463b733fa96543bfbf263790535c11af7ba5"
 dependencies = [
  "proc-macro2 0.4.30",
  "quote 0.6.13",
+]
+
+[[package]]
+name = "wasm-log"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "def95b2a762924804037f77e3de791f1c177d6ecbe0385a64e519bd7902a5f81"
+dependencies = [
+ "log",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

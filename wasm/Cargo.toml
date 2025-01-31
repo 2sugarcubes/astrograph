@@ -29,3 +29,15 @@ wasm-bindgen = "0.2"
 serde_json = "1.0"
 getrandom = { version = "0.2", features = ["js"] }
 gloo-utils = { version = "0.1", features = ["serde"] }
+svg = "0.18"
+wasm-log = "0.3.1"
+rayon = "1.8"
+
+#TODO: add support for web workers
+
+#wasm-bindgen-rayon = "1.2"
+#[target.wasm32-unknown-unknown]
+#rustflags = ["-C", "target-feature=+atomics,+bulk-memory"]
+
+#[unstable]
+#build-std = ["panic_abort", "std"]

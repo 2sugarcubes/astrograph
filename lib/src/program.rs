@@ -4,6 +4,8 @@ use derive_builder::Builder;
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
 
+use rayon::prelude::*;
+
 use crate::{
     body::{
         observatory::{to_observatory, Observatory, WeakObservatory},
@@ -46,47 +48,76 @@ impl Program {
     #[allow(clippy::cast_precision_loss)]
     #[allow(clippy::missing_panics_doc)] // Should only panic in unit tests
     pub fn make_observations(&self, start_time: i128, end_time: i128, step_size: Option<usize>) {
-        for time in (start_time..end_time).step_by(step_size.unwrap_or(1)) {
-            for observatory in &self.observatories {
-                let path = self
+        if let Err(e) = std::fs::create_dir_all(&self.output_file_root) {
+            let message = format!(
+                "ERROR WRITING FILE/DIRECTORY {}, message: {e}",
+                &self
                     .output_file_root
-                    .join(format!("{}/{time:010}", observatory.get_name()));
-                let observations = observatory.observe(time as Float);
-                for output in &self.outputs {
-                    // Write the observations to file, recovering on errors
-                    // HACK: Should remove this match statement and return an error on writing
-                    match output.write_observations(
-                        &observations,
-                        &observatory.get_name(),
-                        time,
-                        &self.output_file_root,
-                    ) {
-                        Ok(()) => info!(
-                            "File {} was written successfully",
-                            &path.to_str().unwrap_or("[could not display path]")
-                        ),
-                        Err(e) => {
-                            let message = format!(
-                                "ERROR WRITING FILE/DIRECTORY {}, message: {e}",
-                                &path.to_str().unwrap_or("[could not display path]")
-                            );
-                            if cfg!(test) {
-                                // Panic can only occur in internal testing mode when panics are expected
-                                panic!("{message}");
-                            } else {
-                                warn!("{message}");
-                            }
-                        }
-                    }
-                }
+                    .to_str()
+                    .unwrap_or("[could not display path]")
+            );
+            if cfg!(test) {
+                // Panic can only occur in internal testing mode when panics are expected
+                panic!("{message}");
+            } else {
+                warn!("{message}");
             }
-        }
+            // We cannot write any outputs, so return without doing anything
+            return;
+        };
+
+        let times: Vec<_> = (start_time..end_time)
+            .step_by(step_size.unwrap_or(1))
+            .collect();
+
+        let _: Vec<()> = times
+            .par_iter()
+            .map(|time| self.make_observation(*time))
+            .collect();
 
         for output in &self.outputs {
             match output.flush() {
                 Ok(()) => (),
                 Err(e) => warn!("{e}"),
             };
+        }
+    }
+
+    /// Makes a single observation to help with parallel computation
+    fn make_observation(&self, time: i128) {
+        info!("Calulating observations for t={time}");
+        for observatory in &self.observatories {
+            let path = self
+                .output_file_root
+                .join(format!("{}/{time:010}", observatory.get_name()));
+            let observations = observatory.observe(time as Float);
+            for output in &self.outputs {
+                // Write the observations to file, recovering on errors
+                // HACK: Should remove this match statement and return an error on writing
+                match output.write_observations(
+                    &observations,
+                    &observatory.get_name(),
+                    time,
+                    &self.output_file_root,
+                ) {
+                    Ok(()) => info!(
+                        "File {} was written successfully",
+                        &path.to_str().unwrap_or("[could not display path]")
+                    ),
+                    Err(e) => {
+                        let message = format!(
+                            "ERROR WRITING FILE/DIRECTORY {}, message: {e}",
+                            &path.to_str().unwrap_or("[could not display path]")
+                        );
+                        if cfg!(test) {
+                            // Panic can only occur in internal testing mode when panics are expected
+                            panic!("{message}");
+                        } else {
+                            warn!("{message}");
+                        }
+                    }
+                }
+            }
         }
     }
 

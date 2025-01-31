@@ -125,6 +125,7 @@ where
     T: Projection,
     T: Clone,
     T: Debug,
+    T: Sync,
 {
     /// Outputs [`Self::consume_observation`] to a given file.
     fn write_observations(

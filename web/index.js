@@ -1,4 +1,5 @@
 import init, {
+  initThreadPool,
   generate_observations_from_json,
   generate_universe,
 } from "./pkg/astrolabe.js";
@@ -85,4 +86,8 @@ console.debug(firstNavButton);
 
 console.debug("Initializing wasm modules");
 await init();
+
+// TODO: add support for web workers
+
+//await initThreadPool(navigator.hardwareConcurrency);
 console.debug("Finished initializing wasm modules");
