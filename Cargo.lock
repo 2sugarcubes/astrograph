@@ -88,6 +88,7 @@ dependencies = [
  "rand",
  "rand_distr",
  "rand_xorshift",
+ "rayon",
  "serde",
  "serde_json",
  "svg",
