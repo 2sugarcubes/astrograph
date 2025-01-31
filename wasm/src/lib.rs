@@ -19,6 +19,7 @@ use wasm_bindgen::prelude::*;
 use output::Web;
 mod output;
 
+pub use wasm_bindgen_rayon::init_thread_pool;
 /// # Errors
 /// Reutrns an error if root or observatories are not valid representations of their values i.e. missing
 /// required fields
