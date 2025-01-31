@@ -41,7 +41,7 @@ impl Output for Web {
     fn flush(&self) -> Result<(), std::io::Error> {
         if let Ok(hash_map) = self.observations.read() {
             let mut observations: Vec<_> = hash_map.par_iter().collect();
-            observations.par_sort_by_key(|x| x.0);
+            observations.par_sort_unstable_by_key(|x| x.0);
             for (time, svg) in observations {
                 draw_observation(*time, svg.to_string());
             }
