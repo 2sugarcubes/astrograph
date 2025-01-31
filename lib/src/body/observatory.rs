@@ -49,7 +49,7 @@ impl Observatory {
                     let local_coordinates =
                         Vector3::from(quaternion::rotate_vector(self.location, (*pos).into()));
                     // FIXME: adjust z based on the body's radius since we aren't observing from the
-                    // centre of the body
+                    // center of the body
 
                     // Filter out bodies below the horizon
                     if local_coordinates.z >= 0.0 {

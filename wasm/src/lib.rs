@@ -102,7 +102,7 @@ pub fn generate_universe() -> JsValue {
     .unwrap()
 }
 
-/// A kind of hacky solution to the problem of serde json not recognising typetaged dynamics when
+/// A kind of hacky solution to the problem of serde json not recognizing typetaged dynamics when
 /// targeting a wasm arch
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]

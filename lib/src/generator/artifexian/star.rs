@@ -85,7 +85,7 @@ impl MainSequenceStar {
                 // Make a second arm, half a turn from the primary
                 rng.sample(d) * 0.25 + 0.5
             } + 1.0 + radius * 1.352 / (WIDTH_OF_MILKY_WAY)) // Make theta map out one and a half turns on
-                                                             // the way from the centre to the outer rim
+                                                             // the way from the center to the outer rim
         } else {
             random_angle(rng)
         };
