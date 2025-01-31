@@ -48,7 +48,9 @@ pub struct Body {
 
 impl From<Body> for Arc {
     fn from(value: Body) -> Self {
-        Arc::new(RwLock::new(value))
+        let result = Arc::new(RwLock::new(value));
+        Body::hydrate_all(&result, &None);
+        result
     }
 }
 
@@ -157,7 +159,7 @@ impl Body {
         let weak = StdArc::downgrade(this);
         if let Ok(this) = this.read() {
             for child in &this.children {
-                Self::hydrate_all(&child, &Some(weak.clone()));
+                Self::hydrate_all(child, &Some(weak.clone()));
             }
         }
     }
@@ -356,6 +358,7 @@ mod tests {
         let result = (bodies[0].clone(), bodies.last().unwrap().clone());
         generate_children(3, [DOWNWARDS_STEP, 0.0, 0.0].into(), result.1.clone());
 
+        Body::hydrate_all(&result.0, &None);
         result
     }
     const UPWARDS_STEP: Float = 13.0;

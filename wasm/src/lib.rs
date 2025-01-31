@@ -30,7 +30,7 @@ pub fn generate_observations_from_json(
 ) -> Result<(), JsError> {
     // Create root body (and whole body tree)
     let fake_root: self::Body = serde_json::from_str(root)?;
-    let root = astrolabe::body::Body::try_from(fake_root).unwrap().into();
+    let root = astrolabe::body::Body::from(fake_root).into();
 
     astrolabe::body::Body::hydrate_all(&root, &None);
 
@@ -106,10 +106,9 @@ struct Body {
     name: Option<String>,
 }
 
-impl TryFrom<Body> for astrolabe::body::Body {
-    type Error = astrolabe::body::BodyBuilderError;
-    fn try_from(value: Body) -> Result<Self, Self::Error> {
-        astrolabe::body::BodyBuilder::default()
+impl From<Body> for astrolabe::body::Body {
+    fn from(value: Body) -> Self {
+        match astrolabe::body::BodyBuilder::default()
             .parent(None)
             .name(value.name.map_or(astrolabe::body::Name::Unknown, |n| {
                 astrolabe::body::Name::Named(n.into())
@@ -118,7 +117,7 @@ impl TryFrom<Body> for astrolabe::body::Body {
                 value
                     .children
                     .into_iter()
-                    .filter_map(|c| astrolabe::body::Body::try_from(c).ok().map(|b| b.into()))
+                    .map(|c| astrolabe::body::Body::from(c).into())
                     .collect(),
             )
             .radius(value.radius)
@@ -128,6 +127,10 @@ impl TryFrom<Body> for astrolabe::body::Body {
                 Dynamic::Keplerian(f) => Box::new(f),
             })
             .build()
+        {
+            Ok(b) => b,
+            Err(_) => unreachable!("All generated bodies are valid"),
+        }
     }
 }
 
