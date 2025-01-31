@@ -31,3 +31,5 @@ getrandom = { version = "0.2", features = ["js"] }
 gloo-utils = { version = "0.1", features = ["serde"] }
 svg = "0.18"
 itertools = "0.8"
+rayon = "1.8"
+wasm-bindgen-rayon = "1.2"
