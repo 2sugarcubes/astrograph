@@ -1,7 +1,5 @@
-use std::sync::{Arc, RwLock};
-
 use astrolabe::{
-    body::{observatory, Body},
+    body::observatory,
     generator::{artifexian::ArtifexianBuilder, Generator},
     program::ProgramBuilder,
 };

@@ -104,6 +104,7 @@ mod tests {
         let earth = Body::new(Some(sun.clone()), Fixed::new([2.0, 0.0, 0.0].into()));
         let _moon = Body::new(Some(earth.clone()), Fixed::new([-1.0, 0.0, 0.0].into()));
 
+        Body::hydrate_all(&sun, &None);
         let time = 0.0;
 
         let observations: Vec<_> = earth
