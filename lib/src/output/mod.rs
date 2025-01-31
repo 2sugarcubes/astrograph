@@ -14,7 +14,7 @@ pub mod logger;
 
 /// The trait for structs that output to a file. It may be made more general in future to better
 /// accommodate non-file outputs e.g. console loggers, or outputs to screen or streams
-pub trait Output: DynClone + Debug {
+pub trait Output: DynClone + Debug + Sync {
     /// # Errors
     /// implementations may panic if there is an error in the filesystem e.g. writing is not
     /// allowed for a user in a specific directory, or one or more of the directories are files
