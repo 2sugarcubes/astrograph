@@ -1,7 +1,7 @@
-.PHONY: help
+.PHONY: help wasm test pre-push serve portable-build
 
 wasm: ## Build wasm target
-	@wasm-pack build --target web --release -d ../web/pkg wasm
+	@wasm-pack build --target web --release -d ../web/pkg --out-name astrolabe wasm
 
 test: ## Run cargo tests
 	@cargo test
