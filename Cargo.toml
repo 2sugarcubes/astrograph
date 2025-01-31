@@ -42,3 +42,6 @@ strip = "none"
 lto = true
 codegen-units = 1
 incremental = false
+
+[workspace.metadata.typos]
+default.locale = "en-us"
