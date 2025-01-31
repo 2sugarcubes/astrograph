@@ -16,6 +16,8 @@ pub struct Observatory {
     location: Quaternion<Float>,
     /// The body that observations are being made from
     body: Arc,
+    /// Name of the observatory, either user defined or derived from the body ID, latitude and
+    /// longitude
     name: Result<String, Vec<usize>>,
 }
 
@@ -83,8 +85,12 @@ impl Observatory {
 #[derive(Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
 pub struct WeakObservatory {
+    /// Latitude and longitude of the observatory
     location: Spherical<Float>,
+    /// ID of the body that this observatory is on
     body_id: Vec<usize>,
+    /// The user defined name. If none it is treated as a flag to generate a name based on the body
+    /// ID, latitude and longitude
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
 }
@@ -110,6 +116,7 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
     )
 }
 
+/// Converts a ID to a string of dash ("-") seperated values that is adequite for generating names
 pub(super) fn to_name(id: &[usize]) -> String {
     if id.is_empty() {
         String::new()

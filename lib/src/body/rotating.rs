@@ -17,7 +17,10 @@ pub struct Rotating {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 struct SerializableRotating {
+    /// Time taken for the body to rotate 360 degrees. Note: different from the [solar day](https://en.wikipedia.org/wiki/Synodic_day) which is
+    /// the time taken for the parent body to reach the same meridian.
     sidereal_period: Float,
+    /// Location of the true-north pole
     axis: Spherical<Float>,
 }
 

@@ -46,6 +46,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 }
 
+/// Sets up the logging facade based on how quiet or verbose the user would like it
 fn setup_log(quiet: u8, verbosity: u8) {
     let mut builder = pretty_env_logger::env_logger::Builder::from_default_env();
 
@@ -64,6 +65,7 @@ fn setup_log(quiet: u8, verbosity: u8) {
     builder.init();
 }
 
+/// Builds a new universe based on the user defined parameters
 fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), Box<dyn Error>> {
     let seed_num = seed
         .map_or_else(
@@ -98,6 +100,7 @@ fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), 
     Ok(())
 }
 
+/// Simulates the given universe
 fn simulate(
     start_time: i128,
     end_time: i128,

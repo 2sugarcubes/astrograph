@@ -16,12 +16,18 @@ use planet::Planet;
 use planet::PlanetType;
 use star::MainSequenceStar;
 
+/// Logic for generating bodies that orbit planets
 mod moon;
+/// Logic for generating bodies that orbit stars
 mod planet;
+/// Logic for generating bodies that are "fixed" in space (Have a very long period that would
+/// appear fixed over short observational periods <100 years)
 mod star;
 
 #[derive(Clone, Copy, Debug, Builder, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Artifexian {
+    /// Number of stars to generate
+    #[builder(default = 1_000_000)]
     star_count: usize,
 }
 
@@ -112,22 +118,27 @@ impl Generator for Artifexian {
     }
 }
 
+/// Convert Astronomical Units (AU) to Light Seconds (ls)
 fn au_to_ls(au: Float) -> Float {
     au * 499.0
 }
 
+/// Convert solar masses to jupiter masses
 fn solar_masses_to_jupiter_masses(sm: Float) -> Float {
     sm * 1048.0
 }
 
+/// Convert earth masses to jupiter masses
 fn earth_masses_to_jupiter_masses(em: Float) -> Float {
     em * 0.003_146
 }
 
+/// Convert Earth Radii to Light Seconds (ls)
 fn earth_radii_to_ls(er: Float) -> Float {
     er * 0.021_251_398
 }
 
+/// Generate a random angle between 0 and Tau
 fn random_angle<G: rand::Rng>(rng: &mut G) -> Float {
     rng.gen_range(0.0..float::TAU)
 }

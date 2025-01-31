@@ -4,14 +4,21 @@ use coordinates::{prelude::Spherical, traits::Positional};
 
 use crate::{body::Arc, consts::float, Float, LocalObservation};
 
+/// Grid applied to ovservations to speed up eclipse detection
 pub struct CollisionGrid {
+    /// Grid of observations
     body_grid: [std::sync::Arc<[LocalObservation]>; Self::NUMBER_OF_CELLS],
 }
 
 impl CollisionGrid {
+    /// Number of cells per row around the sphere (same as the number of columns)
     const CELLS_PER_ROW: usize = 16;
+    /// Number of rows around the spheres
     const ROWS_PER_SPHERE: usize = 8;
+    /// Total number of cells
     const NUMBER_OF_CELLS: usize = Self::CELLS_PER_ROW * Self::ROWS_PER_SPHERE;
+
+    /// Generate a new collision grid
     pub(super) fn new(observed_bodies: &[LocalObservation]) -> Self {
         let mut body_grid: [Vec<_>; Self::NUMBER_OF_CELLS] = match (0..Self::NUMBER_OF_CELLS)
             .map(|_| Vec::with_capacity(observed_bodies.len() / Self::NUMBER_OF_CELLS))
@@ -80,6 +87,7 @@ impl CollisionGrid {
         }
     }
 
+    /// See if the near body is in front of the far body
     fn check_collision(
         near_point: &(Float, Spherical<Float>),
         far_point: &(Float, Spherical<Float>),
@@ -104,6 +112,7 @@ impl CollisionGrid {
         }
     }
 
+    /// Get the index that this body is inside
     #[allow(clippy::cast_sign_loss)] // abs is called before conversion
     #[allow(clippy::cast_possible_truncation)] // floor is called before conversion
     fn get_face_id(loc: &Spherical<Float>) -> usize {
@@ -121,6 +130,7 @@ impl CollisionGrid {
         layer_count + x_count
     }
 
+    /// Get adjacency faces to this face to detect bodies that may bleed over
     fn get_adjacent_faces(id: usize) -> Vec<usize> {
         let row_number = id / Self::CELLS_PER_ROW;
         if row_number > Self::ROWS_PER_SPHERE {

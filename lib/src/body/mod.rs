@@ -43,6 +43,8 @@ pub struct Body {
     pub(crate) radius: Option<Float>,
     //color: [u8,h8,u8],
     #[serde(skip_serializing_if = "Name::is_calculated", default)]
+    /// (Preferably unique) Name of the body. Is either user defined or generated from the ID of
+    /// the body
     pub(crate) name: Name,
 }
 
@@ -65,6 +67,8 @@ pub enum Name {
 }
 
 impl Name {
+    /// Returns true if this value could be calculated from a body tree. i.e. it does not have a
+    /// user defined name
     fn is_calculated(this: &Self) -> bool {
         match this {
             Self::Id(_) | Self::Unknown => true,

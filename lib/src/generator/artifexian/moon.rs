@@ -1,23 +1,32 @@
 use super::{dynamic, float, random_angle, Arc, Body, Float, Planet, PlanetType};
 
+/// Type of moon
 #[derive(Debug, Clone)]
 enum MoonType {
+    /// Major Rocky moon e.g. Luna
     MajorRocky,
+    /// Minor Rocky moon e.g. Deimos
     MinorRocky,
+    /// Major Icy moon e.g. Europa
     MajorIcy,
+    /// Minor Icy moon e.g. most bodies in saturn's rings
     MinorIcy,
 }
 
 #[derive(Debug, Clone)]
 pub(super) struct Moon {
+    /// Radius of the moon in ls
     radius: Float,
+    /// Mass of the moon in jupiter masses
     mass: Float,
+    /// Semi-major axis of the orbit in ls
     semi_major_axis: Float,
+    /// Kind of the moon, e.g. minor icy
     kind: MoonType,
 }
 
 impl Moon {
-    // Earth's moon's density in jupiter masses per cubic light second
+    /// Earth's moon's density in jupiter masses per cubic light second
     const LUNA_DENSITY: Float = 47.47;
 
     /// # Returns
@@ -109,6 +118,7 @@ impl Moon {
         })
     }
 
+    /// Generate "group a moons" for a gas giant
     pub(super) fn new_group_a_moons<G: rand::Rng>(rng: &mut G, parent: &Planet) -> Vec<Self> {
         let mut result = Vec::new();
 
@@ -132,6 +142,7 @@ impl Moon {
         result
     }
 
+    /// Generate "group b moons" for a gas giant
     pub(super) fn new_group_b_moons<G: rand::Rng>(rng: &mut G, parent: &Planet) -> Vec<Self> {
         let mut result = Vec::new();
 
@@ -159,6 +170,7 @@ impl Moon {
         result
     }
 
+    /// Convert this moon to a body
     pub(super) fn to_body<G: rand::Rng>(
         &self,
         rng: &mut G,
