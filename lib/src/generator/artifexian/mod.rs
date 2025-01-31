@@ -74,10 +74,10 @@ impl Generator for Artifexian {
                         {
                             // The next planet isn't too close to the habitable planet
                             planets.push(habitable_planet.clone());
-                            planets.push(Planet::new_terrestial(rng, distance));
+                            planets.push(Planet::new_terrestrial(rng, distance));
                             has_added_habitable_planet = true;
                         } else {
-                            planets.push(Planet::new_terrestial(rng, distance));
+                            planets.push(Planet::new_terrestrial(rng, distance));
                         }
 
                         // TODO break when distance between bodies is less than 0.15
@@ -86,7 +86,7 @@ impl Generator for Artifexian {
                 } else {
                     // We don't have a habitable planet to add
                     while star.planetary_zone.contains(&distance) {
-                        planets.push(Planet::new_terrestial(rng, distance));
+                        planets.push(Planet::new_terrestrial(rng, distance));
 
                         // TODO break when distance between bodies is less than 0.15
                         distance /= rng.gen_range(1.4..2.0);

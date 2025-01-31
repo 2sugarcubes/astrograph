@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 #[derive(Clone, Debug)]
 pub struct Web {
     svg: Svg<projection::StatelessOrthographic>,
-    // PERF: switch to a vector with an inteligent offset to speed up hashing since we know the
+    // PERF: switch to a vector with an intelligent offset to speed up hashing since we know the
     // that observations will be within a set range
     observations: std::sync::Arc<std::sync::RwLock<std::collections::HashMap<i128, svg::Document>>>,
 }

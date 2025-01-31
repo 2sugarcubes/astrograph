@@ -76,7 +76,7 @@ impl Rotating {
         let obliquity_rotation = quaternion::rotation_from_to(self.axis.into(), Vector3::UP.into());
         let around_axis_rotation = self.get_rotation(time);
 
-        // Convert locations to equitorial coordinates. Though the prime meridian is used instead
+        // Convert locations to equatorial coordinates. Though the prime meridian is used instead
         // of the march equinox to mark zero longitude
         for (_, loc) in observations.iter_mut() {
             // Get the axis in the corrext spot (the z axis)

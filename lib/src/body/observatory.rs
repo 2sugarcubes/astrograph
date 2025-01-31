@@ -41,7 +41,7 @@ impl Observatory {
         if let Ok(body) = self.body.read() {
             let raw_observations = body.get_observations_from_here(time);
 
-            // Rotate observations to put them in the local coordinate space from equitorial coordinate
+            // Rotate observations to put them in the local coordinate space from equatorial coordinate
             // space
             raw_observations
                 .iter()
@@ -116,7 +116,7 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
     )
 }
 
-/// Converts a ID to a string of dash ("-") seperated values that is adequite for generating names
+/// Converts a ID to a string of dash ("-") separated values that is adequite for generating names
 pub(super) fn to_name(id: &[usize]) -> String {
     if id.is_empty() {
         String::new()
