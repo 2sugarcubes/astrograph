@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
+/// Struct to describe the arguments for CLAP
 #[derive(Parser)]
 #[command(version, about)]
 #[command(propagate_version = true)]
@@ -25,6 +26,7 @@ pub(super) struct Arguments {
     pub(super) sub_command: Commands,
 }
 
+/// Commands for astrolabe
 #[derive(Parser)]
 pub(super) enum Commands {
     /// Build a universe

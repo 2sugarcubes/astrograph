@@ -1,3 +1,5 @@
+//! Facade layer to link from javascript to the celestial body simulation engine
+
 use astrolabe::{
     body::{
         observatory::{self, Observatory, WeakObservatory},
@@ -57,6 +59,7 @@ pub fn generate_observations_from_json(
     Ok(())
 }
 
+/// Generates a universe from the given seed
 #[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
@@ -71,6 +74,7 @@ pub fn generate_universe_from_seed(seed: u64) -> JsValue {
     .unwrap()
 }
 
+/// Generates a universe with a random seed
 #[cfg_attr(any(target_arch = "wasm32", target_arch = "wasm64"), wasm_bindgen)]
 #[must_use]
 #[allow(clippy::missing_panics_doc)] // Should not be able to panic
@@ -134,8 +138,12 @@ impl From<Body> for astrolabe::body::Body {
     }
 }
 
+/// List of dynamics that are supported
 #[derive(Clone, Debug, Deserialize)]
+#[non_exhaustive]
 enum Dynamic {
+    /// Fixed bodies
     Fixed(Fixed),
+    /// Keplerian bodies
     Keplerian(Keplerian),
 }
