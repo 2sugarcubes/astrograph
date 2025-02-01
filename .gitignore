@@ -1,1 +1,11 @@
 /target
+.vscode
+**/*.tsv
+**/*.ods
+**/*.svg
+**/*.csv
+web/pkg/
+.cargo/config.toml
+tarpaulin-report.html
+perf.data*
+cliff.toml

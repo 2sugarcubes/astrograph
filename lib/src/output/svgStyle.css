@@ -1,0 +1,27 @@
+text {
+  fill: #888;
+  font-size: 0.1%;
+  font-family: serif;
+}
+
+rectangle {
+  fill: #000;
+}
+
+circle {
+  fill: #fff;
+}
+
+text.heading {
+  fill: #fff;
+  font-size: 0.5%;
+  font-family: monospace;
+}
+
+line,
+circle.outer {
+  fill: none;
+  stroke: #555;
+  stroke-width: 0.01;
+  stroke-opacity: 1;
+}

@@ -1,6 +1,47 @@
-[package]
-name = "astrolabe"
+[workspace]
+members = ["lib", "bin", "wasm"]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
+license = "LGPL-3.0-or-later"
+description = "A library dedicated to provinding astronomical predictions of non-chaotic and deterministic bodies."
+repository = "https://github.com/2sugarcubes/astrolabe"
+keywords = ["astronomy", "physics", "mathmatics", "simulation"]
+categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
+authors = ["Lucy <105619409+2sugarcubes@users.noreply.github.com>"]
 
-[dependencies]
+[profile.release]
+opt-level = 3
+debug = false
+strip = "none"
+lto = true
+codegen-units = 1
+incremental = false
+panic = "abort"
+
+[profile.release.package.astrolabe-wasm]
+opt-level = "z"
+
+[profile.dev]
+opt-level = 0
+debug = 0
+lto = false
+codegen-units = 256
+incremental = true
+
+[profile.dev.package.astrolabe-wasm]
+opt-level = "z"
+
+[profile.bench]
+inherits = "release"
+opt-level = 3
+debug = false
+strip = "none"
+lto = true
+codegen-units = 1
+incremental = false
+
+[workspace.metadata.typos]
+default.locale = "en-us"
