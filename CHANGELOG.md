@@ -1,11 +1,13 @@
 # Changelog
 
-## 0.1.0 - 2025-02-XX
+## 0.1.0 - 2025-02-01
 
 _First release._
 
 ### Added
 
+- Add READMEs to all workspace members ([`2759c14`](https://github.com/2sugarcubes/astrolabe/commit/2759c14)) (Lucy Magnusson)
+- Fix Create directories when generating universes ([`2759c14`](https://github.com/2sugarcubes/astrolabe/commit/21ce346)) (Lucy Magnusson)
 - Generate universes from random number generators ([`21ce346`](https://github.com/2sugarcubes/astrolabe/commit/21ce346)) (Lucy Magnusson)
 - New facade for running observatories, body trees, and outputs ([`3142188`](https://github.com/2sugarcubes/astrolabe/commit/3142188)) (Lucy Magnusson)
 - Add multi-threading ([`2760c15`](https://github.com/2sugarcubes/astrolabe/commit/2760c15)) (Lucy Magnusson)
