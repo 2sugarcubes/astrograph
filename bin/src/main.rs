@@ -67,6 +67,16 @@ fn setup_log(quiet: u8, verbosity: u8) {
 
 /// Builds a new universe based on the user defined parameters
 fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), Box<dyn Error>> {
+    if let Some(path) = output.parent() {
+        if let Err(e) = fs::create_dir_all(path) {
+            error!(
+                "{e}, while creating output path '{}'",
+                path.to_str().unwrap_or("CANNOT DISPLAY PATH")
+            );
+            return Err(e.into());
+        }
+    }
+
     let seed_num = seed
         .map_or_else(
             || rand::thread_rng().clone().gen(),
