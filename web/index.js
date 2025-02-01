@@ -1,5 +1,5 @@
 import init, {
-  initThreadPool,
+  //initThreadPool,
   generate_observations_from_json,
   generate_universe,
 } from "./pkg/astrolabe.js";
