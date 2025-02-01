@@ -1,5 +1,9 @@
 # Changelog
 
+## NEXT RELEASE
+
+<!-- TODO: -->
+
 ## 0.1.0 - 2025-02-01
 
 _First release._
