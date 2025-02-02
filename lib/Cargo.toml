@@ -1,5 +1,5 @@
 [package]
-name = "astrolabe"
+name = "astrograph"
 readme = "README.md"
 version.workspace = true
 edition.workspace = true

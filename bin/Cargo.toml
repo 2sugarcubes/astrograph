@@ -1,5 +1,5 @@
 [package]
-name = "astrolabe-bin"
+name = "astrograph-bin"
 readme = "README.md"
 version.workspace = true
 edition.workspace = true
@@ -11,7 +11,7 @@ categories.workspace = true
 authors.workspace = true
 
 [[bin]]
-name = "astrolabe"
+name = "astrograph"
 path = "src/main.rs"
 bench = false
 
@@ -28,11 +28,11 @@ pretty_env_logger = "0.5.0"
 
 [target.'cfg(not(any(target_arch = "x86", target_arch = "i686")))'.dependencies]
 # 64 bit library
-astrolabe = { path = "../lib", version = "0.1", features = ["f64"] }
+astrograph = { path = "../lib", version = "0.1", features = ["f64"] }
 
 [target.'cfg(any(target_arch = "x86", target_arch = "i686"))'.dependencies]
 # 32 bit library
-astrolabe = { path = "../lib", version = "0.1", default-features = false }
+astrograph = { path = "../lib", version = "0.1", default-features = false }
 
 [build-dependencies]
 clap_mangen = "0.2.26"

@@ -1,4 +1,4 @@
-use astrolabe::{
+use astrograph::{
     body::observatory,
     generator::{artifexian::ArtifexianBuilder, Generator},
     program::ProgramBuilder,
@@ -9,10 +9,10 @@ use rand::SeedableRng;
 #[derive(Clone, Debug, Default)]
 struct Output;
 
-impl astrolabe::output::Output for Output {
+impl astrograph::output::Output for Output {
     fn write_observations(
         &self,
-        _observations: &[astrolabe::LocalObservation],
+        _observations: &[astrograph::LocalObservation],
         _observatory_name: &str,
         _time: i128,
         _output_path_root: &std::path::Path,
@@ -31,9 +31,9 @@ fn observations(c: &mut Criterion) {
         .unwrap()
         .generate(&mut rng);
 
-    astrolabe::body::Body::hydrate_all(&root, &None);
+    astrograph::body::Body::hydrate_all(&root, &None);
 
-    let observatories: Vec<astrolabe::body::observatory::WeakObservatory> = serde_json::from_str(
+    let observatories: Vec<astrograph::body::observatory::WeakObservatory> = serde_json::from_str(
         include_str!("../../assets/test/generated/observatories.json"),
     )
     .unwrap();

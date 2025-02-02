@@ -1,4 +1,4 @@
-use astrolabe::{
+use astrograph::{
     dynamic::keplerian::Keplerian,
     generator::{artifexian::ArtifexianBuilder, Generator},
     Float,

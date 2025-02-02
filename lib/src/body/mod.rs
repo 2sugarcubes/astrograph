@@ -173,8 +173,8 @@ impl Body {
     /// # Examples
     ///
     /// ```
-    /// use astrolabe::dynamic::fixed::Fixed;
-    /// use astrolabe::body::Body;
+    /// use astrograph::dynamic::fixed::Fixed;
+    /// use astrograph::body::Body;
     /// use coordinates::prelude::{Vector3, ThreeDimensionalConsts};
     /// // Root returns an empty Vector
     /// let body = Body::new(None, Fixed::new(Vector3::ORIGIN));
