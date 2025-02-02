@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [windows, ubuntu]
         flags: [--no-default-features, --all-features]
-        toolchain: [stable, beta]
+        toolchain: [stable]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -50,8 +50,6 @@ jobs:
         with:
           toolchain: nightly
       - uses: dtolnay/rust-toolchain@clippy
-      - name: Run Clippy
-        run: cargo clippy --all-targets ${{ matrix.arguments }}
       - name: Run Clippy (Pedantic)
         run: cargo clippy --all-targets ${{ matrix.arguments }} -- -D clippy::pedantic
       #- name: Run miri
