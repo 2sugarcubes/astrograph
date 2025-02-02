@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: jetli/wasm-pack-action@v0.4.0
       - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
-      - run: cargo build --bin astrolabe
+      - run: cargo build --bin astrograph
       - name: Add to release
         uses: softprops/action-gh-release@v2
         with:
@@ -39,73 +39,73 @@ jobs:
             runs-on: ubuntu-20.04
             target: x86_64-unknown-linux-musl
             extra-files: |
-              completions/_astrolabe
-              completions/astrolabe.bash
-              completions/astrolabe.elv
-              completions/astrolabe.fish
-              completions/astrolabe.1
+              completions/_astrograph
+              completions/astrograph.bash
+              completions/astrograph.elv
+              completions/astrograph.fish
+              completions/astrograph.1
 
           - os-name: Linux-i686
             runs-on: ubuntu-20.04
             target: i686-unknown-linux-musl
             extra-files: |
-              completions/_astrolabe
-              completions/astrolabe.bash
-              completions/astrolabe.elv
-              completions/astrolabe.fish
-              completions/astrolabe.1
+              completions/_astrograph
+              completions/astrograph.bash
+              completions/astrograph.elv
+              completions/astrograph.fish
+              completions/astrograph.1
 
           - os-name: Linux-aarch64
             runs-on: ubuntu-latest
             target: aarch64-unknown-linux-musl
             extra-files: |
-              completions/_astrolabe
-              completions/astrolabe.bash
-              completions/astrolabe.elv
-              completions/astrolabe.fish
-              completions/astrolabe.1
+              completions/_astrograph
+              completions/astrograph.bash
+              completions/astrograph.elv
+              completions/astrograph.fish
+              completions/astrograph.1
 
           - os-name: Windows-x86_64
             runs-on: windows-latest
             target: x86_64-pc-windows-msvc
             extra-files: |
-              completions/_astrolabe.ps1
+              completions/_astrograph.ps1
 
           - os-name: Windows-aarch64
             runs-on: windows-latest
             target: aarch64-pc-windows-msvc
             extra-files: |
-              completions/_astrolabe.ps1
+              completions/_astrograph.ps1
 
           - os-name: Windows-i686
             runs-on: windows-latest
             target: i686-pc-windows-msvc
             extra-files: |
-              completions/_astrolabe
-              completions/astrolabe.bash
-              completions/astrolabe.elv
-              completions/astrolabe.fish
-              completions/astrolabe.1
+              completions/_astrograph
+              completions/astrograph.bash
+              completions/astrograph.elv
+              completions/astrograph.fish
+              completions/astrograph.1
 
           - os-name: macOS-x86_64
             runs-on: macos-latest
             target: x86_64-apple-darwin
             extra-files: |
-              completions/_astrolabe
-              completions/astrolabe.bash
-              completions/astrolabe.elv
-              completions/astrolabe.fish
-              completions/astrolabe.1
+              completions/_astrograph
+              completions/astrograph.bash
+              completions/astrograph.elv
+              completions/astrograph.fish
+              completions/astrograph.1
 
           - os-name: macOS-aarch64
             runs-on: macos-latest
             target: aarch64-apple-darwin
             extra-files: |
-              completions/_astrolabe
-              completions/astrolabe.bash
-              completions/astrolabe.elv
-              completions/astrolabe.fish
-              completions/astrolabe.1
+              completions/_astrograph
+              completions/astrograph.bash
+              completions/astrograph.elv
+              completions/astrograph.fish
+              completions/astrograph.1
 
     runs-on: ${{ matrix.platform.runs-on }}
     needs: [wasm]
@@ -116,16 +116,16 @@ jobs:
         uses: houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: "--bin astrolabe --release --locked"
+          args: "--bin astrograph --release --locked"
           strip: true
       - name: Get completions
         run: |
           mkdir completions
-          cp target/${{ matrix.platform.target }}/release/build/astrolabe-bin-*/out/* completions/
+          cp target/${{ matrix.platform.target }}/release/build/astrograph-bin-*/out/* completions/
       - name: Publish artifacts and release
         uses: houseabsolute/actions-rust-release@v0.0.4
         with:
-          executable-name: astrolabe
+          executable-name: astrograph
           target: ${{ matrix.platform.target }}
           archive-name: ${{ matrix.platform.os-name }}
           # Changelog and readme provided by wasm-and-completions

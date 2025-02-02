@@ -2,7 +2,7 @@ import init, {
   //initThreadPool,
   generate_observations_from_json,
   generate_universe,
-} from "./pkg/astrolabe.js";
+} from "./pkg/astrograph.js";
 
 async function loadJsonFile(url, callback) {
   fetch(url)

@@ -1,4 +1,4 @@
-use astrolabe::{
+use astrograph::{
     body::observatory::Observatory,
     output::svg::Svg,
     program::{ProgramBuilder, ProgramBuilderError},
@@ -18,8 +18,8 @@ fn file_output() -> Result<(), ProgramBuilderError> {
 
     let output = Svg::new(projection::StatelessOrthographic());
     let (root_body, observing_body) =
-        astrolabe::testing::make_toy_example(astrolabe::testing::DEFAULT_SEED);
-    astrolabe::body::Body::hydrate_all(&root_body, &None);
+        astrograph::testing::make_toy_example(astrograph::testing::DEFAULT_SEED);
+    astrograph::body::Body::hydrate_all(&root_body, &None);
 
     let observatories: Vec<Observatory> = [
         Spherical::UP,

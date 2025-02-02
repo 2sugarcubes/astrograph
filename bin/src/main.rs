@@ -7,7 +7,7 @@ use std::{
     sync::{Arc, RwLock},
 };
 
-use astrolabe::{
+use astrograph::{
     body::{observatory::WeakObservatory, Body},
     generator::{artifexian::ArtifexianBuilder, Generator},
     output::svg::Svg,
@@ -136,10 +136,10 @@ fn simulate(
             }),
     ) {
         trace!("Reading from parts");
-        let root: astrolabe::body::Arc = Arc::new(RwLock::new(universe));
+        let root: astrograph::body::Arc = Arc::new(RwLock::new(universe));
 
         trace!("Hydrating all bodies");
-        astrolabe::body::Body::hydrate_all(&root, &None);
+        astrograph::body::Body::hydrate_all(&root, &None);
 
         trace!("Building the program around these observatories and bodies");
         let mut program_builder = ProgramBuilder::default();
@@ -152,7 +152,7 @@ fn simulate(
         );
 
         for o in observatories {
-            program_builder.add_observatory(astrolabe::body::observatory::to_observatory(o, &root));
+            program_builder.add_observatory(astrograph::body::observatory::to_observatory(o, &root));
         }
 
         program_builder.root_body(root).build().unwrap()

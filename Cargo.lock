@@ -74,7 +74,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4cea652ffbedecf29e9cd41bb4c066881057a42c0c119040f022802b26853e77"
 
 [[package]]
-name = "astrolabe"
+name = "astrograph"
 version = "0.1.0"
 dependencies = [
  "assert_float_eq",
@@ -97,10 +97,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "astrolabe-bin"
+name = "astrograph-bin"
 version = "0.1.0"
 dependencies = [
- "astrolabe",
+ "astrograph",
  "clap",
  "clap_complete",
  "clap_mangen",
@@ -113,10 +113,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "astrolabe-wasm"
+name = "astrograph-wasm"
 version = "0.1.0"
 dependencies = [
- "astrolabe",
+ "astrograph",
  "getrandom",
  "gloo-utils",
  "rand",

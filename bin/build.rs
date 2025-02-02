@@ -16,11 +16,11 @@ fn main() -> std::io::Result<()> {
     let mut buffer: Vec<u8> = Vec::default();
     man.render(&mut buffer)?;
 
-    std::fs::write(out_dir.join("astrolabe.1"), buffer)?;
+    std::fs::write(out_dir.join("astrograph.1"), buffer)?;
 
     // Generate completions
     for &shell in clap_complete::Shell::value_variants() {
-        let path = clap_complete::generate_to(shell, &mut cmd, "astrolabe", &out_dir)?;
+        let path = clap_complete::generate_to(shell, &mut cmd, "astrograph", &out_dir)?;
         println!("cargo::warning=Completion file for {shell: <10} has been generated at: {path:?}");
     }
 

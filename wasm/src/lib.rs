@@ -1,6 +1,6 @@
 //! Facade layer to link from javascript to the celestial body simulation engine
 
-use astrolabe::{
+use astrograph::{
     body::{
         observatory::{self, Observatory, WeakObservatory},
         rotating::Rotating,
@@ -39,9 +39,9 @@ pub fn generate_observations_from_json(
 
     // Create root body (and whole body tree)
     let fake_root: self::Body = serde_json::from_str(root)?;
-    let root = astrolabe::body::Body::from(fake_root).into();
+    let root = astrograph::body::Body::from(fake_root).into();
 
-    astrolabe::body::Body::hydrate_all(&root, &None);
+    astrograph::body::Body::hydrate_all(&root, &None);
 
     // Create weak observatories to avoid memory duplication
     let observatories: Vec<WeakObservatory> = serde_json::from_str(observatories)?;
@@ -123,18 +123,18 @@ struct Body {
     name: Option<String>,
 }
 
-impl From<Body> for astrolabe::body::Body {
+impl From<Body> for astrograph::body::Body {
     fn from(value: Body) -> Self {
-        match astrolabe::body::BodyBuilder::default()
+        match astrograph::body::BodyBuilder::default()
             .parent(None)
-            .name(value.name.map_or(astrolabe::body::Name::Unknown, |n| {
-                astrolabe::body::Name::Named(n.into())
+            .name(value.name.map_or(astrograph::body::Name::Unknown, |n| {
+                astrograph::body::Name::Named(n.into())
             }))
             .children(
                 value
                     .children
                     .into_iter()
-                    .map(|c| astrolabe::body::Body::from(c).into())
+                    .map(|c| astrograph::body::Body::from(c).into())
                     .collect(),
             )
             .radius(value.radius)
