@@ -64,7 +64,7 @@ impl Program {
             }
             // We cannot write any outputs, so return without doing anything
             return;
-        };
+        }
 
         let times: Vec<_> = (start_time..end_time)
             .step_by(step_size.unwrap_or(1))
@@ -79,7 +79,7 @@ impl Program {
             match output.flush() {
                 Ok(()) => (),
                 Err(e) => warn!("{e}"),
-            };
+            }
         }
     }
 
