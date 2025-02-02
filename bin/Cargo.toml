@@ -1,10 +1,10 @@
 [package]
 name = "astrograph-bin"
 readme = "README.md"
+description = "A binary dedicated to provinding astronomical predictions of non-chaotic and deterministic bodies."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description.workspace = true
 repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
