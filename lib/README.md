@@ -6,6 +6,8 @@
 [![GitHub Test Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrograph/tests.yml?label=tests)](https://github.com/2sugarcubes/astrograph/actions/workflows/tests.yml)
 ![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrograph/dev)
 [![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrograph)](https://github.com/2sugarcubes/astrograph/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
+[![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)
 
 A library for predicting the locations of astronomical bodies that are both deterministic and non-chaotic.
 
