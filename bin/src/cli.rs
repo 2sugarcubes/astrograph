@@ -26,7 +26,7 @@ pub(super) struct Arguments {
     pub(super) sub_command: Commands,
 }
 
-/// Commands for astrolabe
+/// Commands for astrograph
 #[derive(Parser)]
 pub(super) enum Commands {
     /// Build a universe

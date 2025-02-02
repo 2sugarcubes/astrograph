@@ -35,10 +35,10 @@ echo -e " ✒️ running rust format" &&
   cargo run -- -vv build -c 100 -s 0x100000000000000000000 &&
   rm universe.json &&
   echo -e "\n 💫 Test run with full Program" &&
-  cargo run -- -vv -o /tmp/astrolabe simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json ||
+  cargo run -- -vv -o /tmp/astrograph simulate -s 100 -e 200 -t 10 -p assets/solar-system.program.json ||
   fail "Program from full json failed " &&
   echo -e "\n 💫 Test run with partial program" &&
-  cargo run -- -vv -o /tmp/astrolabe simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json ||
+  cargo run -- -vv -o /tmp/astrograph simulate -s 0 -e 100 -t 10 -u assets/solar-system.json -o assets/solar-system.observatories.json ||
   fail "Program from parts failed " &&
   echo -e "\n ☂️ Running code coverage" &&
   cargo tarpaulin --skip-clean --fail-under 50 --exclude-files '**/main.rs' --frozen --out html | tail -n 1 &&

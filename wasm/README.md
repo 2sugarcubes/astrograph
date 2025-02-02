@@ -1,12 +1,12 @@
-# Astrolabe Wasm Target
+# Astrograph Wasm Target
 
-[![License](https://img.shields.io/github/license/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/LICENSE.txt)
+[![License](https://img.shields.io/github/license/2sugarcubes/astrograph)](https://github.com/2sugarcubes/astrograph/LICENSE.txt)
 
-[![codecov](https://codecov.io/gh/2sugarcubes/astrolabe/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrolabe)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrolabe/tests)](https://github.com/2sugarcubes/astrolabe/actions)
-[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrolabe)]
+[![codecov](https://codecov.io/gh/2sugarcubes/astrograph/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrograph)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrograph/tests)](https://github.com/2sugarcubes/astrograph/actions)
+[![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrograph)]
 
-[![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrolabe)](https://github.com/2sugarcubes/astrolabe/issues)
+[![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrograph)](https://github.com/2sugarcubes/astrograph/issues)
 
 ## Building
 
@@ -25,7 +25,7 @@ this minimal code.
 import init, {
   generate_observations_from_json,
   generate_universe,
-} from "/pkg/astrolabe.js";
+} from "/pkg/astrograph.js";
 
 /* TODO: select the node that images will live inside */
 const frame_parent = document.getElementById("SOME ID");

@@ -1,6 +1,6 @@
-use astrolabe::projection;
+use astrograph::projection;
 
-use astrolabe::output::{svg::Svg, Output};
+use astrograph::output::{svg::Svg, Output};
 
 use rayon::prelude::*;
 use wasm_bindgen::prelude::*;
@@ -22,7 +22,7 @@ extern "C" {
 impl Output for Web {
     fn write_observations(
         &self,
-        observations: &[astrolabe::LocalObservation],
+        observations: &[astrograph::LocalObservation],
         _observatory_name: &str,
         time: i128,
         _output_path_root: &std::path::Path,
