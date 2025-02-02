@@ -152,7 +152,8 @@ fn simulate(
         );
 
         for o in observatories {
-            program_builder.add_observatory(astrograph::body::observatory::to_observatory(o, &root));
+            program_builder
+                .add_observatory(astrograph::body::observatory::to_observatory(o, &root));
         }
 
         program_builder.root_body(root).build().unwrap()
