@@ -9,7 +9,7 @@ license = "LGPL-3.0-or-later"
 description = "A library dedicated to provinding astronomical predictions of non-chaotic and deterministic bodies."
 repository = "https://github.com/2sugarcubes/astrograph"
 keywords = ["astronomy", "physics", "mathmatics", "simulation"]
-categories = ["aerospace::simulation", "mathmatics", "science", "simulation"]
+categories = ["aerospace::simulation", "mathematics", "science", "simulation"]
 authors = ["Lucy <105619409+2sugarcubes@users.noreply.github.com>"]
 
 [profile.release]
