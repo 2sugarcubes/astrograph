@@ -3,6 +3,7 @@ use std::{
     fmt::Display,
     fs,
     path::{Path, PathBuf},
+    process,
     str::FromStr,
     sync::{Arc, RwLock},
 };
@@ -20,9 +21,17 @@ use rand::{Rng, SeedableRng};
 use rand_xorshift::XorShiftRng;
 mod cli;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let args = cli::Arguments::parse();
+fn main() {
+    human_panic::setup_panic!();
 
+    if let Err(e) = try_main() {
+        eprintln!("Error: {}", e);
+        process::exit(1);
+    }
+}
+
+fn try_main() -> Result<(), Box<dyn Error>> {
+    let args = cli::Arguments::parse();
     setup_log(args.quiet, args.verbose);
 
     match args.sub_command {
@@ -170,12 +179,12 @@ fn simulate(
         observatories.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
     ) {
         error!("Cannot parse observatories at: {universe}, or universe at: {observatories}");
-        return Err(Box::new(crate::ReadError {
+        return Err(Box::new(ReadError {
             file_path: format!("universe: {universe}, observatories: {observatories}"),
         }));
     } else {
         error!("Cannot parse program at: {program}");
-        return Err(Box::new(crate::ReadError {
+        return Err(Box::new(ReadError {
             file_path: program.to_string(),
         }));
     };
@@ -199,23 +208,14 @@ struct ReadError {
     file_path: String,
 }
 
-impl Display for crate::ReadError {
+impl Display for ReadError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Unable to parse file(s) {}", self.file_path)
     }
 }
 
 impl Error for ReadError {
-    fn cause(&self) -> Option<&dyn Error> {
-        None
-    }
-
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
-    }
-    #[allow(unknown_lints)] // causes issue on github actions
-    #[allow(clippy::unnecessary_literal_bound)]
-    fn description(&self) -> &str {
-        "Problem while parsing a file"
     }
 }
