@@ -108,7 +108,7 @@ pub fn generate_universe() -> JsValue {
 #[serde(rename_all = "camelCase")]
 struct Body {
     /// Bodies that orbit around this body
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     children: Vec<Body>,
     /// The way this body moves around the parent
     dynamic: Dynamic,
