@@ -76,7 +76,7 @@ pub fn generate_universe_from_seed(seed: u64) -> JsValue {
 
     JsValue::from_serde(
         &ArtifexianBuilder::default()
-            .star_count(1_000_000)
+            .star_count(100)
             .build()
             .unwrap()
             .generate(&mut XorShiftRng::seed_from_u64(seed)),
@@ -94,7 +94,7 @@ pub fn generate_universe() -> JsValue {
 
     JsValue::from_serde(
         &ArtifexianBuilder::default()
-            .star_count(1_000_000)
+            .star_count(100)
             .build()
             .unwrap()
             .generate(&mut XorShiftRng::from_entropy()),
