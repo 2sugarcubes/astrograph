@@ -124,7 +124,9 @@ pub(super) fn to_name(id: &[usize]) -> String {
         let mut res = id[0].to_string();
 
         for i in &id[1..] {
-            res.push_str(&format!("-{i}"));
+            use std::fmt::Write;
+            // Infalable write
+            let _ = write!(res, "-{i}");
         }
 
         res

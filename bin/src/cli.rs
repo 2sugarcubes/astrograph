@@ -17,8 +17,6 @@ pub(super) struct Arguments {
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub(super) quiet: u8,
 
-    /// Output directory for observations or universe generation, output structure will be like
-    /// `/output_path/observatory_id/time.ext`
     #[arg(short, long, default_value = ".")]
     pub(super) output: PathBuf,
 
@@ -38,6 +36,14 @@ pub(super) enum Commands {
         /// Seed for the random number generator, leave blank for a random seed, supports
         #[arg(short, long)]
         seed: Option<String>,
+
+        /// Filepath to output universe to.
+        #[arg(short, long, default_value = "observatories.json")]
+        observatory_output: PathBuf,
+
+        /// Filepath to output observatories to.
+        #[arg(short, long, default_value = "universe.json")]
+        universe_output: PathBuf,
     },
     /// Simulate using given observatories and bodies
     Simulate {
@@ -61,11 +67,16 @@ pub(super) enum Commands {
 
         /// Path to a JSON file that represents the observatories, if present with
         /// [`Self::universe`] this takes precedence over [`Self::program`]
-        #[arg(short, long)]
+        #[arg(short = 'b', long)]
         observatories: Option<PathBuf>,
 
         /// Path that contains a json representation of the program settings
-        #[arg(short, long, default_value_t = String::from("program.json"))]
+        #[arg(short, long, default_value = "program.json")]
         program: String,
+
+        /// Output directory for observations, output structure will be like
+        /// `/output_path/observatory_id/time.ext`
+        #[arg(short, long, default_value = ".")]
+        output: PathBuf,
     },
 }

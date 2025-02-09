@@ -25,7 +25,7 @@ fn observations(c: &mut Criterion) {
     let mut rng = rand_xorshift::XorShiftRng::from_seed([
         239, 217, 91, 179, 81, 126, 219, 106, 59, 0, 216, 7, 235, 82, 112, 111,
     ]);
-    let root = ArtifexianBuilder::default()
+    let (root, _) = ArtifexianBuilder::default()
         .star_count(1000)
         .build()
         .unwrap()

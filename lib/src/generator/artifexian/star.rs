@@ -69,7 +69,11 @@ impl MainSequenceStar {
     }
 
     /// Convert this star to a body to add to the body tree
-    pub(super) fn to_body<G: rand::Rng>(&self, rng: &mut G, root: &Arc) -> Arc {
+    pub(super) fn to_body<G: rand::Rng>(
+        &self,
+        rng: &mut G,
+        root: &Arc,
+    ) -> (Arc, Option<crate::body::observatory::Observatory>) {
         const WIDTH_OF_MILKY_WAY: Float = 3e12;
 
         let d = rand_distr::Pert::new(-1.0, 1.0, 0.0).unwrap();
@@ -96,11 +100,29 @@ impl MainSequenceStar {
             dynamic::fixed::Fixed(Cylindrical::new(radius, height, theta).into()),
         );
 
+        let mut observatory = None;
         // Add planets to this body
         for p in &self.planets {
-            p.to_body(rng, self, &b);
+            let arc = p.to_body(rng, self, &b);
+
+            match p.kind {
+                super::planet::PlanetType::Habitable => {
+                    use coordinates::prelude::*;
+                    let name = match arc.read() {
+                        Ok(b) => Err(b.get_id()),
+                        Err(_) => Ok("Unnamed".to_string()),
+                    };
+
+                    observatory = Some(crate::body::observatory::Observatory::new(
+                        Spherical::FORWARD,
+                        arc,
+                        name,
+                    ));
+                }
+                super::planet::PlanetType::Terestrial | super::planet::PlanetType::GasGiant => (),
+            }
         }
 
-        return b;
+        return (b, observatory);
     }
 }
