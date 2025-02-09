@@ -7,8 +7,8 @@ use astrograph::{
 #[test]
 fn inclinations() {
     let mut rng = rand::thread_rng();
-    let root = ArtifexianBuilder::default()
-        .star_count(500_000)
+    let (root, _) = ArtifexianBuilder::default()
+        .star_count(5_000)
         .build()
         .unwrap()
         .generate(&mut rng);

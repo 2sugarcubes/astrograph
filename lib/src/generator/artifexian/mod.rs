@@ -32,8 +32,14 @@ pub struct Artifexian {
 }
 
 impl Generator for Artifexian {
-    fn generate<G: rand::Rng>(&self, rng: &mut G) -> crate::body::Arc {
+    /// Generates bodies based on the star count and random number generator. Generated observatories are on "habitable" worlds.
+    fn generate<G: rand::Rng>(
+        &self,
+        rng: &mut G,
+    ) -> (crate::body::Arc, Vec<crate::body::observatory::Observatory>) {
         let root = Body::new(None, Fixed::new(Vector3::ORIGIN));
+
+        let mut observatories = Vec::with_capacity(self.star_count / 100);
 
         for i in 0..self.star_count {
             // At least 1% of stars are habitable
@@ -112,9 +118,11 @@ impl Generator for Artifexian {
                 star
             };
 
-            star.to_body(rng, &root);
+            if let (_, Some(observer)) = star.to_body(rng, &root) {
+                observatories.push(observer);
+            }
         }
-        return root;
+        return (root, observatories);
     }
 }
 
@@ -165,7 +173,7 @@ mod test {
         let root = generator.generate(&mut rng);
 
         println!("x\ty\tz");
-        for p in &root.read().unwrap().children {
+        for p in &root.0.read().unwrap().children {
             let loc: Vector3<Float> = p.read().unwrap().dynamic.get_offset(0.0);
             println!("{}\t{}\t{}", loc.x, loc.y, loc.z);
         }
