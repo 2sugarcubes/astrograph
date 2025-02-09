@@ -19,18 +19,27 @@ pub struct Observatory {
     /// Name of the observatory, either user defined or derived from the body ID, latitude and
     /// longitude
     name: Result<String, Vec<usize>>,
+
+    /// List of constelations that could be visible from this observatory
+    constelations: Vec<crate::constelation::Constelation>,
 }
 
 impl Observatory {
     /// Generates an observatory on the given body and location.
     #[must_use]
-    pub fn new(location: Spherical<Float>, body: Arc, name: Result<String, Vec<usize>>) -> Self {
+    pub fn new(
+        location: Spherical<Float>,
+        body: Arc,
+        name: Result<String, Vec<usize>>,
+        constelations: Vec<crate::constelation::Constelation>,
+    ) -> Self {
         let location: Vector3<Float> = location.into();
 
         Self {
             location: quaternion::rotation_from_to(location.into(), Vector3::UP.into()),
             body,
             name,
+            constelations,
         }
     }
 
@@ -93,6 +102,12 @@ pub struct WeakObservatory {
     /// ID, latitude and longitude
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
+
+    /// List of constelations local to the observatory (e.g.
+    /// [Navajo](https://navajocodetalkers.org/navajo-constellations/), or
+    /// [Modern](https://en.wikipedia.org/wiki/IAU_designated_constellations))
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    constelations: Vec<crate::constelation::weak::Weak>,
 }
 
 /// Converts a [`WeakObservatory`] to a regular [`Observatory`] by adding back reference counted
@@ -108,11 +123,15 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
         let b = body.read().unwrap().children[*child_id].clone();
         body = b;
     }
-
     Observatory::new(
         weak_observatory.location,
         body.clone(),
         weak_observatory.name.ok_or(weak_observatory.body_id),
+        weak_observatory
+            .constelations
+            .into_iter()
+            .map(|weak| weak.upgrade(root))
+            .collect(),
     )
 }
 
@@ -159,6 +178,11 @@ impl From<Observatory> for WeakObservatory {
             },
             body_id,
             name: None,
+            constelations: value
+                .constelations
+                .into_iter()
+                .map(crate::constelation::weak::Weak::from)
+                .collect(),
         }
     }
 }

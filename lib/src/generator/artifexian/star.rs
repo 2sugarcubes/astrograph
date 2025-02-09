@@ -117,6 +117,7 @@ impl MainSequenceStar {
                         Spherical::FORWARD,
                         arc,
                         name,
+                        vec![],
                     ));
                 }
                 super::planet::PlanetType::Terestrial | super::planet::PlanetType::GasGiant => (),

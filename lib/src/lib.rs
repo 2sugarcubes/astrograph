@@ -24,6 +24,8 @@ pub mod projection;
 
 pub mod generator;
 
+pub mod constelation;
+
 #[allow(unused_imports)] // Macro_use is required here
 #[macro_use]
 #[cfg(test)]
