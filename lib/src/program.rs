@@ -91,11 +91,13 @@ impl Program {
                 .output_file_root
                 .join(format!("{}/{time:010}", observatory.get_name()));
             let observations = observatory.observe(time as Float);
+            let constelations = observatory.add_constelatations(&observations);
             for output in &self.outputs {
                 // Write the observations to file, recovering on errors
                 // HACK: Should remove this match statement and return an error on writing
                 match output.write_observations(
                     &observations,
+                    &constelations,
                     &observatory.get_name(),
                     time,
                     &self.output_file_root,

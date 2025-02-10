@@ -1,7 +1,9 @@
 use astrograph::projection;
 
-use astrograph::output::{svg::Svg, Output};
-
+use astrograph::{
+    constelation::Line,
+    output::{svg::Svg, Output},
+};
 use rayon::prelude::*;
 use wasm_bindgen::prelude::*;
 
@@ -23,13 +25,14 @@ impl Output for Web {
     fn write_observations(
         &self,
         observations: &[astrograph::LocalObservation],
+        constellations: &[Line],
         _observatory_name: &str,
         time: i128,
         _output_path_root: &std::path::Path,
     ) -> Result<(), std::io::Error> {
-        let observations = self
-            .svg
-            .consume_observation(&format!("{time}"), observations);
+        let observations =
+            self.svg
+                .consume_observation(&format!("{time}"), observations, constellations);
 
         if let Ok(mut hash_map) = self.observations.write() {
             hash_map.insert(time, observations);

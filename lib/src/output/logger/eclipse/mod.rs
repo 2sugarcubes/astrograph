@@ -55,6 +55,7 @@ impl Output for Logger {
     fn write_observations(
         &self,
         observations: &[(crate::body::Arc, Spherical<Float>)],
+        _constellations: &[crate::constelation::Line],
         observatory_name: &str,
         time: i128,
         output_path_root: &std::path::Path,

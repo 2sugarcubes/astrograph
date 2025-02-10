@@ -3,8 +3,11 @@ use coordinates::three_dimensional::Spherical;
 use serde::Serialize;
 
 use crate::Float;
+use crate::body::Arc;
 
 pub mod weak;
+
+pub type Line = (Spherical<Float>, Spherical<Float>);
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase", into = "weak::Weak")]
@@ -18,7 +21,7 @@ impl Constelation {
     pub fn add_edges(
         &self,
         observations: &[(crate::body::Arc, Spherical<Float>)],
-    ) -> Vec<(Spherical<Float>, Spherical<Float>)> {
+    ) -> Vec<Line> {
         // PERF: is there a O(n) way to do this? currently it is O(n*m) where n is the number of
         // edges and m is the number of observed bodies.
         // It might be quicker if we use a hashmap, or loop through observations first since they are
@@ -44,5 +47,10 @@ impl Constelation {
         });
 
         result.collect()
+    }
+
+    #[must_use]
+    pub fn edges(&self) -> &Vec<(Arc, Arc)> {
+        &self.edges
     }
 }

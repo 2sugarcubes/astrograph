@@ -13,6 +13,10 @@ impl astrograph::output::Output for Output {
     fn write_observations(
         &self,
         _observations: &[astrograph::LocalObservation],
+        _constellations: &[(
+            coordinates::three_dimensional::Spherical<astrograph::Float>,
+            coordinates::three_dimensional::Spherical<astrograph::Float>,
+        )],
         _observatory_name: &str,
         _time: i128,
         _output_path_root: &std::path::Path,

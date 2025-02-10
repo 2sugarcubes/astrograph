@@ -89,6 +89,22 @@ impl Observatory {
             )
         })
     }
+
+    #[must_use]
+    pub fn constellations(&self) -> &Vec<crate::constelation::Constelation> {
+        &self.constelations
+    }
+
+    #[must_use]
+    pub fn add_constelatations(
+        &self,
+        bodies: &[LocalObservation],
+    ) -> Vec<(Spherical<Float>, Spherical<Float>)> {
+        self.constelations
+            .iter()
+            .flat_map(|c| c.add_edges(bodies))
+            .collect()
+    }
 }
 
 #[derive(Serialize, Deserialize)]
