@@ -16,7 +16,8 @@ coverage:
           - lib
 
       wasm:
-        informational: false
+        # Making informational until `wasm-pack test` can be used to generate coverage
+        informational: true
         target: 50
         threshold: 10
         paths:

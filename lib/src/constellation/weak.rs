@@ -31,10 +31,9 @@ fn get_body_by_id(id: &[usize], root: &crate::body::Arc) -> Option<crate::body::
     trace!("id = {id:?}, body = {:?}", root.read().unwrap().get_name());
     if id.is_empty() {
         Some(root.clone())
-    } else if let Ok(next) = &root
-        .read()
-        .map(|x| x.get_children()[*id.last().unwrap()].clone())
-    {
+    } else if let Some(next) = &root.read().map_or(None, |x| {
+        x.get_children().get(*id.last().unwrap()).map(Clone::clone)
+    }) {
         get_body_by_id(&id[1..], next)
     } else {
         warn!("Could not find body");
@@ -64,5 +63,89 @@ impl From<super::Constellation> for Weak {
             .collect();
 
         Self { edges }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::super::*;
+    use super::*;
+    use crate::{body::Body, dynamic::fixed::Fixed};
+    use coordinates::prelude::*;
+
+    #[test]
+    fn from_constellation() {
+        let dynamic = Fixed::new(Vector3::UP);
+        let body_a = Body::new(None, dynamic);
+        let body_b = Body::new(Some(body_a.clone()), dynamic);
+        let body_c = Body::new(Some(body_a.clone()), Fixed::new(Vector3::FORWARD));
+
+        Body::hydrate_all(&body_a, &None);
+
+        println!("{:?}", body_a.read().unwrap().get_id());
+        println!("{:?}", body_b.read().unwrap().get_id());
+        println!("{:?}", body_c.read().unwrap().get_id());
+
+        let constellation = Constellation {
+            edges: vec![
+                (body_a.clone(), body_b.clone()),
+                (body_b.clone(), body_c.clone()),
+                (body_c.clone(), body_a.clone()),
+            ],
+        };
+
+        let weak: Weak = constellation.into();
+
+        assert_eq!(weak.edges.len(), 3);
+        assert_eq!(weak.edges[0], (vec![], vec![0]));
+        assert_eq!(weak.edges[1], (vec![0], vec![1]));
+        assert_eq!(weak.edges[2], (vec![1], vec![]));
+
+        let new_constellation = weak.upgrade(&body_a);
+
+        assert_eq!(new_constellation.edges.len(), 3);
+        assert!(new_constellation.edges[0]
+            .0
+            .read()
+            .unwrap()
+            .eq(&body_a.read().unwrap()));
+        assert!(new_constellation.edges[0]
+            .1
+            .read()
+            .unwrap()
+            .eq(&body_b.read().unwrap()));
+        assert!(new_constellation.edges[1]
+            .0
+            .read()
+            .unwrap()
+            .eq(&body_b.read().unwrap()));
+        assert!(new_constellation.edges[1]
+            .1
+            .read()
+            .unwrap()
+            .eq(&body_c.read().unwrap()));
+        assert!(new_constellation.edges[2]
+            .0
+            .read()
+            .unwrap()
+            .eq(&body_c.read().unwrap()));
+        assert!(new_constellation.edges[2]
+            .1
+            .read()
+            .unwrap()
+            .eq(&body_a.read().unwrap()));
+    }
+
+    #[test]
+    fn get_missing_body() {
+        let body_a = Body::new(None, Fixed::new(Vector3::ORIGIN));
+        let body_b = Body::new(Some(body_a.clone()), Fixed::new(Vector3::ORIGIN));
+
+        assert!(get_body_by_id(&[1, 2, 3], &body_a).is_none());
+        assert!(
+            get_body_by_id(&[], &body_a).is_some_and(|body| std::sync::Arc::ptr_eq(&body_a, &body))
+        );
+        assert!(get_body_by_id(&[0], &body_a)
+            .is_some_and(|body| std::sync::Arc::ptr_eq(&body_b, &body)));
     }
 }

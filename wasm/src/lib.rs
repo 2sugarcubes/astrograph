@@ -76,7 +76,7 @@ pub fn generate_universe_from_seed(seed: u64) -> JsValue {
 
     JsValue::from_serde(
         &ArtifexianBuilder::default()
-            .star_count(100)
+            .star_count(1)
             .build()
             .unwrap()
             .generate(&mut XorShiftRng::seed_from_u64(seed)),
@@ -162,4 +162,43 @@ enum Dynamic {
     Fixed(Fixed),
     /// Keplerian bodies
     Keplerian(Keplerian),
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use coordinates::prelude::*;
+    use wasm_bindgen_test::wasm_bindgen_test;
+
+    #[wasm_bindgen_test(unsupported = test)]
+    fn body_conversion() {
+        let wasm_body = Body {
+            children: vec![],
+            dynamic: Dynamic::Fixed(Fixed::new(Vector3::<astrograph::Float>::ORIGIN)),
+            rotation: None,
+            radius: None,
+            name: None,
+        };
+
+        let body: astrograph::body::Body = wasm_body.into();
+
+        assert_eq!(body.get_children().len(), 0);
+        match body.get_dynamic().as_any().downcast_ref::<Fixed>() {
+            Some(a) => assert_eq!(a, &Fixed::new(Vector3::ORIGIN)),
+            _ => unreachable!("Should be a fixed dynamic"),
+        }
+
+        assert_eq!(body.get_id().len(), 0);
+    }
+
+    #[wasm_bindgen_test]
+    #[allow(dead_code)] // code is used in wasm-pack test ...
+    fn universe_generation() {
+        let universe_a = generate_universe_from_seed(0xffff_1111_0000_8888);
+        let universe_b = generate_universe_from_seed(0xffff_1111_0000_8888);
+        assert_eq!(format!("{universe_a:?}"), format!("{universe_b:?}"));
+
+        let universe_c = generate_universe();
+        assert!(universe_c.is_object());
+    }
 }
