@@ -1,0 +1,34 @@
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+        target: 50
+        threshold: 10
+
+      binary:
+        informational: true
+        target: 50
+        threshold: 10
+        paths:
+          - bin
+
+      library:
+        informational: true
+        target: 50
+        threshold: 10
+        paths:
+          - lib
+
+      wasm:
+        informational: true
+        target: 50
+        threshold: 10
+        paths:
+          - wasm
+
+    patch:
+      default:
+        informational: true
+        target: 50
+        threshold: 10
