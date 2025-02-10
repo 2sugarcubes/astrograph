@@ -109,6 +109,7 @@ impl Observatory {
 
 #[derive(Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
+#[serde(rename_all = "camelCase")]
 pub struct WeakObservatory {
     /// Latitude and longitude of the observatory
     location: Spherical<Float>,
@@ -122,7 +123,7 @@ pub struct WeakObservatory {
     /// List of constellations local to the observatory (e.g.
     /// [Navajo](https://navajocodetalkers.org/navajo-constellations/), or
     /// [Modern](https://en.wikipedia.org/wiki/IAU_designated_constellations))
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     constellations: Vec<crate::constellation::weak::Weak>,
 }
 
