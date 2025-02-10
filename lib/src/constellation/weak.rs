@@ -9,7 +9,7 @@ pub struct Weak {
 }
 
 impl Weak {
-    pub fn upgrade(self, root: &crate::body::Arc) -> super::Constelation {
+    pub fn upgrade(self, root: &crate::body::Arc) -> super::Constellation {
         let mut new_edges = Vec::with_capacity(self.edges.len());
 
         for (a, b) in self.edges {
@@ -20,7 +20,7 @@ impl Weak {
             }
         }
 
-        super::Constelation { edges: new_edges }
+        super::Constellation { edges: new_edges }
     }
 }
 
@@ -38,8 +38,8 @@ fn get_body_by_id(id: &[usize], root: &crate::body::Arc) -> Option<crate::body::
     }
 }
 
-impl From<super::Constelation> for Weak {
-    fn from(value: super::Constelation) -> Self {
+impl From<super::Constellation> for Weak {
+    fn from(value: super::Constellation) -> Self {
         let edges = value
             .edges
             .iter()

@@ -20,8 +20,8 @@ pub struct Observatory {
     /// longitude
     name: Result<String, Vec<usize>>,
 
-    /// List of constelations that could be visible from this observatory
-    constelations: Vec<crate::constelation::Constelation>,
+    /// List of constellations that could be visible from this observatory
+    constellations: Vec<crate::constellation::Constellation>,
 }
 
 impl Observatory {
@@ -31,7 +31,7 @@ impl Observatory {
         location: Spherical<Float>,
         body: Arc,
         name: Result<String, Vec<usize>>,
-        constelations: Vec<crate::constelation::Constelation>,
+        constellations: Vec<crate::constellation::Constellation>,
     ) -> Self {
         let location: Vector3<Float> = location.into();
 
@@ -39,7 +39,7 @@ impl Observatory {
             location: quaternion::rotation_from_to(location.into(), Vector3::UP.into()),
             body,
             name,
-            constelations,
+            constellations,
         }
     }
 
@@ -91,8 +91,8 @@ impl Observatory {
     }
 
     #[must_use]
-    pub fn constellations(&self) -> &Vec<crate::constelation::Constelation> {
-        &self.constelations
+    pub fn constellations(&self) -> &Vec<crate::constellation::Constellation> {
+        &self.constellations
     }
 
     #[must_use]
@@ -100,7 +100,7 @@ impl Observatory {
         &self,
         bodies: &[LocalObservation],
     ) -> Vec<(Spherical<Float>, Spherical<Float>)> {
-        self.constelations
+        self.constellations
             .iter()
             .flat_map(|c| c.add_edges(bodies))
             .collect()
@@ -119,11 +119,11 @@ pub struct WeakObservatory {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
 
-    /// List of constelations local to the observatory (e.g.
+    /// List of constellations local to the observatory (e.g.
     /// [Navajo](https://navajocodetalkers.org/navajo-constellations/), or
     /// [Modern](https://en.wikipedia.org/wiki/IAU_designated_constellations))
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    constelations: Vec<crate::constelation::weak::Weak>,
+    constellations: Vec<crate::constellation::weak::Weak>,
 }
 
 /// Converts a [`WeakObservatory`] to a regular [`Observatory`] by adding back reference counted
@@ -144,7 +144,7 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
         body.clone(),
         weak_observatory.name.ok_or(weak_observatory.body_id),
         weak_observatory
-            .constelations
+            .constellations
             .into_iter()
             .map(|weak| weak.upgrade(root))
             .collect(),
@@ -194,10 +194,10 @@ impl From<Observatory> for WeakObservatory {
             },
             body_id,
             name: None,
-            constelations: value
-                .constelations
+            constellations: value
+                .constellations
                 .into_iter()
-                .map(crate::constelation::weak::Weak::from)
+                .map(crate::constellation::weak::Weak::from)
                 .collect(),
         }
     }

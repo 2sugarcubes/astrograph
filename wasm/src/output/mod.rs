@@ -1,7 +1,7 @@
 use astrograph::projection;
 
 use astrograph::{
-    constelation::Line,
+    constellation::Line,
     output::{svg::Svg, Output},
 };
 use rayon::prelude::*;

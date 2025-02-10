@@ -151,7 +151,7 @@ where
     fn write_observations(
         &self,
         observations: &[LocalObservation],
-        constellations: &[crate::constelation::Line],
+        constellations: &[crate::constellation::Line],
         observatory_name: &str,
         time: i128,
         output_path_root: &Path,

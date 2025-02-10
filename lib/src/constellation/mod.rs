@@ -11,13 +11,13 @@ pub type Line = (Spherical<Float>, Spherical<Float>);
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase", into = "weak::Weak")]
-pub struct Constelation {
+pub struct Constellation {
     /// Lists the edges marked by the bodies that marks the ends of the edges
     edges: Vec<(crate::body::Arc, crate::body::Arc)>,
     // TODO: add name field and figure out how to display it.
 }
 
-impl Constelation {
+impl Constellation {
     pub fn add_edges(
         &self,
         observations: &[(crate::body::Arc, Spherical<Float>)],
