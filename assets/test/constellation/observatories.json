@@ -1,0 +1,20 @@
+[
+  {
+    "location": {
+      "r": 1.0,
+      "theta": 1.57,
+      "phi": 0
+    },
+    "body_id": [],
+    "name": "North Pole (Summer)",
+    "constellations": [
+      {
+        "edges": [
+          [[0], [1]],
+          [[1], [2]],
+          [[2], [0]]
+        ]
+      }
+    ]
+  }
+]

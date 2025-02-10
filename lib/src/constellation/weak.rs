@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use log::warn;
+use log::{trace, warn};
 
 #[derive(Clone, Debug, Deserialize, Serialize, Eq, PartialEq)]
 pub struct Weak {
@@ -26,14 +26,16 @@ impl Weak {
 
 /// Gets a body from the tree based on the ID of the body
 fn get_body_by_id(id: &[usize], root: &crate::body::Arc) -> Option<crate::body::Arc> {
+    trace!("id = {id:?}, body = {:?}", root.read().unwrap().get_name());
     if id.is_empty() {
         Some(root.clone())
     } else if let Ok(next) = &root
         .read()
         .map(|x| x.get_children()[*id.last().unwrap()].clone())
     {
-        get_body_by_id(&id[0..id.len() - 1], next)
+        get_body_by_id(&id[1..], next)
     } else {
+        warn!("Could not find body");
         None
     }
 }
