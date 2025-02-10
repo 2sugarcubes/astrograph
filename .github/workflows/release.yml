@@ -10,15 +10,24 @@ permissions:
   contents: write
 
 jobs:
+  check-semver:
+    name: Check Semantic Versioning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v2
+
   wasm:
     name: Build additional artifacts
     runs-on: ubuntu-latest
+    needs: [check-semver]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: jetli/wasm-pack-action@v0.4.0
       - run: wasm-pack build --target web --release -d ../web/pkg wasm && tar -cvzf wasm.tar.gz web/pkg
-      - run: cargo build --bin astrograph
       - name: Add to release
         uses: softprops/action-gh-release@v2
         with:
@@ -108,7 +117,7 @@ jobs:
               completions/astrograph.1
 
     runs-on: ${{ matrix.platform.runs-on }}
-    needs: [wasm]
+    needs: [wasm, check-semver]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
