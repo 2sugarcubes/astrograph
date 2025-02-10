@@ -1,0 +1,34 @@
+{
+  "name": "Earth",
+  "rotation": {
+    "siderealPeriod": 24,
+    "axis": {
+      "r": 1,
+      "theta": 0.78539,
+      "phi": 0
+    }
+  },
+  "dynamic": {
+    "Fixed": { "x": 0, "y": 0, "z": 0 }
+  },
+  "children": [
+    {
+      "name": "North",
+      "dynamic": {
+        "Fixed": { "x": 0, "y": 0, "z": 1 }
+      }
+    },
+    {
+      "name": "East",
+      "dynamic": {
+        "Fixed": { "x": 0.25, "y": 0, "z": 0.5 }
+      }
+    },
+    {
+      "name": "West",
+      "dynamic": {
+        "Fixed": { "x": -0.25, "y": 0, "z": 0.5 }
+      }
+    }
+  ]
+}

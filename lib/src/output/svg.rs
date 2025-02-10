@@ -2,6 +2,8 @@ use std::{fmt::Debug, path::Path};
 
 use crate::{consts::float, projection::Projection, Float, LocalObservation};
 
+use coordinates::three_dimensional::Spherical;
+
 use super::Output;
 use coordinates::prelude::{Polar, Vector2};
 use svg::{
@@ -26,6 +28,7 @@ impl<T: Projection> Svg<T> {
         &self,
         time: &str,
         observations: &[LocalObservation],
+        constellations: &[(Spherical<Float>, Spherical<Float>)],
     ) -> svg::Document {
         // TODO: remove some magic values (like "0.005", "-0.95", etc.)
 
@@ -83,6 +86,26 @@ impl<T: Projection> Svg<T> {
             );
         }
 
+        // Display constellations behind bodies
+        for (start, end) in constellations.iter().filter_map(|(a, b)| {
+            self.0.project_with_state(a).and_then(|projected_a| {
+                self.0
+                    .project_with_state(b)
+                    .map(|projected_b| (projected_a, projected_b))
+            })
+        }) {
+            let line = Line::new()
+                .set("x1", start.x)
+                .set("y1", start.y)
+                .set("x2", end.x)
+                .set("y2", end.y)
+                .set("style", "stroke-width: 0.003;stroke:#AAA")
+                .set("class", "constellation");
+
+            result.append(line);
+        }
+
+        // Display the bodies on top of everything else
         for (body, projected_location, distance) in observations
             .iter()
             // Map from world space to "screen space" (we still require some uniform
@@ -131,6 +154,7 @@ where
     fn write_observations(
         &self,
         observations: &[LocalObservation],
+        constellations: &[crate::constellation::Line],
         observatory_name: &str,
         time: i128,
         output_path_root: &Path,
@@ -142,7 +166,7 @@ where
 
         svg::save(
             path,
-            &self.consume_observation(&format!("{time:010}"), observations),
+            &self.consume_observation(&format!("{time:010}"), observations, constellations),
         )
     }
 }

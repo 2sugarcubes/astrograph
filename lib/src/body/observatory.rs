@@ -19,18 +19,27 @@ pub struct Observatory {
     /// Name of the observatory, either user defined or derived from the body ID, latitude and
     /// longitude
     name: Result<String, Vec<usize>>,
+
+    /// List of constellations that could be visible from this observatory
+    constellations: Vec<crate::constellation::Constellation>,
 }
 
 impl Observatory {
     /// Generates an observatory on the given body and location.
     #[must_use]
-    pub fn new(location: Spherical<Float>, body: Arc, name: Result<String, Vec<usize>>) -> Self {
+    pub fn new(
+        location: Spherical<Float>,
+        body: Arc,
+        name: Result<String, Vec<usize>>,
+        constellations: Vec<crate::constellation::Constellation>,
+    ) -> Self {
         let location: Vector3<Float> = location.into();
 
         Self {
             location: quaternion::rotation_from_to(location.into(), Vector3::UP.into()),
             body,
             name,
+            constellations,
         }
     }
 
@@ -80,10 +89,27 @@ impl Observatory {
             )
         })
     }
+
+    #[must_use]
+    pub fn constellations(&self) -> &Vec<crate::constellation::Constellation> {
+        &self.constellations
+    }
+
+    #[must_use]
+    pub fn add_constelatations(
+        &self,
+        bodies: &[LocalObservation],
+    ) -> Vec<(Spherical<Float>, Spherical<Float>)> {
+        self.constellations
+            .iter()
+            .flat_map(|c| c.add_edges(bodies))
+            .collect()
+    }
 }
 
 #[derive(Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
+#[serde(rename_all = "camelCase")]
 pub struct WeakObservatory {
     /// Latitude and longitude of the observatory
     location: Spherical<Float>,
@@ -93,6 +119,12 @@ pub struct WeakObservatory {
     /// ID, latitude and longitude
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
+
+    /// List of constellations local to the observatory (e.g.
+    /// [Navajo](https://navajocodetalkers.org/navajo-constellations/), or
+    /// [Modern](https://en.wikipedia.org/wiki/IAU_designated_constellations))
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    constellations: Vec<crate::constellation::weak::Weak>,
 }
 
 /// Converts a [`WeakObservatory`] to a regular [`Observatory`] by adding back reference counted
@@ -108,11 +140,15 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
         let b = body.read().unwrap().children[*child_id].clone();
         body = b;
     }
-
     Observatory::new(
         weak_observatory.location,
         body.clone(),
         weak_observatory.name.ok_or(weak_observatory.body_id),
+        weak_observatory
+            .constellations
+            .into_iter()
+            .map(|weak| weak.upgrade(root))
+            .collect(),
     )
 }
 
@@ -159,6 +195,11 @@ impl From<Observatory> for WeakObservatory {
             },
             body_id,
             name: None,
+            constellations: value
+                .constellations
+                .into_iter()
+                .map(crate::constellation::weak::Weak::from)
+                .collect(),
         }
     }
 }
