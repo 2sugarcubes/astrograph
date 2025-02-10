@@ -50,3 +50,34 @@ impl Constellation {
         &self.edges
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::dynamic::fixed::Fixed;
+    use coordinates::prelude::*;
+    #[test]
+    fn draw_lines() {
+        let body_a = crate::body::Body::new(None, Fixed::new(Vector3::ORIGIN));
+        let body_b = crate::body::Body::new(None, Fixed::new(Vector3::ORIGIN));
+        let body_c = crate::body::Body::new(None, Fixed::new(Vector3::ORIGIN));
+
+        let constellation = Constellation {
+            edges: vec![
+                (body_a.clone(), body_b.clone()),
+                (body_b.clone(), body_c.clone()),
+                (body_c.clone(), body_a.clone()),
+            ],
+        };
+
+        let loc_a = Spherical::UP;
+        let loc_b = Spherical::FORWARD;
+        let loc_c = Spherical::RIGHT;
+
+        let edges = constellation.add_edges(&[(body_a, loc_a), (body_b, loc_b), (body_c, loc_c)]);
+
+        assert_eq!(edges[0], (loc_a, loc_b));
+        assert_eq!(edges[1], (loc_b, loc_c));
+        assert_eq!(edges[2], (loc_c, loc_a));
+    }
+}

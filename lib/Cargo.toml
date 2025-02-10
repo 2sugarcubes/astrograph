@@ -19,7 +19,7 @@ default = ["f64"]
 f64 = []
 
 [dependencies]
-coordinates = { version = "0.3.1", features = ["serde"] }
+coordinates = { version = "0.4", features = ["serde"] }
 quaternion = "1.0.0"
 dyn-clone = "1.0.17"
 dyn_partial_eq = "0.1.2"
