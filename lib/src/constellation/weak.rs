@@ -5,6 +5,7 @@ use log::{trace, warn};
 #[derive(Clone, Debug, Deserialize, Serialize, Eq, PartialEq)]
 pub struct Weak {
     /// List of the edges and the IDs of the bodies that mark their ends
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     edges: Vec<(Vec<usize>, Vec<usize>)>,
 }
 
