@@ -86,6 +86,26 @@ impl<T: Projection> Svg<T> {
             );
         }
 
+        // Display constellations behind bodies
+        for (start, end) in constellations.iter().filter_map(|(a, b)| {
+            self.0.project_with_state(a).and_then(|projected_a| {
+                self.0
+                    .project_with_state(b)
+                    .map(|projected_b| (projected_a, projected_b))
+            })
+        }) {
+            let line = Line::new()
+                .set("x1", start.x)
+                .set("y1", start.y)
+                .set("x2", end.x)
+                .set("y2", end.y)
+                .set("style", "stroke-width: 0.003;stroke:#AAA")
+                .set("class", "constellation");
+
+            result.append(line);
+        }
+
+        // Display the bodies on top of everything else
         for (body, projected_location, distance) in observations
             .iter()
             // Map from world space to "screen space" (we still require some uniform
@@ -117,23 +137,6 @@ impl<T: Projection> Svg<T> {
                 );
 
             result.append(circle);
-        }
-
-        for (start, end) in constellations.iter().filter_map(|(a, b)| {
-            self.0.project_with_state(a).and_then(|projected_a| {
-                self.0
-                    .project_with_state(b)
-                    .map(|projected_b| (projected_a, projected_b))
-            })
-        }) {
-            let line = Line::new()
-                .set("x1", start.x)
-                .set("y1", start.y)
-                .set("x2", end.x)
-                .set("y2", end.y)
-                .set("stroke", "white");
-
-            result.append(line);
         }
 
         return result;
