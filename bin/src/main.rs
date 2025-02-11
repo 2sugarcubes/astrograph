@@ -25,7 +25,7 @@ fn main() {
     human_panic::setup_panic!();
 
     if let Err(e) = try_main() {
-        eprintln!("Error: {}", e);
+        log::error!("Error: {e}");
         process::exit(1);
     }
 }
@@ -115,11 +115,12 @@ fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), 
         "Writing universe to file {}",
         output_file.to_str().unwrap_or("UNPRINTABLE PATH")
     );
-    std::fs::write(output_file, json)?;
+    fs::write(output_file, json)?;
     Ok(())
 }
 
 /// Simulates the given universe
+#[allow(clippy::too_many_arguments)]
 fn simulate(
     start_time: i128,
     end_time: i128,
@@ -148,7 +149,7 @@ fn simulate(
         let root: astrograph::body::Arc = Arc::new(RwLock::new(universe));
 
         trace!("Hydrating all bodies");
-        astrograph::body::Body::hydrate_all(&root, &None);
+        Body::hydrate_all(&root, &None);
 
         trace!("Building the program around these observatories and bodies");
         let mut program_builder = ProgramBuilder::default();
