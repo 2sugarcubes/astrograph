@@ -4,7 +4,6 @@ use std::{
     fs,
     path::{Path, PathBuf},
     process,
-    str::FromStr,
     sync::{Arc, RwLock},
 };
 
