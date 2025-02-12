@@ -35,7 +35,17 @@ fn try_main() -> Result<(), Box<dyn Error>> {
     setup_log(args.quiet, args.verbose);
 
     match args.sub_command {
-        cli::Commands::Build { star_count, seed } => build(seed.as_ref(), star_count, &args.output),
+        cli::Commands::Build {
+            star_count,
+            seed,
+            observatory_output,
+            universe_output,
+        } => build(
+            seed.as_ref(),
+            star_count,
+            &universe_output,
+            &observatory_output,
+        ),
         cli::Commands::Simulate {
             start_time,
             end_time,
@@ -43,6 +53,7 @@ fn try_main() -> Result<(), Box<dyn Error>> {
             universe,
             observatories,
             program,
+            output,
         } => simulate(
             start_time,
             end_time,
@@ -50,7 +61,7 @@ fn try_main() -> Result<(), Box<dyn Error>> {
             universe.as_ref(),
             observatories.as_ref(),
             &program,
-            &args.output,
+            &output,
         ),
     }
 }
@@ -75,14 +86,21 @@ fn setup_log(quiet: u8, verbosity: u8) {
 }
 
 /// Builds a new universe based on the user defined parameters
-fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), Box<dyn Error>> {
-    if let Some(path) = output.parent() {
-        if let Err(e) = fs::create_dir_all(path) {
-            error!(
-                "{e}, while creating output path '{}'",
-                path.to_str().unwrap_or("CANNOT DISPLAY PATH")
-            );
-            return Err(e.into());
+fn build(
+    seed: Option<&String>,
+    star_count: usize,
+    universe_output: &Path,
+    observatory_output: &Path,
+) -> Result<(), Box<dyn Error>> {
+    for p in [universe_output, observatory_output] {
+        if let Some(path) = p.parent() {
+            if let Err(e) = fs::create_dir_all(path) {
+                error!(
+                    "{e}, while creating output path '{}'",
+                    path.to_str().unwrap_or("CANNOT DISPLAY PATH")
+                );
+                return Err(e.into());
+            }
         }
     }
 
@@ -99,23 +117,37 @@ fn build(seed: Option<&String>, star_count: usize, output: &Path) -> Result<(), 
     debug!("Seed: 0x{:x}", u128::from_be_bytes(seed_num));
 
     let mut rng = XorShiftRng::from_seed(seed_num);
-    let tree = ArtifexianBuilder::default()
+    let (tree, observatories) = ArtifexianBuilder::default()
         .star_count(star_count)
         .build()
         .unwrap()
         .generate(&mut rng);
 
+    // Write universe out
     let json = serde_json::to_string(&tree)?;
 
-    let mut output_file: PathBuf = output.into();
+    let mut output_file: PathBuf = universe_output.into();
     if output_file.is_dir() {
-        output_file.push(PathBuf::from_str("universe.json").unwrap());
+        output_file.set_file_name("universe.json");
     }
     info!(
         "Writing universe to file {}",
         output_file.to_str().unwrap_or("UNPRINTABLE PATH")
     );
     fs::write(output_file, json)?;
+
+    // Write observatories out
+    let json = serde_json::to_string(&observatories)?;
+    let mut output_file: PathBuf = observatory_output.into();
+    if output_file.is_dir() {
+        output_file.set_file_name("observatories.json");
+    }
+    info!(
+        "Writing observatories to file {}",
+        output_file.to_str().unwrap_or("UNPRINTABLE PATH")
+    );
+    std::fs::write(output_file, json)?;
+
     Ok(())
 }
 

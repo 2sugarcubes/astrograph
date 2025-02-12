@@ -22,6 +22,7 @@ pub trait Output: DynClone + Debug + Sync {
     fn write_observations(
         &self,
         observations: &[LocalObservation],
+        constellations: &[crate::constellation::Line],
         observatory_name: &str,
         time: i128,
         output_path_root: &Path,

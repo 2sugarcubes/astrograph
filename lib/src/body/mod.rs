@@ -622,4 +622,34 @@ mod tests {
             Err(e) => panic!("Error while serializing: {e}"),
         }
     }
+
+    #[test]
+    fn to_id() {
+        let id = [0, 1, 2, 3, 4, 5];
+
+        assert!(match Name::from_id(&id) {
+            Name::Id(name) => name == "0-1-2-3-4-5".into(),
+            _ => false,
+        });
+    }
+
+    #[test]
+    fn name_methods() {
+        let none = Name::Unknown;
+        let id = Name::from_id(&[0, 1, 2, 3]);
+        let named = Name::Named("Hello World".into());
+        assert!(Name::is_calculated(&none));
+        assert!(Name::is_calculated(&id));
+        assert!(!Name::is_calculated(&named));
+
+        assert!(Option::<StdArc<str>>::from(none).is_none());
+        assert!(Option::<StdArc<str>>::from(id).is_none());
+        assert!(Option::<StdArc<str>>::from(named).is_some_and(|x| x == "Hello World".into()));
+
+        assert!(match Some("Hello World").into() {
+            Name::Named(a) => a == "Hello World".into(),
+            _ => false,
+        });
+        matches!(Option::<StdArc<str>>::None.into(), Name::Unknown);
+    }
 }

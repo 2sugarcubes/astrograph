@@ -35,6 +35,7 @@ fn file_output() -> Result<(), ProgramBuilderError> {
             dir,
             observing_body.clone(),
             Err(observing_body.read().unwrap().get_id()),
+            vec![],
         )
     })
     .collect();

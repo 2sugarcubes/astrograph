@@ -97,6 +97,7 @@ mod test {
     use crate::{consts::float, Float};
 
     use super::Rotating;
+    use super::SerializableRotating;
 
     #[test]
     fn normalize_axis() {
@@ -225,5 +226,19 @@ mod test {
                 println!("Passed ✅");
             }
         }
+    }
+
+    #[test]
+    fn into_serializable() {
+        let rotating = Rotating {
+            sidereal_period: 24.0,
+            axis: Vector3::UP,
+        };
+
+        let serializable: SerializableRotating = rotating.clone().into();
+        let new_rotating: Rotating = serializable.into();
+
+        assert_float_absolute_eq!(rotating.sidereal_period, new_rotating.sidereal_period);
+        assert_eq!(rotating.axis, new_rotating.axis);
     }
 }
