@@ -1,6 +1,4 @@
 use std::{
-    error::Error,
-    fmt::Display,
     fs,
     path::{Path, PathBuf},
     process,
@@ -19,6 +17,7 @@ use log::{debug, error, info, trace, warn};
 use rand::{Rng, SeedableRng};
 use rand_xorshift::XorShiftRng;
 mod cli;
+mod err;
 
 fn main() {
     human_panic::setup_panic!();
@@ -29,7 +28,7 @@ fn main() {
     }
 }
 
-fn try_main() -> Result<(), Box<dyn Error>> {
+fn try_main() -> Result<(), err::Error> {
     let args = cli::Arguments::parse();
     setup_log(args.quiet, args.verbose);
 
@@ -90,7 +89,7 @@ fn build(
     star_count: usize,
     universe_output: &Path,
     observatory_output: &Path,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), err::Error> {
     for p in [universe_output, observatory_output] {
         if let Some(path) = p.parent() {
             if let Err(e) = fs::create_dir_all(path) {
@@ -98,7 +97,7 @@ fn build(
                     "{e}, while creating output path '{}'",
                     path.to_str().unwrap_or("CANNOT DISPLAY PATH")
                 );
-                return Err(e.into());
+                return Err(err::Error::write_error(e));
             }
         }
     }
@@ -133,7 +132,7 @@ fn build(
         "Writing universe to file {}",
         output_file.to_str().unwrap_or("UNPRINTABLE PATH")
     );
-    fs::write(output_file, json)?;
+    fs::write(output_file, json).map_err(err::Error::write_error)?;
 
     // Write observatories out
     let json = serde_json::to_string(&observatories)?;
@@ -145,7 +144,7 @@ fn build(
         "Writing observatories to file {}",
         output_file.to_str().unwrap_or("UNPRINTABLE PATH")
     );
-    std::fs::write(output_file, json)?;
+    std::fs::write(output_file, json).map_err(err::Error::write_error)?;
 
     Ok(())
 }
@@ -160,65 +159,84 @@ fn simulate(
     observatories: Option<&PathBuf>,
     program: &str,
     output: &Path,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), err::Error> {
     trace!("Entered Simulation function in binary");
-    let program: Program = if let (Some(universe), Some(observatories)) = (
-        universe
-            .and_then(|path| fs::read_to_string(path).ok())
+
+    let program_contents = fs::read_to_string(program)
+        .map_err(err::Error::read_error)
+        .and_then(|json| serde_json::from_str::<Program>(&json).map_err(err::Error::from));
+    let universe_contents = universe.map(|universe| {
+        fs::read_to_string(universe)
+            .map_err(err::Error::read_error)
+            .and_then(|json| serde_json::from_str::<Body>(&json).map_err(err::Error::from))
+    });
+    let observatory_contents = observatories.map(|observatories| {
+        fs::read_to_string(observatories)
+            .map_err(err::Error::read_error)
             .and_then(|json| {
-                let res: Result<Body, _> = serde_json::from_str(&json);
-                res.ok()
-            }),
-        observatories
-            .and_then(|path| fs::read_to_string(path).ok())
-            .and_then(|json| {
-                let res: Result<Vec<WeakObservatory>, _> = serde_json::from_str(&json);
-                res.ok()
-            }),
-    ) {
-        trace!("Reading from parts");
-        let root: astrograph::body::Arc = Arc::new(RwLock::new(universe));
+                serde_json::from_str::<Vec<WeakObservatory>>(&json).map_err(err::Error::from)
+            })
+    });
 
-        trace!("Hydrating all bodies");
-        Body::hydrate_all(&root, &None);
+    let program: Program = match (universe_contents, observatory_contents) {
+        (Some(Ok(universe)), Some(Ok(observatories))) => {
+            trace!("Reading from parts");
+            let root: astrograph::body::Arc = Arc::new(RwLock::new(universe.clone()));
 
-        trace!("Building the program around these observatories and bodies");
-        let mut program_builder = ProgramBuilder::default();
-        program_builder
-            .add_output(Box::new(Svg::new(StatelessOrthographic())))
-            .output_file_root(output.to_owned());
-        debug!(
-            "Created a program from parts with {} observatories",
-            observatories.len()
-        );
+            trace!("Hydrating all bodies");
+            Body::hydrate_all(&root, &None);
 
-        for o in observatories {
+            trace!("Building the program around these observatories and bodies");
+            let mut program_builder = ProgramBuilder::default();
             program_builder
-                .add_observatory(astrograph::body::observatory::to_observatory(o, &root));
-        }
+                .add_output(Box::new(Svg::new(StatelessOrthographic())))
+                .output_file_root(output.to_owned());
+            debug!(
+                "Created a program from parts with {} observatories",
+                observatories.len()
+            );
 
-        program_builder.root_body(root).build().unwrap()
-    } else if let Some(mut program) = fs::read_to_string(program)
-        .ok()
-        .and_then(|json| serde_json::from_str::<Program>(&json).ok())
-    {
-        trace!("Reading from program file");
-        program.add_output(Box::new(Svg::new(StatelessOrthographic())));
-        program.set_output_path(output);
-        program
-    } else if let (Some(universe), Some(observatories)) = (
-        universe.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
-        observatories.map(|x| x.to_str().unwrap_or("UNPRINTABLE PATH").to_string()),
-    ) {
-        error!("Cannot parse observatories at: {universe}, or universe at: {observatories}");
-        return Err(Box::new(ReadError {
-            file_path: format!("universe: {universe}, observatories: {observatories}"),
-        }));
-    } else {
-        error!("Cannot parse program at: {program}");
-        return Err(Box::new(ReadError {
-            file_path: program.to_string(),
-        }));
+            for o in observatories {
+                program_builder
+                    .add_observatory(astrograph::body::observatory::to_observatory(o, &root));
+            }
+
+            program_builder.root_body(root).build().unwrap()
+        }
+        // HACK: is there an easier way to return errors if one or more of these fields failed
+        // while reading or parsing? like a "?" operator that could work over a vec?
+        (Some(Err(e)), Some(Ok(_))) => {
+            error!(
+                "Error with universe at {}",
+                universe.map_or("NONE".into(), |p| p.to_string_lossy())
+            );
+            return Err(e);
+        }
+        (Some(Ok(_)), Some(Err(e))) => {
+            error!(
+                "Error with observatories at {}",
+                observatories.map_or("NONE".into(), |p| p.to_string_lossy())
+            );
+            return Err(e);
+        }
+        (Some(Err(universe_error)), Some(Err(observatoies_error))) => {
+            error!(
+                "Errors with universe at {} and observatories at {}",
+                universe.map_or("NONE".into(), |p| p.to_string_lossy()),
+                observatories.map_or("NONE".into(), |p| p.to_string_lossy())
+            );
+            return Err(err::Error::Multiple(vec![
+                universe_error,
+                observatoies_error,
+            ]));
+        }
+        (_, None) | (None, _) => {
+            let mut program = program_contents?;
+            trace!("Reading from program file");
+            program.add_output(Box::new(Svg::new(StatelessOrthographic())));
+            program.set_output_path(output);
+            program
+        }
     };
 
     trace!("Making observations");
@@ -233,21 +251,4 @@ fn simulate(
     );
     trace!("Finished Observations");
     Ok(())
-}
-
-#[derive(Clone, Debug)]
-struct ReadError {
-    file_path: String,
-}
-
-impl Display for ReadError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Unable to parse file(s) {}", self.file_path)
-    }
-}
-
-impl Error for ReadError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
 }
