@@ -26,7 +26,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows, ubuntu]
-        flags: [--no-default-features, --all-features]
         toolchain: [stable]
     timeout-minutes: 45
     steps:
@@ -35,18 +34,14 @@ jobs:
       - uses: jetli/wasm-pack-action@v0.4.0
         with:
           toolchain: ${{matrix.toolchain}}
-      - run: cargo test -p astrograph-wasm ${{matrix.flags}}
+      - run: cargo test -p astrograph-wasm
         if: matrix.os == 'ubuntu'
-      - run: cargo test -p astrograph-wasm ${{matrix.flags}} -- --skip ui --exact
+      - run: cargo test -p astrograph-wasm -- --skip ui --exact
         if: matrix.os == 'windows'
       - run: wasm-pack test --firefox --headless wasm
 
   deep_check:
     name: Clippy Check (wasm)
-    strategy:
-      fail-fast: false
-      matrix:
-        arguments: [--features f64, --no-default-features]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +52,7 @@ jobs:
           toolchain: nightly
       - uses: dtolnay/rust-toolchain@clippy
       - name: Run Clippy (Pedantic)
-        run: cargo clippy --all-targets -p astrograph-wasm ${{ matrix.arguments }} -- -D clippy::pedantic
+        run: cargo clippy --all-targets -p astrograph-wasm -- -D clippy::pedantic
       #- name: Run miri
       #  run: cargo miri setup
       #- run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test

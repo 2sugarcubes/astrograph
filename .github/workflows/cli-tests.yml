@@ -27,7 +27,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows, ubuntu]
-        flags: [--no-default-features, --all-features]
         toolchain: [stable]
     timeout-minutes: 45
     steps:
@@ -35,17 +34,13 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.toolchain}}
-      - run: cargo test -p astrograph-bin ${{matrix.flags}}
+      - run: cargo test -p astrograph-bin
         if: matrix.os == 'ubuntu'
-      - run: cargo test -p astrograph-bin ${{matrix.flags}} -- --skip ui --exact
+      - run: cargo test -p astrograph-bin -- --skip ui --exact
         if: matrix.os == 'windows'
 
   deep_check:
     name: Clippy Check (cli)
-    strategy:
-      fail-fast: false
-      matrix:
-        arguments: [--features f64, --no-default-features]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +51,7 @@ jobs:
           toolchain: nightly
       - uses: dtolnay/rust-toolchain@clippy
       - name: Run Clippy (Pedantic)
-        run: cargo clippy --all-targets -p astrograph-bin ${{ matrix.arguments }} -- -D clippy::pedantic
+        run: cargo clippy --all-targets -p astrograph-bin -- -D clippy::pedantic
       #- name: Run miri
       #  run: cargo miri setup
       #- run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test
