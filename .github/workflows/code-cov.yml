@@ -5,6 +5,9 @@ on:
     branches: ["master", "dev"]
   pull_request:
     branches: ["master", "dev"]
+    paths:
+      - lib/**/*.rs
+      - bin/**/*.rs
 
 env:
   CARGO_TERM_COLOR: always
