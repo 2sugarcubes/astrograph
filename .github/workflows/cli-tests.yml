@@ -1,0 +1,61 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+      - "release-candidate/**"
+  pull_request:
+    paths:
+      - bin/**
+
+permissions:
+  contents: read
+
+env:
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  targets:
+    name: Test suite
+    runs-on: ${{matrix.os}}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows, ubuntu]
+        flags: [--no-default-features, --all-features]
+        toolchain: [stable]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.toolchain}}
+      - run: cargo test -p astrograph-bin ${{matrix.flags}}
+        if: matrix.os == 'ubuntu'
+      - run: cargo test -p astrograph-bin ${{matrix.flags}} -- --skip ui --exact
+        if: matrix.os == 'windows'
+
+  deep_check:
+    name: Clippy Check
+    strategy:
+      fail-fast: false
+      matrix:
+        arguments: [--features f64, --no-default-features]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check spelling
+        uses: crate-ci/typos@v1.29.5
+      - uses: dtolnay/rust-toolchain@miri
+        with:
+          toolchain: nightly
+      - uses: dtolnay/rust-toolchain@clippy
+      - name: Run Clippy (Pedantic)
+        run: cargo clippy --all-targets -p astrograph-bin ${{ matrix.arguments }} -- -D clippy::pedantic
+      #- name: Run miri
+      #  run: cargo miri setup
+      #- run: MIRIFLAGS=-Zmiri-disable-isolation cargo miri test
+      #  env:
+      #    MIRIFLAGS: -Zmiri-strict-provenance
