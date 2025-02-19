@@ -18,7 +18,7 @@ env:
 
 jobs:
   targets:
-    name: Test suite
+    name: Test suite (wasm)
     runs-on: ${{matrix.os}}-latest
     strategy:
       fail-fast: false
@@ -40,7 +40,7 @@ jobs:
       - run: wasm-pack test --firefox --headless wasm
 
   deep_check:
-    name: Clippy Check
+    name: Clippy Check (wasm)
     strategy:
       fail-fast: false
       matrix:

@@ -18,7 +18,7 @@ env:
 
 jobs:
   targets:
-    name: Test suite
+    name: Test suite (library)
     runs-on: ${{matrix.os}}-latest
     strategy:
       fail-fast: false
@@ -38,7 +38,7 @@ jobs:
         if: matrix.os == 'windows'
 
   deep_check:
-    name: Clippy Check
+    name: Clippy Check (library)
     strategy:
       fail-fast: false
       matrix:
