@@ -17,9 +17,6 @@ pub(super) struct Arguments {
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub(super) quiet: u8,
 
-    #[arg(short, long, default_value = ".")]
-    pub(super) output: PathBuf,
-
     #[command(subcommand)]
     pub(super) sub_command: Commands,
 }
