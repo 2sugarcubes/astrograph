@@ -6,6 +6,8 @@ on:
       - dev
       - master
       - "release-candidate/**"
+    paths:
+      - wasm/**
   pull_request:
     paths:
       - wasm/**

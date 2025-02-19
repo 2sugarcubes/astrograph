@@ -6,6 +6,9 @@ on:
       - dev
       - master
       - "release-candidate/**"
+    paths:
+      - bin/**
+
   pull_request:
     paths:
       - bin/**
