@@ -29,7 +29,9 @@ If it doesn't resolve an issue please also provide a description as to
 
 > Please only refer to [evergreen issues](https://github.com/2sugarcubes/astrograph/labels/evergreen)
 > in **Related issues** because closes will trigger github to auto-close that issue
-> after a successful merge.
+> after a successful merge, for more information check out [this article](https://docs.github.com/articles/closing-issues-using-keywords).
+
+<!-- you can have as many or few (including zero) related and closing issues as you need -->
 
 - Related issue #CHANGEME
 - closes #CHANGEME
@@ -37,6 +39,8 @@ If it doesn't resolve an issue please also provide a description as to
 ## Added/updated tests
 
 > We encourage you to keep code coverage above 50%
+
+<!-- if you add an 'x' inside one of the square brackets it will appear checked in the preview tab -->
 
 - [ ] Yes
 - [ ] No, and this is why: _please replace this text with the the reason(s) why
