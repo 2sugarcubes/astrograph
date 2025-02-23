@@ -37,7 +37,7 @@ window.simulate = async function simulate() {
   const root = generate_universe();
   const observatories = [
     {
-      body_id: [0, 1],
+      bodyId: [0, 1],
       location: { r: 1.0, theta: 2.146716234, phi: 2.587676113 },
     },
   ];
@@ -56,7 +56,7 @@ window.simulate = async function simulate() {
     console.info("Loaded Solar System");
     const observatories = [
       {
-        body_id: [2],
+        bodyId: [2],
         location: { r: 1.0, theta: 2.146716234, phi: 2.587676113 },
       },
     ];
