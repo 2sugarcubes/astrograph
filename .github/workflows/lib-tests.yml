@@ -52,7 +52,7 @@ jobs:
         uses: crate-ci/typos@v1.29.5
       - uses: dtolnay/rust-toolchain@nightly
         with:
-          components: clippy, fmt
+          components: clippy, rustfmt
       - name: Run rust fmt
         run: cargo fmt -p astrograph --check
       - name: Run Clippy (Pedantic)
