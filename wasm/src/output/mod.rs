@@ -2,14 +2,13 @@ use astrograph::projection;
 
 use astrograph::{
     constellation::Line,
-    output::{svg::Svg, Output},
+    output::{svg as astro_svg, Output},
 };
 use rayon::prelude::*;
 use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Debug)]
 pub struct Web {
-    svg: Svg<projection::StatelessOrthographic>,
     // PERF: switch to a vector with an intelligent offset to speed up hashing since we know the
     // that observations will be within a set range
     observations: std::sync::Arc<std::sync::RwLock<std::collections::HashMap<i128, svg::Document>>>,
@@ -30,9 +29,12 @@ impl Output for Web {
         time: i128,
         _output_path_root: &std::path::Path,
     ) -> Result<(), std::io::Error> {
-        let observations =
-            self.svg
-                .consume_observation(&format!("{time}"), observations, constellations);
+        let observations = astro_svg::new_document(
+            &format!("{time}"),
+            observations,
+            constellations,
+            &projection::StatelessOrthographic(),
+        );
 
         if let Ok(mut hash_map) = self.observations.write() {
             hash_map.insert(time, observations);
@@ -61,7 +63,6 @@ impl Output for Web {
 impl Default for Web {
     fn default() -> Self {
         Web {
-            svg: Svg::new(projection::StatelessOrthographic()),
             observations: std::sync::Arc::new(std::sync::RwLock::new(
                 std::collections::HashMap::default(),
             )),
