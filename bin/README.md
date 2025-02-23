@@ -3,11 +3,11 @@
 [![License](https://img.shields.io/github/license/2sugarcubes/astrograph)](https://github.com/2sugarcubes/astrograph/LICENSE.txt)
 [![Code Coverage](https://codecov.io/gh/2sugarcubes/astrograph/branch/dev/graph/badge.svg?token=E27GPTMWQY)](https://codecov.io/github/2sugarcubes/astrograph)
 [![GitHub Release Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrograph/release.yml)](https://github.com/2sugarcubes/astrograph/releases)
-[![GitHub Test Workflow Status](https://img.shields.io/github/actions/workflow/status/2sugarcubes/astrograph/tests.yml?label=tests)](https://github.com/2sugarcubes/astrograph/actions/workflows/tests.yml)
+[![GitHub tests status](https://img.shields.io/github/check-runs/2sugarcubes/astrograph/dev)](https://github.com/2sugarcubes/astrograph/actions)
 ![Total commits](https://img.shields.io/github/commit-activity/t/2sugarcubes/astrograph/dev)
 [![Open Issues](https://img.shields.io/github/issues/2sugarcubes/astrograph)](https://github.com/2sugarcubes/astrograph/issues)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
-[![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-leaf--green)](https://makeapullrequest.com)
+[![First-timers-only friendly](https://img.shields.io/badge/first--timers--only-friendly-leaf--green)](https://www.firsttimersonly.com/)
 
 A binary that assists with generating star-charts for arbitrary universes
 or solar systems.
