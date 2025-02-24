@@ -28,7 +28,7 @@ jobs:
           INSERT_ISSUE_URLS: "true"
           CLOSE_ISSUES: "true"
           IDENTIFIERS: '[{ "name": "TODO", "labels": [] }, { "name": "HACK", "labels": ["bug"] }, { "name": "PERF", "labels": ["enhancement"] }, { "name": "WARN", "labels": ["bug"] }]'
-          IGNORE: "^./web/"
+          IGNORE: "^web/.*,.*md$"
           ESCAPE: false
           AUTO_P: false
         env:
@@ -39,8 +39,6 @@ jobs:
         with:
           branch: chore/add-refrences-to-todo-issues
           commit-message: "Chore(todo comments): add refreneces to related issues"
-          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
           delete-branch: true
           title: "[BOT] Add refrences to issues in todo comments"
           body: |
@@ -62,4 +60,3 @@ jobs:
             documentation
           assignees: 2sugarcubes
           reviewers: 2sugarcubes
-          draft: false
