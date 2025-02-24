@@ -137,6 +137,7 @@ pub fn to_observatory(weak_observatory: WeakObservatory, root: &Arc) -> Observat
     let mut body = root.clone();
     for child_id in &weak_observatory.body_id {
         // HACK: remove unwrap here, probably by returning an Option<Observatory>
+        // Issue URL: https://github.com/2sugarcubes/astrograph/issues/121
         let b = body.read().unwrap().children[*child_id].clone();
         body = b;
     }

@@ -95,6 +95,7 @@ impl Program {
             for output in &self.outputs {
                 // Write the observations to file, recovering on errors
                 // HACK: Should remove this match statement and return an error on writing
+                // Issue URL: https://github.com/2sugarcubes/astrograph/issues/131
                 match output.write_observations(
                     &observations,
                     &constellations,

@@ -19,6 +19,7 @@ pub fn new_document<P: Projection>(
     projector: &P,
 ) -> svg::node::element::SVG {
     // TODO: remove some magic values (like "0.005", "-0.95", etc.)
+    // Issue URL: https://github.com/2sugarcubes/astrograph/issues/130
 
     // Create lines of longitude through the circle to more easily read it.
     const NUMBER_OF_BISECTIONS: u8 = 4;
@@ -115,6 +116,7 @@ pub fn new_document<P: Projection>(
             .set("cx", projected_location.x)
             .set("cy", projected_location.y)
             // TODO: set color based on body type or name? (Will likely require user defined settings)
+            // Issue URL: https://github.com/2sugarcubes/astrograph/issues/129
             .set("fill", "#FFF")
             .set(
                 "class",

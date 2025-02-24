@@ -30,6 +30,7 @@ wasm-log = "0.3.1"
 rayon = "1.8"
 
 #TODO: add support for web workers
+#Issue URL: https://github.com/2sugarcubes/astrograph/issues/133
 
 #wasm-bindgen-rayon = "1.2"
 #[target.wasm32-unknown-unknown]

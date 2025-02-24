@@ -25,6 +25,7 @@ fn get_eclipses_on_frame(
     time: &str,
 ) -> Vec<String> {
     // TODO: Handle lunar eclipses
+    // Issue URL: https://github.com/2sugarcubes/astrograph/issues/128
     // Create an object to speed up searches similar to a hashgrid or oct-tree
     let grid = CollisionGrid::new(observations);
 

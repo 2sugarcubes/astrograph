@@ -16,17 +16,20 @@ pub struct Constellation {
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     edges: Vec<(crate::body::Arc, crate::body::Arc)>,
     // TODO: add name field and figure out how to display it.
+    // Issue URL: https://github.com/2sugarcubes/astrograph/issues/124
 }
 
 impl Constellation {
     pub fn add_edges(&self, observations: &[LocalObservation]) -> Vec<Line> {
         // PERF: is there a O(n) way to do this? currently it is O(n*m) where n is the number of
+        // Issue URL: https://github.com/2sugarcubes/astrograph/issues/123
         // edges and m is the number of observed bodies.
         // It might be quicker if we use a hashmap, or loop through observations first since they are
         // unique and edges almost certainly contains duplicates
         let result = self.edges.iter().filter_map(|(a, b)| {
             if let Some((_, loc_a)) = observations.iter().find(|(x, _)| {
                 // HACK: ptr_eq can result in false positives and false negatives
+                // Issue URL: https://github.com/2sugarcubes/astrograph/issues/122
                 // https://stackoverflow.com/a/67114787
                 // https://doc.rust-lang.org/std/sync/struct.Arc.html#method.ptr_eq
                 std::sync::Arc::ptr_eq(x, a)

@@ -247,6 +247,7 @@ impl Body {
         if let Some(parent) = self.parent.clone().and_then(|p| p.upgrade()) {
             if let Ok(parent) = parent.read() {
                 // PERF: return an iterator instead of copying all elements into a single vector
+                // Issue URL: https://github.com/2sugarcubes/astrograph/issues/120
                 results.extend(
                     parent
                         .traverse_up(time, Vector3::ORIGIN - self.dynamic.get_offset(time))
@@ -317,6 +318,7 @@ impl Body {
             // This body is the root. We need to add it manually since it can't be added by a parent
 
             // TODO: find a cleaner way of getting an arc<rwlock> if this body.
+            // Issue URL: https://github.com/2sugarcubes/astrograph/issues/119
             // results.push((Arc::new(RwLock::new(self.clone())), current_position)); (Could be
             // expensive, could leak memory, could result in desyncing between this self and the
             // new self)
@@ -600,6 +602,7 @@ mod tests {
             num_children!(venus, 0);
             num_children!(earth, 1);
             // HACK: find data for moons of MARS, JUPITER, SATURN, URANUS, and NEPTUNE.
+            // Issue URL: https://github.com/2sugarcubes/astrograph/issues/118
             num_children!(mars, 0);
             // We are just going to count the galilean moons
             num_children!(jupiter, 0);

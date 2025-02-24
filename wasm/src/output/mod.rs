@@ -10,6 +10,7 @@ use wasm_bindgen::prelude::*;
 #[derive(Clone, Debug)]
 pub struct Web {
     // PERF: switch to a vector with an intelligent offset to speed up hashing since we know the
+    // Issue URL: https://github.com/2sugarcubes/astrograph/issues/135
     // that observations will be within a set range
     observations: std::sync::Arc<std::sync::RwLock<std::collections::HashMap<i128, svg::Document>>>,
 }

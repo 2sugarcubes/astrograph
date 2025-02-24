@@ -204,6 +204,7 @@ fn simulate(
             program_builder.root_body(root).build().unwrap()
         }
         // HACK: is there an easier way to return errors if one or more of these fields failed
+        // Issue URL: https://github.com/2sugarcubes/astrograph/issues/117
         // while reading or parsing? like a "?" operator that could work over a vec?
         (Some(Err(e)), Some(Ok(_))) => {
             error!(

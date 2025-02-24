@@ -25,6 +25,7 @@ impl std::fmt::Display for Error {
             Self::Multiple(vec) => {
                 assert!(vec.len() > 1);
                 // HACK: flatten vec so that if it did contain a nested multiple type it would not
+                // Issue URL: https://github.com/2sugarcubes/astrograph/issues/116
                 // be nested e.g. "Multiple errors: Error 1, Error 2, Multiple errors: Error 3,
                 // Error 4."
                 write!(f, "Multiple Errors: {}", vec[0])?;

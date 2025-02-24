@@ -20,6 +20,7 @@ use output::Web;
 mod output;
 
 // TODO: add support for web workers
+// Issue URL: https://github.com/2sugarcubes/astrograph/issues/134
 
 //pub use wasm_bindgen_rayon::init_thread_pool;
 

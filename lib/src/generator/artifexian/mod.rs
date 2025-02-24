@@ -87,6 +87,7 @@ impl Generator for Artifexian {
                         }
 
                         // TODO break when distance between bodies is less than 0.15
+                        // Issue URL: https://github.com/2sugarcubes/astrograph/issues/127
                         distance /= rng.gen_range(1.4..2.0);
                     }
                 } else {
@@ -95,6 +96,7 @@ impl Generator for Artifexian {
                         planets.push(Planet::new_terrestrial(rng, distance));
 
                         // TODO break when distance between bodies is less than 0.15
+                        // Issue URL: https://github.com/2sugarcubes/astrograph/issues/126
                         distance /= rng.gen_range(1.4..2.0);
                     }
                 }
@@ -161,6 +163,7 @@ mod test {
     #[test]
     fn flame_test() {
         //TODO there seems to be a problem with distributions when inc contains more than 7
+        //Issue URL: https://github.com/2sugarcubes/astrograph/issues/125
         //consecuive zeros
         const INC: u64 = 0x0101_0101_0101_0101;
 

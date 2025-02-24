@@ -78,6 +78,7 @@ impl Projection for Orthographic {
 }
 
 // TODO: make macro for this (will speed up implementing projections)
+// Issue URL: https://github.com/2sugarcubes/astrograph/issues/132
 #[cfg(test)]
 mod test {
     mod stateless {
