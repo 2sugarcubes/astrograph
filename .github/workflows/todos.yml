@@ -27,7 +27,7 @@ jobs:
         with:
           INSERT_ISSUE_URLS: "true"
           CLOSE_ISSUES: "true"
-          IDENTIFIERS: '[{ "name": "TODO", "labels": [] }, { "name": "HACK", "labels": ["bug"] }, { "name": "PERF", "labels": ["enhancement"] }, { "name": "WARN", "labels": ["bug"] }]'
+          IDENTIFIERS: '[{ "name": "TODO", "labels": ["todo comment"] }, { "name": "HACK", "labels": ["todo comment", "bug"] }, { "name": "PERF", "labels": ["todo comment", "enhancement"] }, { "name": "WARN", "labels": ["todo comment", "bug"] }]'
           IGNORE: "^web/.*,.*md$"
           ESCAPE: false
           AUTO_P: false
