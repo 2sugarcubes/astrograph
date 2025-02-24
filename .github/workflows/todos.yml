@@ -1,0 +1,53 @@
+name: "Convert TODOs to Issues"
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      MANUAL_COMMIT_REF:
+        description: "The SHA of the commit to get the diff for"
+        required: true
+      MANUAL_BASE_REF:
+        description: "By default, the commit entered above is compared to the one directly before it; to go back further, enter an earlier SHA here"
+        required: false
+
+jobs:
+  read-todos:
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: "actions/checkout@v4"
+      - name: "TODO to Issue"
+        uses: "alstr/todo-to-issue-action@v5"
+        with:
+          INSERT_ISSUE_URLS: "true"
+          IDENTIFIERS:
+            [
+              { "name": "TODO", "labels": [] },
+              { "name": "HACK", "labels": ["bug"] },
+              { "name": "PERF", "labels": ["enhancement"] },
+              { "name": "WARN", "labels": ["bug"] },
+            ]
+          IGNORE: "web/"
+          ESCAPE: false
+          AUTO_P: false
+      - name: Set Git user
+        uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          name: "GitHub Action[bot]"
+          email: "github-actions[bot]@users.noreply.github.com"
+      - name: Commit and Push Changes
+        run: |
+          git add -A
+          if [[ `git status --porcelain` ]]; then
+            git commit -m "chore: Automatically added GitHub issue links to TODOs"
+            git push origin ${{ github.ref_name }}
+          else
+            echo "No changes to commit"
+          fi
