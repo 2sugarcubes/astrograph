@@ -27,13 +27,12 @@ jobs:
         with:
           INSERT_ISSUE_URLS: "true"
           IDENTIFIERS:
-            [
-              { "name": "TODO", "labels": [] },
-              { "name": "HACK", "labels": ["bug"] },
-              { "name": "PERF", "labels": ["enhancement"] },
-              { "name": "WARN", "labels": ["bug"] },
-            ]
-          IGNORE: "web/"
+            - { "name": "TODO", "labels": [] }
+            - { "name": "HACK", "labels": ["bug"] }
+            - { "name": "PERF", "labels": ["enhancement"] }
+            - { "name": "WARN", "labels": ["bug"] }
+
+          IGNORE: "^./web/"
           ESCAPE: false
           AUTO_P: false
       - name: Set Git user
