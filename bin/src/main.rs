@@ -23,7 +23,8 @@ fn main() {
     human_panic::setup_panic!();
 
     if let Err(e) = try_main() {
-        log::error!("Error: {e}");
+        // Call flatten here to remove any nested "multiple" type errors
+        log::error!("Error: {}", e.flatten());
         process::exit(1);
     }
 }
