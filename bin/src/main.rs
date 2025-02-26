@@ -203,8 +203,7 @@ fn simulate(
 
             program_builder.root_body(root).build().unwrap()
         }
-        // HACK: is there an easier way to return errors if one or more of these fields failed
-        // while reading or parsing? like a "?" operator that could work over a vec?
+        // Error parsing universe
         (Some(Err(e)), Some(Ok(_))) => {
             error!(
                 "Error with universe at {}",
@@ -212,6 +211,7 @@ fn simulate(
             );
             return Err(e);
         }
+        // Error parsing observatories
         (Some(Ok(_)), Some(Err(e))) => {
             error!(
                 "Error with observatories at {}",
@@ -219,6 +219,7 @@ fn simulate(
             );
             return Err(e);
         }
+        // Errors parsing universe and observatories
         (Some(Err(universe_error)), Some(Err(observatoies_error))) => {
             error!(
                 "Errors with universe at {} and observatories at {}",
@@ -230,6 +231,7 @@ fn simulate(
                 observatoies_error,
             ]));
         }
+        // If either observatories or universe was not provided
         (_, None) | (None, _) => {
             let mut program = program_contents?;
             trace!("Reading from program file");
