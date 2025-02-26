@@ -114,7 +114,6 @@ pub fn new_document<P: Projection>(
             )
             .set("cx", projected_location.x)
             .set("cy", projected_location.y)
-            // TODO: set color based on body type or name? (Will likely require user defined settings)
             .set("fill", "#FFF")
             .set(
                 "class",
