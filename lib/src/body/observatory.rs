@@ -54,18 +54,14 @@ impl Observatory {
             // space
             raw_observations
                 .iter()
-                .filter_map(|(body, pos)| {
+                .map(|(body, pos)| {
                     let local_coordinates =
                         Vector3::from(quaternion::rotate_vector(self.location, (*pos).into()));
                     // FIXME: adjust z based on the body's radius since we aren't observing from the
                     // center of the body
 
                     // Filter out bodies below the horizon
-                    if local_coordinates.z >= 0.0 {
-                        Some((body.clone(), local_coordinates.into()))
-                    } else {
-                        None
-                    }
+                    (body.clone(), local_coordinates.into())
                 })
                 .collect()
         } else {
