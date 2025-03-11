@@ -213,15 +213,15 @@ mod tests {
         program.add_output(Box::new(Svg::new(projection::StatelessOrthographic())));
 
         // Set output path to an invalid path on windows AND linux
-        let mut path = PathBuf::new();
+        let mut path = String::new();
         if cfg!(windows) {
-            path.push("I:\\\\//");
+            path.push_str("I:\\\\//");
         } else {
-            path.push("/test\0");
+            path.push_str("/test/");
         }
 
-        path.push("\0");
-        path.push(">.<");
+        path.push('\0');
+        path.push_str(">.<");
 
         println!("{path:?}");
         program.set_output_path(path);
