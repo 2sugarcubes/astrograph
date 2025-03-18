@@ -21,7 +21,10 @@ fn main() -> std::io::Result<()> {
     // Generate completions
     for &shell in clap_complete::Shell::value_variants() {
         let path = clap_complete::generate_to(shell, &mut cmd, "astrograph", &out_dir)?;
-        println!("cargo::warning=Completion file for {shell: <10} has been generated at: {path:?}");
+        println!(
+            "cargo::warning=Completion file for {shell: <10} has been generated at: {}",
+            path.display()
+        );
     }
 
     Ok(())
